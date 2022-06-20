@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BookNook</string>
+    <string name="google_books_api_key">AIzaSyCIH6JcoToLAbhhOizI9JEngHhgx8X6Bso</string>
 </resources>
