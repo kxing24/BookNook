@@ -13,6 +13,8 @@ public class Book {
     private String author;
     private String title;
     private String description;
+    private String thumbnailUrl;
+    private String coverUrl;
 
     public String getId() {
         return id;
@@ -28,12 +30,13 @@ public class Book {
 
     public String getDescription() { return description; }
 
-    /*
-    // Get book cover from covers API
-    public String getCoverUrl() {
-        return "https://covers.openlibrary.org/b/olid/" + openLibraryId + "-L.jpg?default=false";
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
-     */
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
 
     // Returns a Book given the expected JSON
     public static Book fromJson(JSONObject jsonObject) {
@@ -44,6 +47,8 @@ public class Book {
             book.title = jsonObject.getJSONObject("volumeInfo").getString("title");
             book.author = getAuthor(jsonObject);
             book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
+            book.thumbnailUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+            book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("medium");
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
