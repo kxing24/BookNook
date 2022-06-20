@@ -56,10 +56,6 @@ public class BookSearchActivity extends AppCompatActivity {
             public void onItemClick(View itemView, int position) {
                 // get the book clicked and launch the book detail activity
                 // TODO: bookdetailactivity
-                Toast.makeText(
-                        BookSearchActivity.this,
-                        "An item at position " + position + " clicked!",
-                        Toast.LENGTH_SHORT).show();
 
                 Book book = abooks.get(position);
 
