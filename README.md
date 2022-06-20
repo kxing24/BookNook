@@ -88,7 +88,7 @@ An app that helps you explore different books, find your next read, and interact
     * Post details?
 
 ## Wireframes
-<img src="https://github.com/kxing24/BookNook/raw/main/wireframes.png" width=600>
+<img src="https://github.com/kxing24/BookNook/raw/master/wireframes.png" width=600>
 
 ## Schema
 [This section will be completed in Unit 9]
