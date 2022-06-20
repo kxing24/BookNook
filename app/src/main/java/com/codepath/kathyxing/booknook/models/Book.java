@@ -5,9 +5,11 @@ import android.text.TextUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
 
+@Parcel
 public class Book {
     private String id;
     private String author;
@@ -15,6 +17,9 @@ public class Book {
     private String description;
     private String thumbnailUrl;
     private String coverUrl;
+
+    // empty constructor for parcel
+    public Book() {}
 
     public String getId() {
         return id;
@@ -46,7 +51,7 @@ public class Book {
             book.id = jsonObject.getString("id");
             book.title = jsonObject.getJSONObject("volumeInfo").getString("title");
             book.author = getAuthor(jsonObject);
-            //book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
+            book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
             book.thumbnailUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
             book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
             //TODO: set the coverUrl to something higher-quality if it exists

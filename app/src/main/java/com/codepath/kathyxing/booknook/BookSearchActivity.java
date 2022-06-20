@@ -22,6 +22,7 @@ import com.codepath.kathyxing.booknook.net.BookClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -55,16 +56,12 @@ public class BookSearchActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View itemView, int position) {
                 // get the book clicked and launch the book detail activity
-                // TODO: bookdetailactivity
 
                 Book book = abooks.get(position);
 
-                /*
                 Intent selectedItemIntent = new Intent(getBaseContext(), BookDetailActivity.class);
                 selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
                 startActivity(selectedItemIntent);
-
-                 */
             }
         });
 
