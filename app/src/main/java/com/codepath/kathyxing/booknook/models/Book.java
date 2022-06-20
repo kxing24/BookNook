@@ -46,9 +46,11 @@ public class Book {
             book.id = jsonObject.getString("id");
             book.title = jsonObject.getJSONObject("volumeInfo").getString("title");
             book.author = getAuthor(jsonObject);
-            book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
+            //book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
             book.thumbnailUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
-            book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("medium");
+            book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+            //TODO: set the coverUrl to something higher-quality if it exists
+            //book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("medium");
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
