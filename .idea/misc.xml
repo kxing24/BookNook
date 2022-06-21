@@ -5,7 +5,8 @@
       <map>
         <entry key="app/src/main/res/layout/activity_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_book_search.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/activity_group.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/activity_group.xml" value="0.30569610595703123" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.22056159420289856" />
@@ -13,6 +14,8 @@
         <entry key="app/src/main/res/layout/item_post.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/menu/book_search_menu.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_book_search.xml" value="0.2796875" />
+        <entry key="app/src/main/res/menu/menu_group_feed.xml" value="0.2796875" />
+        <entry key="app/src/main/res/xml/fileprovider.xml" value="0.1" />
       </map>
     </option>
   </component>

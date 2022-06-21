@@ -15,7 +15,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:layout_toEndOf="@+id/ivProfile"
+        android:layout_toEndOf="@+id/ivProfilePicture"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         tools:text="kathy" />
 
@@ -26,11 +26,11 @@
         android:layout_below="@+id/tvUsername"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
-        android:layout_toEndOf="@+id/ivProfile"
+        android:layout_toEndOf="@+id/ivProfilePicture"
         tools:text="Created at: " />
 
     <ImageView
-        android:id="@+id/ivImage"
+        android:id="@+id/ivPostImage"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_below="@+id/tvPostDescription"
@@ -53,7 +53,7 @@
         tools:text="This is my description" />
 
     <ImageView
-        android:id="@+id/ivProfile"
+        android:id="@+id/ivProfilePicture"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentStart="true"

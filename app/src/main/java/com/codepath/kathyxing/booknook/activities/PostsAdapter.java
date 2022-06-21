@@ -51,38 +51,38 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         private TextView tvUsername;
         private TextView tvCreationTime;
-        private ImageView ivProfile;
-        private ImageView ivImage;
+        private ImageView ivProfilePicture;
+        private ImageView ivPostImage;
         private TextView tvPostDescription;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvCreationTime = itemView.findViewById(R.id.tvCreationTime);
-            ivImage = itemView.findViewById(R.id.ivImage);
+            ivPostImage = itemView.findViewById(R.id.ivPostImage);
             tvPostDescription = itemView.findViewById(R.id.tvPostDescription);
-            ivProfile = itemView.findViewById(R.id.ivProfile);
+            ivProfilePicture = itemView.findViewById(R.id.ivProfilePicture);
         }
 
         public void bind(Post post) {
             // Bind the post data to the view elements
             tvPostDescription.setText(post.getDescription());
-            tvCreationTime.setText("Created at " + post.getCreatedAt().toString());
+            //tvCreationTime.setText("Created at " + post.getCreatedAt().toString());
             tvUsername.setText(post.getUser().getUsername());
 
             // TODO: rotate the image to face the correct orientation
             // load in image with glide
             ParseFile image = post.getImage();
             if (image != null) {
-                Glide.with(context).load(image.getUrl()).into(ivImage);
+                Glide.with(context).load(image.getUrl()).into(ivPostImage);
             }
             else {
-                ivImage.setVisibility(View.GONE);
+                ivPostImage.setVisibility(View.GONE);
             }
 
             // load in profile picture with glide
             ParseFile profilePicture = post.getUser().getProfilePicture();
-            Glide.with(context).load(profilePicture.getUrl()).circleCrop().into(ivProfile);
+            Glide.with(context).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);
 
         }
     }

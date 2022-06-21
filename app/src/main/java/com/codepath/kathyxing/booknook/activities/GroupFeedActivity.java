@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.codepath.kathyxing.booknook.R;
@@ -32,6 +35,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     private Book book;
     private Group group;
     private RecyclerView rvPosts;
+    private final int ADD_POST = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,8 @@ public class GroupFeedActivity extends AppCompatActivity {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         // include data referred by user key
         query.include(Post.KEY_USER);
+        // include post creation time
+        query.include(Post.KEY_CREATED_AT);
         // get the posts in the group
         query.whereEqualTo("to", group);
         // limit query to latest 20 items
@@ -132,5 +138,44 @@ public class GroupFeedActivity extends AppCompatActivity {
         selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
         startActivity(selectedItemIntent);
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present
+        getMenuInflater().inflate(R.menu.menu_group_feed, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.compose) {
+            // Compose icon has been selected
+            // Navigate to the compose activity
+            Intent intent = new Intent(this, ComposeActivity.class);
+            intent.putExtra("group", group);
+            startActivityForResult(intent, ADD_POST);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // add the post to the top of the recyclerview
+        if (requestCode == ADD_POST && resultCode == RESULT_OK) {
+            // Get data from the intent (post)
+            Post post = (Post) data.getExtras().get("post");
+
+            // Update the RV with the tweet
+            // Modify data source of tweets
+            allPosts.add(0, post);
+
+            // Update the adapter
+            adapter.notifyItemInserted(0);
+            rvPosts.smoothScrollToPosition(0);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

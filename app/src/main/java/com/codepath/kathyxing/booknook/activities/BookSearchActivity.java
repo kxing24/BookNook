@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook;
+package com.codepath.kathyxing.booknook.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.BookAdapter;
+import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
 import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.models.Book;
@@ -133,11 +135,15 @@ public class BookSearchActivity extends AppCompatActivity {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
+        // TODO: user can search for query in author, in title, etc. (and/or)
+
         // Expand the search view and request focus
         searchItem.expandActionView();
         searchView.requestFocus();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            // TODO: results show up as user types
 
             @Override
             public boolean onQueryTextSubmit(String query) {
