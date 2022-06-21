@@ -67,7 +67,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void bind(Post post) {
             // Bind the post data to the view elements
             tvPostDescription.setText(post.getDescription());
-            //tvCreationTime.setText("Created at " + post.getCreatedAt().toString());
+            tvCreationTime.setText("Created at " + post.getCreatedAt().toString());
             tvUsername.setText(post.getUser().getUsername());
 
             // TODO: rotate the image to face the correct orientation
