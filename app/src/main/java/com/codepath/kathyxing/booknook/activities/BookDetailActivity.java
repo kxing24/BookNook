@@ -86,8 +86,8 @@ public class BookDetailActivity extends AppCompatActivity {
         // Extract book object from intent extras
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
 
-        // Check if the book group exists
-        bookGroupExists(book);
+        // Check if the book group exists and whether the user is already in the group
+        bookGroupStatus(book);
 
         // Set view text
         tvTitle.setText(book.getTitle());
@@ -120,20 +120,15 @@ public class BookDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(BookDetailActivity.this, "Going to group!", Toast.LENGTH_SHORT).show();
+                goGroupFeedActivity();
             }
         });
-    }
-
-    private void goBookSearchActivity() {
-        Intent i = new Intent(this, BookSearchActivity.class);
-        startActivity(i);
-        finish();
     }
 
     // Check if the book group exists
     // If the book group exists, check if the user is in the group
     // Set the visibility of the join group, create group, and goto group buttons based on results
-    private void bookGroupExists(Book book) {
+    private void bookGroupStatus(Book book) {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         query.whereEqualTo("bookId", book.getId());
         query.getFirstInBackground(new GetCallback<Group>() {
@@ -289,5 +284,18 @@ public class BookDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void goBookSearchActivity() {
+        Intent i = new Intent(this, BookSearchActivity.class);
+        startActivity(i);
+        finish();
+    }
+
+    private void goGroupFeedActivity() {
+        Intent i = new Intent(this, GroupFeedActivity.class);
+        i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
+        startActivity(i);
+        finish();
     }
 }
