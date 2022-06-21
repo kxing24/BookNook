@@ -3,6 +3,9 @@ package com.codepath.kathyxing.booknook;
 import android.app.Application;
 
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.parse_classes.Group;
+import com.codepath.kathyxing.booknook.parse_classes.Member;
+import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -14,7 +17,9 @@ public class ParseApplication extends Application {
         super.onCreate();
 
         // Register your parse models
-        // ParseObject.registerSubclass(Post.class);
+        ParseObject.registerSubclass(Group.class);
+        ParseObject.registerSubclass(Member.class);
+        ParseObject.registerSubclass(User.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(getString(R.string.back4app_app_id))

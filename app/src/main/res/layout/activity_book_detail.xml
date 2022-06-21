@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            tools:context=".BookDetailActivity">
+            tools:context=".activities.BookDetailActivity">
 
             <ImageView
                 android:id="@+id/ivBookCover"
@@ -64,9 +64,39 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="55dp"
                 android:layout_marginEnd="20dp"
                 tools:text="Here is my book description." />
+
+            <Button
+                android:id="@+id/btnJoinGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvAuthor"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="Join Group"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnCreateGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvAuthor"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="Create Group"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnGotoGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvAuthor"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="Go To Group"
+                android:visibility="gone" />
 
         </RelativeLayout>
 

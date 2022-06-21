@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook;
+package com.codepath.kathyxing.booknook.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.codepath.kathyxing.booknook.BookSearchActivity;
+import com.codepath.kathyxing.booknook.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;

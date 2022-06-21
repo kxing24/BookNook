@@ -13,10 +13,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
+import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 import com.parse.ParseUser;
