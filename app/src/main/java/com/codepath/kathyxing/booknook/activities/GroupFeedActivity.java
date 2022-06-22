@@ -46,7 +46,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
 
         // Set the group
-        setGroup(book);
+        setGroupAsync(book);
 
         // set up the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -111,7 +111,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         });
     }
 
-    private void setGroup(Book book) {
+    private void setGroupAsync(Book book) {
         // create a query to get the group from the book
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id

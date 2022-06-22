@@ -76,7 +76,7 @@ public class BookDetailActivity extends AppCompatActivity {
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
 
         // Check if the book group exists and whether the user is already in the group
-        bookGroupStatus(book);
+        bookGroupStatusAsync(book);
 
         // Set view text
         tvTitle.setText(book.getTitle());
@@ -100,7 +100,7 @@ public class BookDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // make the user a member of the group
-                addMember(book, (User) User.getCurrentUser());
+                addMemberAsync(book, (User) User.getCurrentUser());
             }
         });
 
@@ -117,7 +117,7 @@ public class BookDetailActivity extends AppCompatActivity {
     // Check if the book group exists
     // If the book group exists, check if the user is in the group
     // Set the visibility of the join group, create group, and goto group buttons based on results
-    private void bookGroupStatus(Book book) {
+    private void bookGroupStatusAsync(Book book) {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         query.whereEqualTo("bookId", book.getId());
         query.getFirstInBackground(new GetCallback<Group>() {
@@ -125,7 +125,7 @@ public class BookDetailActivity extends AppCompatActivity {
             public void done(Group object, ParseException e) {
                 if (e == null) {
                     // book group exists, check if the user is in the group
-                    userInGroup(book, (User) User.getCurrentUser());
+                    userInGroupAsync(book, (User) User.getCurrentUser());
                 }
                 else {
                     if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
@@ -159,13 +159,17 @@ public class BookDetailActivity extends AppCompatActivity {
                     Log.i(TAG, "Successfully created group for " + group.getBookId());
                 }
                 // make the user a member of the group
-                addMember(group, user);
+                addMemberAsync(group, user);
+
+                // edit the visibility of buttons
+                btnCreateGroup.setVisibility(View.GONE);
+                btnGoToGroup.setVisibility(View.VISIBLE);
             }
         });
     }
 
     // Add a user to a group
-    private void addMember(Group group, User user) {
+    private void addMemberAsync(Group group, User user) {
         // Create a new member
         Member member = new Member();
         member.setFrom(user);
@@ -193,7 +197,7 @@ public class BookDetailActivity extends AppCompatActivity {
     }
 
     // Add a user to a group given the book
-    private void addMember(Book book, User user) {
+    private void addMemberAsync(Book book, User user) {
         // create the query
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
@@ -210,7 +214,7 @@ public class BookDetailActivity extends AppCompatActivity {
                 // group exists: get the group and create a member with the group and user
                 else {
                     Group group = objects.get(0);
-                    addMember(group, user);
+                    addMemberAsync(group, user);
                 }
             }
         });
@@ -218,7 +222,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
     // checks if a user is in a group given the corresponding book
     // set the goto group and join group buttons accordingly
-    private void userInGroup(Book book, User user) {
+    private void userInGroupAsync(Book book, User user) {
         // create a query to get the group from the book
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
@@ -235,7 +239,7 @@ public class BookDetailActivity extends AppCompatActivity {
                 // group exists: get the group and check if user is in group
                 else {
                     Group group = objects.get(0);
-                    userInGroup(group, user);
+                    userInGroupAsync(group, user);
                 }
             }
         });
@@ -243,7 +247,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
     // checks if a user is in a group
     // set the goto group and join group buttons accordingly
-    private void userInGroup(Group group, User user) {
+    private void userInGroupAsync(Group group, User user) {
         // create the query
         ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
         // get results with the user

@@ -32,14 +32,19 @@ import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ComposeActivity extends AppCompatActivity {
+    // TODO: add a button to remove the image
 
     public static final String TAG = "ComposeActivity";
 
     public final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public final static int PICK_PHOTO_CODE = 1046;
     private EditText etDescription;
     private Button btnCaptureImage;
     private Button btnGetImageFromGallery;
@@ -67,6 +72,7 @@ public class ComposeActivity extends AppCompatActivity {
         pbLoading = findViewById(R.id.pbLoading);
 
         // click handler for CaptureImage button
+        // launch the camera so that the user can take a picture
         btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,10 +81,11 @@ public class ComposeActivity extends AppCompatActivity {
         });
 
         // click handler for GetImageFromGallery button
+        // go to the gallery so that the user can choose an image
         btnGetImageFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                onPickPhoto();
             }
         });
 
@@ -121,29 +128,49 @@ public class ComposeActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == this.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
                 // by this point we have the camera photo on disk
-                //Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                Bitmap takenImage = rotateBitmapOrientation(photoFile.getPath());
+                Bitmap takenImage = rotateBitmapOrientationCamera(photoFile.getPath());
                 // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
                 ivPostImage.setImageBitmap(takenImage);
                 ivPostImage.setVisibility(View.VISIBLE);
-            } else { // Result was a failure
-                Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
+            if (requestCode == PICK_PHOTO_CODE) {
+                Uri photoUri = data.getData();
+
+                // Load the image located at photoUri into selectedImage with the correct orientation
+                Bitmap selectedImage = null;
+                try {
+                    selectedImage = rotateBitmapOrientationGallery(photoUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Load the taken image into a preview
+                ivPostImage.setImageBitmap(selectedImage);
+                ivPostImage.setVisibility(View.VISIBLE);
+
+            }
+        }
+        else {
+            Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();
         }
     }
 
+    // save a post to parse
     private void savePost(String description, ParseUser currentUser, File photoFile) {
         pbLoading.setVisibility(View.VISIBLE);
 
+        // create a new post
         Post post = new Post();
+        // set the post's parameters
         post.setDescription(description);
         post.setImage(new ParseFile(photoFile));
         post.setUser((User) currentUser);
         post.setGroup(group);
+        // save the parameter to parse
         post.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -154,9 +181,11 @@ public class ComposeActivity extends AppCompatActivity {
                 else {
                     Log.i(TAG, "Post save was successful!");
                 }
+                // set the activity's views
                 etDescription.setText("");
                 ivPostImage.setImageResource(0);
                 pbLoading.setVisibility(View.INVISIBLE);
+                // put post metadata into the intent
                 Intent intent = new Intent();
                 intent.putExtra("post", post);
                 // set result code and bundle data for response
@@ -164,6 +193,29 @@ public class ComposeActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    // Trigger gallery selection for a photo
+    private void onPickPhoto() {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // Create a File reference for future access
+        photoFile = getPhotoFileUri(photoFileName);
+
+        // wrap File object into a content provider
+        // required for API >= 24
+        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
+        Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider", photoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
     }
 
     // Returns the File for a photo stored on disk given the fileName
@@ -182,7 +234,8 @@ public class ComposeActivity extends AppCompatActivity {
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
-    public Bitmap rotateBitmapOrientation(String photoFilePath) {
+    // rotate the image to the correct orientation using the EXIF data stored in the image
+    public Bitmap rotateBitmapOrientationCamera(String photoFilePath) {
         // Create and configure BitmapFactory
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
@@ -198,6 +251,32 @@ public class ComposeActivity extends AppCompatActivity {
         }
         String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
         int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+        int rotationAngle = 0;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+        // Rotate Bitmap
+        Matrix matrix = new Matrix();
+        matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
+        // Return result
+        return rotatedBitmap;
+    }
+
+    public Bitmap rotateBitmapOrientationGallery(Uri photoUri) throws IOException {
+        InputStream input = this.getContentResolver().openInputStream(photoUri);
+        // Create and configure BitmapFactory
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(input, null, bounds);
+        Bitmap bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
+        // Read EXIF Data
+        InputStream inputStream = this.getContentResolver().openInputStream(photoUri);
+        ExifInterface exif = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            exif = new ExifInterface(inputStream);
+        }
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         int rotationAngle = 0;
         if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
         if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
