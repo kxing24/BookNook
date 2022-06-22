@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.codepath.kathyxing.booknook.ImageSelectionUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
@@ -109,7 +110,7 @@ public class ComposeActivity extends AppCompatActivity {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Create a File reference for future access
-        photoFile = getPhotoFileUri(photoFileName);
+        photoFile = ImageSelectionUtilities.getPhotoFileUri(photoFileName, this, TAG);
 
         // wrap File object into a content provider
         // required for API >= 24
@@ -125,37 +126,26 @@ public class ComposeActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-                // by this point we have the camera photo on disk
-                Bitmap takenImage = rotateBitmapOrientationCamera(photoFile.getPath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
-                ivPostImage.setImageBitmap(takenImage);
-                ivPostImage.setVisibility(View.VISIBLE);
-            }
-            if (requestCode == PICK_PHOTO_CODE) {
-                Uri photoUri = data.getData();
+    // Trigger gallery selection for a photo
+    private void onPickPhoto() {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-                // Load the image located at photoUri into selectedImage with the correct orientation
-                Bitmap selectedImage = null;
-                try {
-                    selectedImage = rotateBitmapOrientationGallery(photoUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        // Create a File reference for future access
+        photoFile = ImageSelectionUtilities.getPhotoFileUri(photoFileName, this, TAG);
 
-                // Load the taken image into a preview
-                ivPostImage.setImageBitmap(selectedImage);
-                ivPostImage.setVisibility(View.VISIBLE);
+        // wrap File object into a content provider
+        // required for API >= 24
+        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
+        Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider", photoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
-            }
-        }
-        else {
-            Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
         }
     }
 
@@ -195,98 +185,38 @@ public class ComposeActivity extends AppCompatActivity {
         });
     }
 
-    // Trigger gallery selection for a photo
-    private void onPickPhoto() {
-        // Create intent for picking a photo from the gallery
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+                // by this point we have the camera photo on disk
+                Bitmap takenImage = ImageSelectionUtilities.rotateBitmapOrientationCamera(photoFile.getPath());
+                // RESIZE BITMAP, see section below
+                // Load the taken image into a preview
+                ivPostImage.setImageBitmap(takenImage);
+                ivPostImage.setVisibility(View.VISIBLE);
+            }
+            if (requestCode == PICK_PHOTO_CODE) {
+                Uri photoUri = data.getData();
 
-        // Create a File reference for future access
-        photoFile = getPhotoFileUri(photoFileName);
+                // Load the image located at photoUri into selectedImage with the correct orientation
+                Bitmap selectedImage = null;
+                try {
+                    selectedImage = ImageSelectionUtilities.rotateBitmapOrientationGallery(photoUri, this.getContentResolver());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-        // wrap File object into a content provider
-        // required for API >= 24
-        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
-        Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+                // Load the taken image into a preview
+                ivPostImage.setImageBitmap(selectedImage);
+                ivPostImage.setVisibility(View.VISIBLE);
 
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            // Bring up gallery to select a photo
-            startActivityForResult(intent, PICK_PHOTO_CODE);
+            }
         }
-    }
-
-    // Returns the File for a photo stored on disk given the fileName
-    public File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(TAG, "failed to create directory");
+        else {
+            Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();
         }
-
-        // Return the file target for the photo based on filename
-        return new File(mediaStorageDir.getPath() + File.separator + fileName);
-    }
-
-    // rotate the image to the correct orientation using the EXIF data stored in the image
-    public Bitmap rotateBitmapOrientationCamera(String photoFilePath) {
-        // Create and configure BitmapFactory
-        BitmapFactory.Options bounds = new BitmapFactory.Options();
-        bounds.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(photoFilePath, bounds);
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        Bitmap bm = BitmapFactory.decodeFile(photoFilePath, opts);
-        // Read EXIF Data
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(photoFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-        int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
-        int rotationAngle = 0;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
-        // Rotate Bitmap
-        Matrix matrix = new Matrix();
-        matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
-        // Return result
-        return rotatedBitmap;
-    }
-
-    public Bitmap rotateBitmapOrientationGallery(Uri photoUri) throws IOException {
-        InputStream input = this.getContentResolver().openInputStream(photoUri);
-        // Create and configure BitmapFactory
-        BitmapFactory.Options bounds = new BitmapFactory.Options();
-        bounds.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(input, null, bounds);
-        Bitmap bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
-        // Read EXIF Data
-        InputStream inputStream = this.getContentResolver().openInputStream(photoUri);
-        ExifInterface exif = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            exif = new ExifInterface(inputStream);
-        }
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int rotationAngle = 0;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
-        // Rotate Bitmap
-        Matrix matrix = new Matrix();
-        matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
-        // Return result
-        return rotatedBitmap;
     }
 
 }
