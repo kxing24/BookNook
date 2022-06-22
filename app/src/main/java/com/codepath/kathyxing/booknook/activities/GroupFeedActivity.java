@@ -20,7 +20,6 @@ import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
@@ -40,7 +39,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group);
+        setContentView(R.layout.activity_group_feed);
 
         // Extract book object from intent extras
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
@@ -60,7 +59,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goBookDetailActivity();
+                finish();
             }
         });
 
@@ -131,13 +130,6 @@ public class GroupFeedActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void goBookDetailActivity() {
-        Intent selectedItemIntent = new Intent(getBaseContext(), BookDetailActivity.class);
-        selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
-        startActivity(selectedItemIntent);
-        finish();
     }
 
     @Override

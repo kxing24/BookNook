@@ -50,7 +50,7 @@ public class BookDetailActivity extends AppCompatActivity {
         // set up the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        getSupportActionBar().setTitle("Book Details");
 
         // have the toolbar show a back button
         setSupportActionBar(toolbar);
@@ -59,7 +59,7 @@ public class BookDetailActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goBookSearchActivity();
+                finish();
             }
         });
 
@@ -279,16 +279,11 @@ public class BookDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void goBookSearchActivity() {
-        Intent i = new Intent(this, BookSearchActivity.class);
-        startActivity(i);
-        finish();
-    }
-
     private void goGroupFeedActivity() {
         Intent i = new Intent(this, GroupFeedActivity.class);
         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
         startActivity(i);
-        finish();
     }
+
+
 }

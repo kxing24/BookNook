@@ -1,24 +1,29 @@
-package com.codepath.kathyxing.booknook.activities;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+package com.codepath.kathyxing.booknook.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.BookAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
-import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 import com.parse.ParseUser;
@@ -31,28 +36,41 @@ import java.util.ArrayList;
 
 import okhttp3.Headers;
 
-public class BookSearchActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class BookSearchFragment extends Fragment {
 
-    public static final String TAG = "BookSearchActivity";
-
+    // the fragment initialization parameters
+    public static final String TAG = "BookSearchFragment";
     private RecyclerView rvBooks;
     private BookAdapter bookAdapter;
     private BookClient client;
     private ArrayList<Book> abooks;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_search);
+    // Required empty public constructor
+    public BookSearchFragment() {}
 
-        // set up the toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    @Override
+    // The onCreateView method is called when Fragment should create its View object hierarchy,
+    // either dynamically or via XML layout inflation.
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_book_search, container, false);
+    }
+
+    // This event is triggered soon after onCreateView().
+    // onViewCreated() is only called if the view returned from onCreateView() is non-null.
+    // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         // initialize fields
-        rvBooks = findViewById(R.id.rvBooks);
+        rvBooks = view.findViewById(R.id.rvBooks);
         abooks = new ArrayList<>();
-        bookAdapter = new BookAdapter(this, abooks);
+        bookAdapter = new BookAdapter(getContext(), abooks);
 
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
@@ -62,7 +80,7 @@ public class BookSearchActivity extends AppCompatActivity {
 
                 Book book = abooks.get(position);
 
-                Intent selectedItemIntent = new Intent(getBaseContext(), BookDetailActivity.class);
+                Intent selectedItemIntent = new Intent(getActivity().getBaseContext(), BookDetailActivity.class);
                 selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
                 startActivity(selectedItemIntent);
             }
@@ -72,7 +90,8 @@ public class BookSearchActivity extends AppCompatActivity {
         rvBooks.setAdapter(bookAdapter);
 
         // Set layout manager to position the items
-        rvBooks.setLayoutManager(new LinearLayoutManager(this));
+        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
+
     }
 
     // Executes an API call to the Google Books search endpoint, parses the results
@@ -115,22 +134,16 @@ public class BookSearchActivity extends AppCompatActivity {
         });
     }
 
-    private void logoutUser() {
-        Log.i(TAG, "Logging out");
-        ParseUser.logOutInBackground();
-        goLoginActivity();
-    }
-
-    private void goLoginActivity() {
-        Intent i = new Intent(this, LoginActivity.class);
-        startActivity(i);
-        finish();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_book_search, menu);
+        inflater.inflate(R.menu.menu_book_search, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -141,6 +154,7 @@ public class BookSearchActivity extends AppCompatActivity {
         searchItem.expandActionView();
         searchView.requestFocus();
 
+        // Set the textlistener for the searchview
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             // TODO: results show up as user types
@@ -161,25 +175,6 @@ public class BookSearchActivity extends AppCompatActivity {
             }
         });
 
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        switch (id) {
-            case R.id.action_settings:
-                return true;
-            case R.id.action_logout:
-                logoutUser();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        super.onCreateOptionsMenu(menu,inflater);
     }
 }

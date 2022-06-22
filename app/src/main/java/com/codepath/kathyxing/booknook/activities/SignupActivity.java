@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.codepath.kathyxing.booknook.MainActivity;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.ParseException;
@@ -89,7 +90,7 @@ public class SignupActivity extends AppCompatActivity {
                 if (e == null) {
                     // Hooray! Let them use the app now.
                     Toast.makeText(SignupActivity.this, "You have signed up for an account!", Toast.LENGTH_SHORT).show();
-                    goBookSearchActivity();
+                    goMainActivity();
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong
@@ -105,8 +106,8 @@ public class SignupActivity extends AppCompatActivity {
         finish();
     }
 
-    private void goBookSearchActivity() {
-        Intent i = new Intent(this, BookSearchActivity.class);
+    private void goMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
     }

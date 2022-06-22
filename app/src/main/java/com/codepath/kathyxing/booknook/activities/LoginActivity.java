@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.codepath.kathyxing.booknook.MainActivity;
 import com.codepath.kathyxing.booknook.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // If user is already logged in, don't show login screen
         if (ParseUser.getCurrentUser() != null) {
-            goBookSearchActivity();
+            goMainActivity();
         }
 
         // Initialize views
@@ -72,15 +73,15 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 else {
-                    goBookSearchActivity();
+                    goMainActivity();
                     Log.i(TAG, "Successfully logged in");
                 }
             }
         });
     }
 
-    private void goBookSearchActivity() {
-        Intent i = new Intent(this, BookSearchActivity.class);
+    private void goMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
         finish();
     }
