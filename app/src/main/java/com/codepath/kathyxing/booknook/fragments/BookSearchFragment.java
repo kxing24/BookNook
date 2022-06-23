@@ -19,6 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
@@ -42,10 +45,17 @@ public class BookSearchFragment extends Fragment {
 
     // the fragment parameters
     public static final String TAG = "BookSearchFragment";
+    public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
+    private ProgressBar pbLoading;
+    private Button btnPrevPage;
+    private Button btnNextPage;
+    private TextView tvPageNumber;
     private BookAdapter bookAdapter;
     private BookClient client;
     private ArrayList<Book> books;
+    private String savedQuery;
+    private int pageNumber = 0;
 
     // Required empty public constructor
     public BookSearchFragment() {}
@@ -85,8 +95,18 @@ public class BookSearchFragment extends Fragment {
 
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
+        pbLoading = view.findViewById(R.id.pbLoading);
+        tvPageNumber = view.findViewById(R.id.tvPageNumber);
+        btnPrevPage = view.findViewById(R.id.btnPrevPage);
+        btnNextPage = view.findViewById(R.id.btnNextPage);
         books = new ArrayList<>();
         bookAdapter = new BookAdapter(getContext(), books);
+
+        // Attach the adapter to the RecyclerView
+        rvBooks.setAdapter(bookAdapter);
+
+        // Set layout manager to position the items
+        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
@@ -102,11 +122,24 @@ public class BookSearchFragment extends Fragment {
             }
         });
 
-        // Attach the adapter to the RecyclerView
-        rvBooks.setAdapter(bookAdapter);
+        btnPrevPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pageNumber--;
+                // Get the new books
+                fetchNewBooks();
+            }
+        });
 
-        // Set layout manager to position the items
-        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
+        // set up a click handler for the next page button
+        btnNextPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pageNumber++;
+                // Get the new books
+                fetchNewBooks();
+            }
+        });
 
     }
 
@@ -132,9 +165,11 @@ public class BookSearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
-                fetchBooks(query);
+                fetchBooks(query, pageNumber);
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 searchView.clearFocus();
+                // save the query
+                savedQuery = query;
 
                 return true;
             }
@@ -150,9 +185,14 @@ public class BookSearchFragment extends Fragment {
 
     // Executes an API call to the Google Books search endpoint, parses the results
     // Converts them into an array of book objects and adds them to the adapter
-    private void fetchBooks(String query) {
+    private void fetchBooks(String query, int pageNumber) {
+        pbLoading.setVisibility(View.VISIBLE);
+        int startIndex = pageNumber * MAX_RESULTS;
+        Log.i(TAG, "startIndex is " + startIndex);
+
+        // initialize a book client to get API data
         client = new BookClient();
-        client.getBooks(query, new JsonHttpResponseHandler() {
+        client.getBooks(query, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON response) {
@@ -172,6 +212,15 @@ public class BookSearchFragment extends Fragment {
 
                         bookAdapter.notifyDataSetChanged();
 
+                        // Set view visibilities
+                        pbLoading.setVisibility(View.GONE);
+                        btnNextPage.setVisibility(View.VISIBLE);
+                        if(pageNumber > 0) {
+                            btnPrevPage.setVisibility(View.VISIBLE);
+                        }
+                        tvPageNumber.setText("Page " + (pageNumber + 1));
+                        tvPageNumber.setVisibility(View.VISIBLE);
+
                         Log.i(TAG, "fetch books success");
                     }
                 } catch (JSONException e) {
@@ -186,5 +235,18 @@ public class BookSearchFragment extends Fragment {
                 Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
             }
         });
+    }
+
+    private void fetchNewBooks() {
+        // Remove books from the adapter
+        bookAdapter.clear();
+        // get the new books
+        fetchBooks(savedQuery, pageNumber);
+        // smooth scroll to top
+        rvBooks.smoothScrollToPosition(0);
+        // adjust view visibility
+        tvPageNumber.setVisibility(View.GONE);
+        btnNextPage.setVisibility(View.GONE);
+        btnPrevPage.setVisibility(View.GONE);
     }
 }

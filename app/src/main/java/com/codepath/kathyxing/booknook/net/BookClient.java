@@ -1,6 +1,7 @@
 package com.codepath.kathyxing.booknook.net;
 
 import com.codepath.asynchttpclient.AsyncHttpClient;
+import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.R;
 
@@ -17,8 +18,8 @@ public class BookClient {
     }
 
     // Method for accessing the search API
-    public void getBooks(final String query, JsonHttpResponseHandler handler) {
-        String url = getApiUrl("books/v1/volumes?q=" + query);
+    public void getBooks(final String query, int startIndex, int maxResults ,JsonHttpResponseHandler handler) {
+        String url = getApiUrl("books/v1/volumes?q=" + query + "&startIndex=" + startIndex + "&maxResults=" + maxResults);
         client.get(url, handler);
     }
 

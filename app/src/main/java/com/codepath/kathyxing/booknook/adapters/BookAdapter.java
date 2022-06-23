@@ -114,4 +114,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     private Context getContext() {
         return context;
     }
+
+    // Clean all elements of the recycler
+    public void clear() {
+        books.clear();
+        notifyDataSetChanged();
+    }
 }
