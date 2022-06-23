@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.codepath.kathyxing.booknook.MainActivity;
 import com.codepath.kathyxing.booknook.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;

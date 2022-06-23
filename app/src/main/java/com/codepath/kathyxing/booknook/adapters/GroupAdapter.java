@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook;
+package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,13 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.parse.ParseException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,16 +93,16 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         // Get the data model based on position
         Group group = groups.get(position);
 
-        // Get the group's book using an API call
         BookClient client = new BookClient();
         try {
+            // Populate data into the views
+            holder.tvGroupTitle.setText(group.fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
+            // Get the group's book using an API call to set the book cover
             client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Headers headers, JSON json) {
                     book = Book.fromJson(json.jsonObject);
 
-                    // Populate data into the views
-                    holder.tvGroupTitle.setText(book.getTitle());
                     Glide.with(getContext())
                             .load(Uri.parse(book.getCoverUrl()))
                             .apply(new RequestOptions()
@@ -120,7 +118,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        // Return the completed view to render on screen
     }
 
     @Override

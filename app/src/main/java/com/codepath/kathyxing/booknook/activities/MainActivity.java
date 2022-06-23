@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook;
+package com.codepath.kathyxing.booknook.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.fragments.BookSearchFragment;
 import com.codepath.kathyxing.booknook.fragments.HomeFragment;

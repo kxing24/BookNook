@@ -43,6 +43,7 @@ public final class ImageSelectionUtilities {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             exif = new ExifInterface(inputStream);
         }
+        // get the orientation and set the rotation angle accordingly
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         int rotationAngle = 0;
         if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
@@ -77,6 +78,7 @@ public final class ImageSelectionUtilities {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // get the orientation and set the rotation angle accordingly
         String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
         int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
         int rotationAngle = 0;

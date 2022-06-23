@@ -19,15 +19,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-import com.codepath.kathyxing.booknook.BookAdapter;
+import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
-import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;

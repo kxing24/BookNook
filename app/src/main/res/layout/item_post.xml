@@ -10,7 +10,7 @@
         android:id="@+id/tvUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/tvGroupName"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
@@ -20,14 +20,14 @@
         tools:text="kathy" />
 
     <TextView
-        android:id="@+id/tvCreationTime"
-        android:layout_width="match_parent"
+        android:id="@+id/tvTimeAgo"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvUsername"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/ivProfilePicture"
-        tools:text="Created at: " />
+        tools:text="4d ago" />
 
     <ImageView
         android:id="@+id/ivPostImage"
@@ -46,7 +46,7 @@
         android:id="@+id/tvPostDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvCreationTime"
+        android:layout_below="@+id/tvTimeAgo"
         android:layout_alignParentStart="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
@@ -56,10 +56,21 @@
         android:id="@+id/ivProfilePicture"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_below="@+id/tvGroupName"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:scaleType="centerCrop"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvGroupName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:textStyle="bold"
+        tools:text="Pride and Prejudice Group" />
 </RelativeLayout>

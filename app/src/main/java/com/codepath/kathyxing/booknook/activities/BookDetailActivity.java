@@ -41,7 +41,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private Button btnGoToGroup;
 
     private Book book;
-    private Group group;
+    private Group bookGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +131,7 @@ public class BookDetailActivity extends AppCompatActivity {
                 // book group exists
                 if (e == null) {
                     // book group exists, set the group and check if the user is in the group
-                    group = object;
+                    bookGroup = object;
                     userInGroupAsync(book, (User) User.getCurrentUser());
                 }
                 else {
@@ -154,8 +154,9 @@ public class BookDetailActivity extends AppCompatActivity {
     // Creates the group and adds the first user
     private void bookGroupCreate(Book book, User user) {
         // creates the group
-        Group g = new Group();
+        Group group = new Group();
         group.setBookId(book.getId());
+        group.setGroupName(book.getTitle() + " Group");
         group.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -164,11 +165,11 @@ public class BookDetailActivity extends AppCompatActivity {
                     Toast.makeText(BookDetailActivity.this, "Error while creating group!", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Log.i(TAG, "Successfully created group for " + g.getBookId());
+                    Log.i(TAG, "Successfully created group for " + group.getBookId());
                     // set the group
-                    group = g;
+                    bookGroup = group;
                     // make the user a member of the group
-                    addMemberAsync(g, user);
+                    addMemberAsync(group, user);
                 }
             }
         });
@@ -262,7 +263,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private void goGroupFeedActivity() {
         Intent i = new Intent(this, GroupFeedActivity.class);
         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
-        i.putExtra("group", group);
+        i.putExtra("group", bookGroup);
         startActivity(i);
     }
 

@@ -1,8 +1,6 @@
-package com.codepath.kathyxing.booknook.activities;
+package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import java.util.List;
@@ -50,7 +50,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvUsername;
-        private TextView tvCreationTime;
+        private TextView tvGroupName;
+        private TextView tvTimeAgo;
         private ImageView ivProfilePicture;
         private ImageView ivPostImage;
         private TextView tvPostDescription;
@@ -58,7 +59,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUsername = itemView.findViewById(R.id.tvUsername);
-            tvCreationTime = itemView.findViewById(R.id.tvCreationTime);
+            tvGroupName = itemView.findViewById(R.id.tvGroupName);
+            tvTimeAgo = itemView.findViewById(R.id.tvTimeAgo);
             ivPostImage = itemView.findViewById(R.id.ivPostImage);
             tvPostDescription = itemView.findViewById(R.id.tvPostDescription);
             ivProfilePicture = itemView.findViewById(R.id.ivProfilePicture);
@@ -66,8 +68,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public void bind(Post post) {
             // Bind the post data to the view elements
+            try {
+                tvGroupName.setText(post.getGroup().fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             tvPostDescription.setText(post.getDescription());
-            tvCreationTime.setText("Created at " + post.getCreatedAt().toString());
+            tvTimeAgo.setText(Post.calculateTimeAgo(post.getCreatedAt()));
             tvUsername.setText(post.getUser().getUsername());
 
             // TODO: rotate the image to face the correct orientation

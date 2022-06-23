@@ -22,6 +22,7 @@ public class BookClient {
         client.get(url, handler);
     }
 
+    // Gets the book from the API given the book id
     public void getBook(final String bookId, JsonHttpResponseHandler handler) {
         String url = getApiUrl("books/v1/volumes/" + bookId);
         client.get(url, handler);

@@ -15,14 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.PostsAdapter;
+import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
-import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -101,6 +99,7 @@ public class HomeFragment extends Fragment {
                 }
 
                 // query the posts from the groups
+                // query the posts from each group then add them into the main query
                 List<ParseQuery<Post>> queries = new ArrayList<ParseQuery<Post>>();
                 for(Member member : memberList) {
                     Group group = member.getTo();
@@ -109,6 +108,7 @@ public class HomeFragment extends Fragment {
                     queries.add(postQuery);
                 }
                 ParseQuery<Post> mainQuery = ParseQuery.or(queries);
+                // show posts
                 mainQuery.addDescendingOrder(Post.KEY_CREATED_AT);
                 mainQuery.setLimit(20);
                 mainQuery.include(Post.KEY_USER);

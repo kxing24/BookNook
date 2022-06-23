@@ -7,19 +7,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
@@ -50,7 +49,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         // set up the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(book.getTitle() + " Group");
+        getSupportActionBar().setTitle(group.getGroupName());
 
         // have the toolbar show a back button
         setSupportActionBar(toolbar);

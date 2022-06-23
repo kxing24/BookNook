@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook;
+package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 
 import java.util.ArrayList;
