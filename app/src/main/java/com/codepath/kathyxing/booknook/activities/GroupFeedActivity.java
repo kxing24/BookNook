@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.R;
@@ -35,6 +36,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     private Book book;
     private Group group;
     private RecyclerView rvPosts;
+    private ProgressBar pbLoading;
     private final int ADD_POST = 20;
 
     @Override
@@ -62,8 +64,9 @@ public class GroupFeedActivity extends AppCompatActivity {
             }
         });
 
-        // initialize the recyclerview
+        // initialize the views
         rvPosts = findViewById(R.id.rvPosts);
+        pbLoading = findViewById(R.id.pbLoading);
 
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
@@ -106,6 +109,7 @@ public class GroupFeedActivity extends AppCompatActivity {
                 // save received posts to list and notify adapter of new data
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
+                pbLoading.setVisibility(View.GONE);
             }
         });
     }

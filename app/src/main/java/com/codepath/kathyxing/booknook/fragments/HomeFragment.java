@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
@@ -37,6 +38,7 @@ public class HomeFragment extends Fragment {
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
     private RecyclerView rvPosts;
+    private ProgressBar pbLoading;
 
     // Required empty public constructor
     public HomeFragment() {}
@@ -63,8 +65,9 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // initialize the recyclerview
+        // initialize views
         rvPosts = view.findViewById(R.id.rvPosts);
+        pbLoading = view.findViewById(R.id.pbLoading);
 
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
@@ -82,8 +85,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void queryPosts() {
-        // TODO: post displays group
-
         // first query the groups that the user is in
         ParseQuery<Member> memberQuery = ParseQuery.getQuery(Member.class);
         // get data where the "from" (user) parameter matches the current user
@@ -119,6 +120,7 @@ public class HomeFragment extends Fragment {
                         // save received posts to list and notify adapter of new data
                         allPosts.addAll(objects);
                         adapter.notifyDataSetChanged();
+                        pbLoading.setVisibility(View.GONE);
                     }
                 });
             }

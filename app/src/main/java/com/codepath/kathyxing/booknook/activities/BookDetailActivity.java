@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private Button btnJoinGroup;
     private Button btnCreateGroup;
     private Button btnGoToGroup;
+    private ProgressBar pbLoading;
 
     private Book book;
     private Group bookGroup;
@@ -72,6 +74,7 @@ public class BookDetailActivity extends AppCompatActivity {
         btnJoinGroup = (Button) findViewById(R.id.btnJoinGroup);
         btnCreateGroup = (Button) findViewById(R.id.btnCreateGroup);
         btnGoToGroup = (Button) findViewById(R.id.btnGotoGroup);
+        pbLoading = (ProgressBar) findViewById(R.id.pbLoading);
 
         // Extract book object from intent extras
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
@@ -140,6 +143,7 @@ public class BookDetailActivity extends AppCompatActivity {
                     {
                         // set the create group button to visible
                         btnCreateGroup.setVisibility(View.VISIBLE);
+                        pbLoading.setVisibility(View.GONE);
                     }
                     // unknown error, debug
                     else
@@ -242,6 +246,7 @@ public class BookDetailActivity extends AppCompatActivity {
                     // user is in the group
                     // set the go to group button to be visible
                     btnGoToGroup.setVisibility(View.VISIBLE);
+                    pbLoading.setVisibility(View.GONE);
                 }
                 else {
                     if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
@@ -249,6 +254,7 @@ public class BookDetailActivity extends AppCompatActivity {
                         // user is not in the group
                         // set the join group button to be visible
                         btnJoinGroup.setVisibility(View.VISIBLE);
+                        pbLoading.setVisibility(View.GONE);
                     }
                     else
                     {

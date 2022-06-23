@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -46,6 +47,7 @@ public class MyGroupsFragment extends Fragment {
     private RecyclerView rvMyGroups;
     private GroupAdapter groupAdapter;
     private ArrayList<Group> myGroups;
+    private ProgressBar pbLoading;
 
     // Required empty public constructor
     public MyGroupsFragment() {}
@@ -76,6 +78,8 @@ public class MyGroupsFragment extends Fragment {
         rvMyGroups = view.findViewById(R.id.rvMyGroups);
         myGroups = new ArrayList<>();
         groupAdapter = new GroupAdapter(getContext(), myGroups);
+
+        pbLoading = view.findViewById(R.id.pbLoading);
 
         // set up a click handler for bookAdapter
         groupAdapter.setOnItemClickListener(new GroupAdapter.OnItemClickListener() {
@@ -146,6 +150,7 @@ public class MyGroupsFragment extends Fragment {
                     myGroups.add(member.getTo());
                 }
                 groupAdapter.notifyDataSetChanged();
+                pbLoading.setVisibility(View.GONE);
             }
         });
     }
