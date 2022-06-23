@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,6 +65,17 @@ public class MyGroupsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle(getString(R.string.my_groups));
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -123,7 +135,7 @@ public class MyGroupsFragment extends Fragment {
         // specify what type of data we want to query - Groups.class
         ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
         // get data where the "from" (user) parameter matches the current user
-        query.whereEqualTo("from", ParseUser.getCurrentUser());
+        query.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
         // limit query to latest 20 items
         query.setLimit(20);
         // start an asynchronous call for groups

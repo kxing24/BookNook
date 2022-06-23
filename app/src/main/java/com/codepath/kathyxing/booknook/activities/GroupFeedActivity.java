@@ -63,6 +63,7 @@ public class GroupFeedActivity extends AppCompatActivity {
             }
         });
 
+        // initialize the recyclerview
         rvPosts = findViewById(R.id.rvPosts);
 
         // initialize the array that will hold posts and create a PostsAdapter

@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -64,6 +65,17 @@ public class BookSearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_book_search, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle(getString(R.string.book_search));
+        }
     }
 
     // This event is triggered soon after onCreateView().
