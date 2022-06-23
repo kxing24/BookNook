@@ -65,7 +65,7 @@ public class BookDetailActivity extends AppCompatActivity {
 
         // Initialize views
         ivBookCover = (ImageView) findViewById(R.id.ivBookCover);
-        tvTitle = (TextView) findViewById(R.id.tvTitle);
+        tvTitle = (TextView) findViewById(R.id.tvGroupTitle);
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
         tvDescription = (TextView) findViewById(R.id.tvDescription);
         btnJoinGroup = (Button) findViewById(R.id.btnJoinGroup);

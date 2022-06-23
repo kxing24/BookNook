@@ -41,15 +41,21 @@ import okhttp3.Headers;
  */
 public class BookSearchFragment extends Fragment {
 
-    // the fragment initialization parameters
+    // the fragment parameters
     public static final String TAG = "BookSearchFragment";
     private RecyclerView rvBooks;
     private BookAdapter bookAdapter;
     private BookClient client;
-    private ArrayList<Book> abooks;
+    private ArrayList<Book> books;
 
     // Required empty public constructor
     public BookSearchFragment() {}
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     // The onCreateView method is called when Fragment should create its View object hierarchy,
@@ -69,8 +75,8 @@ public class BookSearchFragment extends Fragment {
 
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
-        abooks = new ArrayList<>();
-        bookAdapter = new BookAdapter(getContext(), abooks);
+        books = new ArrayList<>();
+        bookAdapter = new BookAdapter(getContext(), books);
 
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
@@ -78,7 +84,7 @@ public class BookSearchFragment extends Fragment {
             public void onItemClick(View itemView, int position) {
                 // get the book clicked and launch the book detail activity
 
-                Book book = abooks.get(position);
+                Book book = books.get(position);
 
                 Intent selectedItemIntent = new Intent(getActivity().getBaseContext(), BookDetailActivity.class);
                 selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
@@ -92,52 +98,6 @@ public class BookSearchFragment extends Fragment {
         // Set layout manager to position the items
         rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    }
-
-    // Executes an API call to the Google Books search endpoint, parses the results
-    // Converts them into an array of book objects and adds them to the adapter
-    private void fetchBooks(String query) {
-        client = new BookClient();
-        client.getBooks(query, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON response) {
-                try {
-                    JSONArray items;
-                    if (response != null) {
-                        // Get the items json array
-                        items = response.jsonObject.getJSONArray("items");
-                        // Parse json array into array of model objects
-                        final ArrayList<Book> books = Book.fromJson(items);
-                        // Remove all books from the adapter
-                        abooks.clear();
-                        // Load model objects into the adapter
-                        for (Book book : books) {
-                            abooks.add(book); // add book through the adapter
-                        }
-
-                        bookAdapter.notifyDataSetChanged();
-
-                        Log.i(TAG, "fetch books success");
-                    }
-                } catch (JSONException e) {
-                    // Invalid JSON format, show appropriate error.
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
-                // Handle failed request here
-                Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
-            }
-        });
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -176,5 +136,45 @@ public class BookSearchFragment extends Fragment {
         });
 
         super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    // Executes an API call to the Google Books search endpoint, parses the results
+    // Converts them into an array of book objects and adds them to the adapter
+    private void fetchBooks(String query) {
+        client = new BookClient();
+        client.getBooks(query, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON response) {
+                try {
+                    JSONArray items;
+                    if (response != null) {
+                        // Get the items json array
+                        items = response.jsonObject.getJSONArray("items");
+                        // Parse json array into array of model objects
+                        final ArrayList<Book> b = Book.fromJson(items);
+                        // Remove all books from the adapter
+                        books.clear();
+                        // Load model objects into the adapter
+                        for (Book book : b) {
+                            books.add(book); // add book through the adapter
+                        }
+
+                        bookAdapter.notifyDataSetChanged();
+
+                        Log.i(TAG, "fetch books success");
+                    }
+                } catch (JSONException e) {
+                    // Invalid JSON format, show appropriate error.
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
+                // Handle failed request here
+                Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
+            }
+        });
     }
 }

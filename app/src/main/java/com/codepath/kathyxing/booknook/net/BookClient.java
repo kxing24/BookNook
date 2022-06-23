@@ -21,4 +21,9 @@ public class BookClient {
         String url = getApiUrl("books/v1/volumes?q=" + query);
         client.get(url, handler);
     }
+
+    public void getBook(final String bookId, JsonHttpResponseHandler handler) {
+        String url = getApiUrl("books/v1/volumes/" + bookId);
+        client.get(url, handler);
+    }
 }
