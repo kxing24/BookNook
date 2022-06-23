@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Movie;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.codepath.kathyxing.booknook.ImageSelectionUtilities;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.codepath.kathyxing.booknook.parse_classes.User;
@@ -54,6 +56,7 @@ public class ComposeActivity extends AppCompatActivity {
     private File photoFile;
     private ProgressBar pbLoading;
     private Group group;
+    private Book book;
     public String photoFileName = "photo.jpg";
 
     @Override
@@ -63,6 +66,8 @@ public class ComposeActivity extends AppCompatActivity {
 
         // Extract group from intent extras
         group = (Group) getIntent().getExtras().get("group");
+        // unwrap the book passed in via intent, using its simple name as a key
+        book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
 
         // initialize the views
         etDescription = findViewById(R.id.etDescription);
@@ -157,9 +162,12 @@ public class ComposeActivity extends AppCompatActivity {
         Post post = new Post();
         // set the post's parameters
         post.setDescription(description);
-        post.setImage(new ParseFile(photoFile));
+        if (photoFile != null) {
+            post.setImage(new ParseFile(photoFile));
+        }
         post.setUser((User) currentUser);
         post.setGroup(group);
+        post.setBookId(book.getId());
         // save the parameter to parse
         post.saveInBackground(new SaveCallback() {
             @Override

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
@@ -87,8 +89,8 @@ public class GroupFeedActivity extends AppCompatActivity {
         query.include(Post.KEY_USER);
         // include post creation time
         query.include(Post.KEY_CREATED_AT);
-        // get the posts in the group
-        query.whereEqualTo("to", group);
+        // query data where the post's book id is equal to the group book's id
+        query.whereEqualTo(Post.KEY_BOOK_ID, book.getId());
         // limit query to latest 20 items
         query.setLimit(20);
         // order posts by creation date (newest first)
@@ -115,18 +117,15 @@ public class GroupFeedActivity extends AppCompatActivity {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
         query.whereEqualTo("bookId", book.getId());
-        query.findInBackground(new FindCallback<Group>() {
+        // get the group from the query
+        query.getFirstInBackground(new GetCallback<Group>() {
             @Override
-            public void done(List<Group> objects, ParseException e) {
-                // query yields an empty list
-                // group does not exist
-                if (objects.isEmpty()) {
-                    Log.e(TAG, "Group does not exist!");
+            public void done(Group object, ParseException e) {
+                if (e == null) {
+                    group = object;
                 }
-                // query is nonempty
-                // group exists: get the group and check if user is in group
                 else {
-                    group = objects.get(0);
+                    Log.e(TAG, "Error getting group!");
                 }
             }
         });
@@ -146,6 +145,8 @@ public class GroupFeedActivity extends AppCompatActivity {
             // Navigate to the compose activity
             Intent intent = new Intent(this, ComposeActivity.class);
             intent.putExtra("group", group);
+            // serialize the book using parceler, use its short name as a key
+            intent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
             startActivityForResult(intent, ADD_POST);
 
             return true;

@@ -157,13 +157,13 @@ public class BookDetailActivity extends AppCompatActivity {
                 }
                 else {
                     Log.i(TAG, "Successfully created group for " + group.getBookId());
-                }
-                // make the user a member of the group
-                addMemberAsync(group, user);
+                    // make the user a member of the group
+                    addMemberAsync(group, user);
 
-                // edit the visibility of buttons
-                btnCreateGroup.setVisibility(View.GONE);
-                btnGoToGroup.setVisibility(View.VISIBLE);
+                    // edit the visibility of buttons
+                    btnCreateGroup.setVisibility(View.GONE);
+                    btnGoToGroup.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -174,6 +174,7 @@ public class BookDetailActivity extends AppCompatActivity {
         Member member = new Member();
         member.setFrom(user);
         member.setTo(group);
+        member.setBookId(book.getId());
         member.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -202,58 +203,67 @@ public class BookDetailActivity extends AppCompatActivity {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
         query.whereEqualTo("bookId", book.getId());
-        query.findInBackground(new FindCallback<Group>() {
+        // get the group from the query
+        query.getFirstInBackground(new GetCallback<Group>() {
             @Override
-            public void done(List<Group> objects, ParseException e) {
-                // query yields an empty list
-                // group does not exist
-                if (objects.isEmpty()) {
-                    Log.e(TAG, "Group does not exist!");
-                }
-                // query is nonempty
-                // group exists: get the group and create a member with the group and user
-                else {
-                    Group group = objects.get(0);
+            public void done(Group group, ParseException e) {
+                // get the group and create a member with the group and user
+                if (e == null) {
                     addMemberAsync(group, user);
                 }
+                // an error occurred
+                else {
+                    Log.e(TAG, "Issue getting group", e);
+                }
             }
         });
     }
 
-    // checks if a user is in a group given the corresponding book
+    // checks if a user is in a group given the book
     // set the goto group and join group buttons accordingly
     private void userInGroupAsync(Book book, User user) {
-        // create a query to get the group from the book
-        ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
-        // get results with the book id
-        query.whereEqualTo("bookId", book.getId());
-        query.findInBackground(new FindCallback<Group>() {
+        // create the query
+        ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
+        // get results with the user
+        query.whereEqualTo(Member.KEY_FROM, user);
+        // get results with the group
+        query.whereEqualTo(Member.KEY_BOOK_ID, book.getId());
+        // get the member from the query
+        query.getFirstInBackground(new GetCallback<Member>() {
             @Override
-            public void done(List<Group> objects, ParseException e) {
-                // query yields an empty list
-                // group does not exist
-                if (objects.isEmpty()) {
-                    Log.e(TAG, "Group does not exist!");
+            public void done(Member object, ParseException e) {
+                if (e == null) {
+                    // user is in the group
+                    // set the go to group button to be visible
+                    btnGoToGroup.setVisibility(View.VISIBLE);
                 }
-                // query is nonempty
-                // group exists: get the group and check if user is in group
                 else {
-                    Group group = objects.get(0);
-                    userInGroupAsync(group, user);
+                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
+                    {
+                        // user is not in the group
+                        // set the join group button to be visible
+                        btnJoinGroup.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        // unknown error, debug
+                        Log.e(TAG, "Query failed", e);
+                    }
                 }
             }
         });
     }
 
-    // checks if a user is in a group
+    // checks if a user is in a group given the group
     // set the goto group and join group buttons accordingly
     private void userInGroupAsync(Group group, User user) {
         // create the query
         ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
         // get results with the user
-        query.whereEqualTo("from", user);
+        query.whereEqualTo(Member.KEY_FROM, user);
         // get results with the group
-        query.whereEqualTo("to", group);
+        query.whereEqualTo(Member.KEY_TO, group);
+        // get the member from the query
         query.getFirstInBackground(new GetCallback<Member>() {
             @Override
             public void done(Member object, ParseException e) {

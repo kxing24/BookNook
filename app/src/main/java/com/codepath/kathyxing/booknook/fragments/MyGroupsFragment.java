@@ -92,7 +92,7 @@ public class MyGroupsFragment extends Fragment {
         query.whereEqualTo("from", ParseUser.getCurrentUser());
         // limit query to latest 20 items
         query.setLimit(20);
-        // start an asynchronous call for posts
+        // start an asynchronous call for groups
         query.findInBackground(new FindCallback<Member>() {
             @Override
             public void done(List<Member> memberList, ParseException e) {

@@ -13,6 +13,7 @@ import java.util.Date;
 public class Member extends ParseObject implements Parcelable {
     public static final String KEY_FROM = "from";
     public static final String KEY_TO = "to";
+    public static final String KEY_BOOK_ID = "bookId";
 
     public User getFrom() { return (User) getParseUser(KEY_FROM); }
 
@@ -21,4 +22,8 @@ public class Member extends ParseObject implements Parcelable {
     public Group getTo() { return (Group) getParseObject(KEY_TO); }
 
     public void setTo(Group group) { put(KEY_TO, group); }
+
+    public String getBookId() { return getString(KEY_BOOK_ID); }
+
+    public void setBookId(String bookId) { put(KEY_BOOK_ID, bookId); }
 }

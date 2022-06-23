@@ -13,6 +13,7 @@ public class Post extends ParseObject implements Parcelable {
     public static final String KEY_USER = "user";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_IMAGE = "image";
+    public static final String KEY_BOOK_ID = "bookId";
 
     public Group getGroup() { return (Group) getParseObject(KEY_GROUP); }
 
@@ -41,5 +42,9 @@ public class Post extends ParseObject implements Parcelable {
     public void setImage(ParseFile image) {
         put(KEY_IMAGE, image);
     }
+
+    public String getBookId() { return getString(KEY_BOOK_ID); }
+
+    public void setBookId(String bookId) { put(KEY_BOOK_ID, bookId); }
 
 }
