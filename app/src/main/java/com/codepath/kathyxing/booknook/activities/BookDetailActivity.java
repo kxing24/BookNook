@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
@@ -88,7 +90,16 @@ public class BookDetailActivity extends AppCompatActivity {
         tvDescription.setText(book.getDescription());
 
         // Load in the cover image
-        Glide.with(this).load(book.getCoverUrl()).into(ivBookCover);
+        if(book.getCoverUrl() != null) {
+            Glide.with(this)
+                    .load(Uri.parse(book.getCoverUrl()))
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.ic_nocover))
+                    .into(ivBookCover);
+        }
+        else {
+            Glide.with(this).load(R.drawable.ic_nocover).into(ivBookCover);
+        }
 
         // Click handler for the create group button
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {

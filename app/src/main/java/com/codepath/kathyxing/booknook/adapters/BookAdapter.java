@@ -90,11 +90,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         holder.tvTitle.setText(book.getTitle());
         holder.tvAuthor.setText(book.getAuthor());
 
-        Glide.with(getContext())
-                .load(Uri.parse(book.getCoverUrl()))
-                .apply(new RequestOptions()
-                        .placeholder(R.drawable.ic_nocover))
-                .into(holder.ivCover);
+        if(book.getCoverUrl() != null) {
+            Glide.with(getContext())
+                    .load(Uri.parse(book.getCoverUrl()))
+                    .apply(new RequestOptions()
+                            .placeholder(R.drawable.ic_nocover))
+                    .into(holder.ivCover);
+        }
+        else {
+            Glide.with(getContext())
+                    .load(R.drawable.ic_nocover)
+                    .into(holder.ivCover);
+        }
         // Return the completed view to render on screen
     }
 

@@ -15,7 +15,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="7dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
         android:background="@color/white"
@@ -36,29 +36,39 @@
 
             <ImageView
                 android:id="@+id/ivBookCover"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_centerHorizontal="true"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="0dp"
+                android:layout_marginEnd="20dp"
                 tools:src="@tools:sample/avatars" />
 
             <TextView
                 android:id="@+id/tvGroupTitle"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ivBookCover"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:textAlignment="center"
                 tools:text="Pride and Prejudice" />
 
             <TextView
                 android:id="@+id/tvAuthor"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvGroupTitle"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:textAlignment="center"
                 tools:text="by Jane Austen" />
 
             <TextView

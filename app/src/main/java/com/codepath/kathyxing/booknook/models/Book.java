@@ -14,6 +14,7 @@ public class Book {
     private String id;
     private String author;
     private String title;
+    private String subtitle;
     private String description;
     private String thumbnailUrl;
     private String coverUrl;
@@ -26,12 +27,20 @@ public class Book {
     }
 
     public String getTitle() {
-        return title;
+        if (title.equals("")) {
+            return "no title available";
+        }
+        if (subtitle.equals("")) {
+            return title;
+        }
+        return title + ": " + subtitle;
     }
 
     public String getAuthor() {
         return author;
     }
+
+    public String getSubtitle() { return subtitle; }
 
     public String getDescription() { return description; }
 
@@ -49,11 +58,33 @@ public class Book {
         try {
             // Deserialize json into object fields
             book.id = jsonObject.getString("id");
-            book.title = jsonObject.getJSONObject("volumeInfo").getString("title");
+            if(jsonObject.getJSONObject("volumeInfo").has("title")) {
+                book.title = jsonObject.getJSONObject("volumeInfo").getString("title");
+            }
+            else {
+                book.title = "";
+            }
+            if(jsonObject.getJSONObject("volumeInfo").has("subtitle")) {
+                book.subtitle = jsonObject.getJSONObject("volumeInfo").getString("subtitle");
+            }
+            else {
+                book.subtitle = "";
+            }
             book.author = getAuthor(jsonObject);
-            book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
-            book.thumbnailUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
-            book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+            if(jsonObject.getJSONObject("volumeInfo").has("description")) {
+                book.description = jsonObject.getJSONObject("volumeInfo").getString("description");
+            }
+            else {
+                book.description = "no description available";
+            }
+            if(jsonObject.getJSONObject("volumeInfo").has("imageLinks")) {
+                book.thumbnailUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+                book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
+            }
+            else {
+                book.thumbnailUrl = null;
+                book.coverUrl = null;
+            }
             //TODO: set the coverUrl to something higher-quality if it exists
             //book.coverUrl = jsonObject.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("medium");
         } catch (JSONException e) {
