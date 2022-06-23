@@ -43,11 +43,9 @@ public class GroupFeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_feed);
 
-        // Extract book object from intent extras
+        // Extract book and group objects from intent extras
         book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
-
-        // Set the group
-        setGroupAsync(book);
+        group = (Group) getIntent().getExtras().get("group");
 
         // set up the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -108,25 +106,6 @@ public class GroupFeedActivity extends AppCompatActivity {
                 // save received posts to list and notify adapter of new data
                 allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    private void setGroupAsync(Book book) {
-        // create a query to get the group from the book
-        ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
-        // get results with the book id
-        query.whereEqualTo("bookId", book.getId());
-        // get the group from the query
-        query.getFirstInBackground(new GetCallback<Group>() {
-            @Override
-            public void done(Group object, ParseException e) {
-                if (e == null) {
-                    group = object;
-                }
-                else {
-                    Log.e(TAG, "Error getting group!");
-                }
             }
         });
     }

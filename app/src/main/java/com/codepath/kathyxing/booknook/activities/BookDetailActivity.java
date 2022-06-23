@@ -41,6 +41,7 @@ public class BookDetailActivity extends AppCompatActivity {
     private Button btnGoToGroup;
 
     private Book book;
+    private Group group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,8 @@ public class BookDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // create the group and make the user a member
                 bookGroupCreate(book, (User) User.getCurrentUser());
+                // set button visibility
+                btnCreateGroup.setVisibility(View.GONE);
             }
         });
 
@@ -101,6 +104,8 @@ public class BookDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // make the user a member of the group
                 addMemberAsync(book, (User) User.getCurrentUser());
+                // set button visibility
+                btnJoinGroup.setVisibility(View.GONE);
             }
         });
 
@@ -123,19 +128,22 @@ public class BookDetailActivity extends AppCompatActivity {
         query.getFirstInBackground(new GetCallback<Group>() {
             @Override
             public void done(Group object, ParseException e) {
+                // book group exists
                 if (e == null) {
-                    // book group exists, check if the user is in the group
+                    // book group exists, set the group and check if the user is in the group
+                    group = object;
                     userInGroupAsync(book, (User) User.getCurrentUser());
                 }
                 else {
+                    // object doesn't exist
                     if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
                     {
-                        // object doesn't exist, set the create group button to visible
+                        // set the create group button to visible
                         btnCreateGroup.setVisibility(View.VISIBLE);
                     }
+                    // unknown error, debug
                     else
                     {
-                        //unknown error, debug
                         Log.e(TAG, "Query failed", e);
                     }
                 }
@@ -146,7 +154,7 @@ public class BookDetailActivity extends AppCompatActivity {
     // Creates the group and adds the first user
     private void bookGroupCreate(Book book, User user) {
         // creates the group
-        Group group = new Group();
+        Group g = new Group();
         group.setBookId(book.getId());
         group.saveInBackground(new SaveCallback() {
             @Override
@@ -156,16 +164,15 @@ public class BookDetailActivity extends AppCompatActivity {
                     Toast.makeText(BookDetailActivity.this, "Error while creating group!", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Log.i(TAG, "Successfully created group for " + group.getBookId());
+                    Log.i(TAG, "Successfully created group for " + g.getBookId());
+                    // set the group
+                    group = g;
                     // make the user a member of the group
-                    addMemberAsync(group, user);
-
-                    // edit the visibility of buttons
-                    btnCreateGroup.setVisibility(View.GONE);
-                    btnGoToGroup.setVisibility(View.VISIBLE);
+                    addMemberAsync(g, user);
                 }
             }
         });
+
     }
 
     // Add a user to a group
@@ -189,8 +196,6 @@ public class BookDetailActivity extends AppCompatActivity {
                     Toast.makeText(BookDetailActivity.this, "Joined group!", Toast.LENGTH_SHORT).show();
 
                     // User is now a member of the group: adjust visibility of buttons
-                    btnCreateGroup.setVisibility(View.GONE);
-                    btnJoinGroup.setVisibility(View.GONE);
                     btnGoToGroup.setVisibility(View.VISIBLE);
                 }
             }
@@ -254,44 +259,10 @@ public class BookDetailActivity extends AppCompatActivity {
         });
     }
 
-    // checks if a user is in a group given the group
-    // set the goto group and join group buttons accordingly
-    private void userInGroupAsync(Group group, User user) {
-        // create the query
-        ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
-        // get results with the user
-        query.whereEqualTo(Member.KEY_FROM, user);
-        // get results with the group
-        query.whereEqualTo(Member.KEY_TO, group);
-        // get the member from the query
-        query.getFirstInBackground(new GetCallback<Member>() {
-            @Override
-            public void done(Member object, ParseException e) {
-                if (e == null) {
-                    // user is in the group
-                    // set the go to group button to be visible
-                    btnGoToGroup.setVisibility(View.VISIBLE);
-                }
-                else {
-                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
-                    {
-                        // user is not in the group
-                        // set the join group button to be visible
-                        btnJoinGroup.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
-                        // unknown error, debug
-                        Log.e(TAG, "Query failed", e);
-                    }
-                }
-            }
-        });
-    }
-
     private void goGroupFeedActivity() {
         Intent i = new Intent(this, GroupFeedActivity.class);
         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
+        i.putExtra("group", group);
         startActivity(i);
     }
 

@@ -1,6 +1,7 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.BookAdapter;
 import com.codepath.kathyxing.booknook.GroupAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
+import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.models.Book;
+import com.codepath.kathyxing.booknook.net.BookClient;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
@@ -34,13 +40,15 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Headers;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MyGroupsFragment extends Fragment {
 
     // the fragment parameters
-    public static final String TAG = "MyGroupsGragment";
+    public static final String TAG = "MyGroupsFragment";
     private RecyclerView rvMyGroups;
     private GroupAdapter groupAdapter;
     private ArrayList<Group> myGroups;
@@ -68,10 +76,35 @@ public class MyGroupsFragment extends Fragment {
         groupAdapter.setOnItemClickListener(new GroupAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Toast.makeText(getContext(), "item clicked at position " + position, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
 
                 // get the group clicked
                 Group group = myGroups.get(position);
+
+                // Get the group's book using an API call
+                // After getting the book, go to the group's feed
+                BookClient client = new BookClient();
+                try {
+                    client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Book book = Book.fromJson(json.jsonObject);
+
+                            // go to the group's feed
+                            Intent i = new Intent(getContext(), GroupFeedActivity.class);
+                            i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
+                            i.putExtra("group", group);
+                            startActivity(i);
+                        }
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            // Handle failed request here
+                            Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + response);
+                        }
+                    });
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -85,6 +118,7 @@ public class MyGroupsFragment extends Fragment {
 
     }
 
+    // get the groups and add them to the myGroups list
     private void queryGroups() {
         // specify what type of data we want to query - Groups.class
         ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
@@ -110,4 +144,5 @@ public class MyGroupsFragment extends Fragment {
             }
         });
     }
+
 }
