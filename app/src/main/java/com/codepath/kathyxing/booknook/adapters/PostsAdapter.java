@@ -66,7 +66,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivProfilePicture = itemView.findViewById(R.id.ivProfilePicture);
         }
 
-        public void bind(Post post) {
+        public void bind(@NonNull Post post) {
             // Bind the post data to the view elements
             try {
                 tvGroupName.setText(post.getGroup().fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
@@ -76,8 +76,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvPostDescription.setText(post.getDescription());
             tvTimeAgo.setText(Post.calculateTimeAgo(post.getCreatedAt()));
             tvUsername.setText(post.getUser().getUsername());
-
-            // TODO: rotate the image to face the correct orientation
             // load in image with glide
             ParseFile image = post.getImage();
             if (image != null) {
@@ -86,7 +84,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             else {
                 ivPostImage.setVisibility(View.GONE);
             }
-
             // load in profile picture with glide
             ParseFile profilePicture = post.getUser().getProfilePicture();
             Glide.with(context).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);

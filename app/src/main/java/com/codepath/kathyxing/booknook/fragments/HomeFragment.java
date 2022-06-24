@@ -87,51 +87,30 @@ public class HomeFragment extends Fragment {
         queryPosts();
     }
 
+    // get the posts from the user's groups and display them
     private void queryPosts() {
-        // first query the groups that the user is in
+        // first query the groups from the user
         ParseQuery<Member> memberQuery = ParseQuery.getQuery(Member.class);
-        // get data where the "from" (user) parameter matches the current user
         memberQuery.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
-        // start an asynchronous call for groups
-        memberQuery.findInBackground(new FindCallback<Member>() {
+        // query the groups from the posts
+        ParseQuery<Post> postQuery = ParseQuery.getQuery(Post.class);
+        postQuery.include(Post.KEY_CREATED_AT);
+        postQuery.include(Post.KEY_USER);
+        // find the results where the groups match across queries
+        // this yield the posts of the groups that the user is in
+        postQuery.whereMatchesKeyInQuery(Post.KEY_GROUP, Member.KEY_TO, memberQuery);
+        // sort the posts in descending order by creation date
+        postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
+        postQuery.findInBackground(new FindCallback<Post>() {
             @Override
-            public void done(List<Member> memberList, ParseException e) {
-                // check for errors
+            public void done(List<Post> objects, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with getting groups", e);
+                    Log.e(TAG, "Query posts error", e);
                     return;
                 }
-
-                // query the posts from the groups
-                // query the posts from each group then add them into the main query
-                List<ParseQuery<Post>> queries = new ArrayList<ParseQuery<Post>>();
-                for(Member member : memberList) {
-                    Group group = member.getTo();
-                    ParseQuery<Post> postQuery = ParseQuery.getQuery(Post.class);
-                    postQuery.whereEqualTo(Post.KEY_GROUP, group);
-                    queries.add(postQuery);
-                }
-                if(!queries.isEmpty()) {
-                    ParseQuery<Post> mainQuery = ParseQuery.or(queries);
-                    // show posts
-                    mainQuery.addDescendingOrder(Post.KEY_CREATED_AT);
-                    mainQuery.setLimit(20);
-                    mainQuery.include(Post.KEY_USER);
-                    mainQuery.include(Post.KEY_CREATED_AT);
-                    mainQuery.findInBackground(new FindCallback<Post>() {
-                        @Override
-                        public void done(List<Post> objects, ParseException e) {
-                            // save received posts to list and notify adapter of new data
-                            allPosts.addAll(objects);
-                            adapter.notifyDataSetChanged();
-                            pbLoading.setVisibility(View.GONE);
-                        }
-                    });
-                }
-                else {
-                    tvNoPosts.setVisibility(View.VISIBLE);
-                    pbLoading.setVisibility(View.GONE);
-                }
+                allPosts.addAll(objects);
+                adapter.notifyDataSetChanged();
+                pbLoading.setVisibility(View.GONE);
             }
         });
     }
