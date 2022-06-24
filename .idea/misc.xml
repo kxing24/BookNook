@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_advanced_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_book_search.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2796875" />
@@ -10,6 +11,7 @@
         <entry key="app/src/main/res/layout/activity_group_feed.xml" value="0.25661773681640626" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_search_results.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/fragment_book_search.xml" value="0.2862196332952949" />

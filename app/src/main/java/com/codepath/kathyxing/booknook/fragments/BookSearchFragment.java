@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.activities.AdvancedSearchActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
@@ -48,6 +49,7 @@ public class BookSearchFragment extends Fragment {
     public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
     private ProgressBar pbLoading;
+    private Button btnAdvancedSearch;
     private Button btnPrevPage;
     private Button btnNextPage;
     private TextView tvPageNumber;
@@ -96,6 +98,7 @@ public class BookSearchFragment extends Fragment {
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
+        btnAdvancedSearch = view.findViewById(R.id.btnAdvancedSearch);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
         btnPrevPage = view.findViewById(R.id.btnPrevPage);
         btnNextPage = view.findViewById(R.id.btnNextPage);
@@ -108,26 +111,36 @@ public class BookSearchFragment extends Fragment {
         // Set layout manager to position the items
         rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // set up a click handler for the advanced search button
+        btnAdvancedSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // launch the advanced search activity
+                Intent intent = new Intent(getActivity().getBaseContext(), AdvancedSearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                // get the book clicked and launch the book detail activity
-
+                // get the book clicked
                 Book book = books.get(position);
-
+                // launch the book detail activity
                 Intent selectedItemIntent = new Intent(getActivity().getBaseContext(), BookDetailActivity.class);
                 selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
                 startActivity(selectedItemIntent);
             }
         });
 
+        // set up a click handler for the prev page button
         btnPrevPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 pageNumber--;
                 // Get the new books
-                fetchNewBooks();
+                fetchBooks(savedQuery, pageNumber);
             }
         });
 
@@ -137,7 +150,7 @@ public class BookSearchFragment extends Fragment {
             public void onClick(View v) {
                 pageNumber++;
                 // Get the new books
-                fetchNewBooks();
+                fetchBooks(savedQuery, pageNumber);
             }
         });
 
@@ -153,15 +166,29 @@ public class BookSearchFragment extends Fragment {
 
         // TODO: user can search for query in author, in title, etc. (and/or)
 
-        // Expand the search view and request focus
-        searchItem.expandActionView();
-        searchView.requestFocus();
+        // set actions for when the searchItem expands and collapses
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                // hide the advanced search button
+                btnAdvancedSearch.setVisibility(View.GONE);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // show the advanced search button
+                btnAdvancedSearch.setVisibility(View.VISIBLE);
+                // clear the items from the adapter
+                bookAdapter.clear();
+                bookAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
 
         // Set the textlistener for the searchview
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
             // TODO: results show up as user types
-
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
@@ -190,6 +217,15 @@ public class BookSearchFragment extends Fragment {
         int startIndex = pageNumber * MAX_RESULTS;
         Log.i(TAG, "startIndex is " + startIndex);
 
+        // smooth scroll to top
+        rvBooks.smoothScrollToPosition(0);
+        // adjust view visibility
+        tvPageNumber.setVisibility(View.GONE);
+        btnNextPage.setVisibility(View.GONE);
+        btnPrevPage.setVisibility(View.GONE);
+        // Remove books from the adapter
+        bookAdapter.clear();
+
         // initialize a book client to get API data
         client = new BookClient();
         client.getBooks(query, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
@@ -203,8 +239,6 @@ public class BookSearchFragment extends Fragment {
                         items = response.jsonObject.getJSONArray("items");
                         // Parse json array into array of model objects
                         final ArrayList<Book> b = Book.fromJson(items);
-                        // Remove all books from the adapter
-                        books.clear();
                         // Load model objects into the adapter
                         for (Book book : b) {
                             books.add(book); // add book through the adapter
@@ -235,18 +269,5 @@ public class BookSearchFragment extends Fragment {
                 Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
             }
         });
-    }
-
-    private void fetchNewBooks() {
-        // Remove books from the adapter
-        bookAdapter.clear();
-        // get the new books
-        fetchBooks(savedQuery, pageNumber);
-        // smooth scroll to top
-        rvBooks.smoothScrollToPosition(0);
-        // adjust view visibility
-        tvPageNumber.setVisibility(View.GONE);
-        btnNextPage.setVisibility(View.GONE);
-        btnPrevPage.setVisibility(View.GONE);
     }
 }

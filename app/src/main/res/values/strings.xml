@@ -8,6 +8,7 @@
     <string name="back4app_client_key">hPt63G7FESroWVEGPB20LEw0R5MJiJXchdcOJUhL</string>
     <string name="login"><u>Login</u></string>
     <string name="signup"><u>Sign up</u></string>
+    <string name="advanced_search"><u>Advanced Search</u></string>
     <string name="next_page"><u>Next Page</u></string>
     <string name="prev_page"><u>Prev Page</u></string>
     <string name="home">Home</string>
