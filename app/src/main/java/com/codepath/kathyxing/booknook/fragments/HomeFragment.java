@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
@@ -39,6 +40,7 @@ public class HomeFragment extends Fragment {
     protected List<Post> allPosts;
     private RecyclerView rvPosts;
     private ProgressBar pbLoading;
+    private TextView tvNoPosts;
 
     // Required empty public constructor
     public HomeFragment() {}
@@ -68,6 +70,7 @@ public class HomeFragment extends Fragment {
         // initialize views
         rvPosts = view.findViewById(R.id.rvPosts);
         pbLoading = view.findViewById(R.id.pbLoading);
+        tvNoPosts = view.findViewById(R.id.tvNoPosts);
 
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
@@ -108,21 +111,27 @@ public class HomeFragment extends Fragment {
                     postQuery.whereEqualTo(Post.KEY_GROUP, group);
                     queries.add(postQuery);
                 }
-                ParseQuery<Post> mainQuery = ParseQuery.or(queries);
-                // show posts
-                mainQuery.addDescendingOrder(Post.KEY_CREATED_AT);
-                mainQuery.setLimit(20);
-                mainQuery.include(Post.KEY_USER);
-                mainQuery.include(Post.KEY_CREATED_AT);
-                mainQuery.findInBackground(new FindCallback<Post>() {
-                    @Override
-                    public void done(List<Post> objects, ParseException e) {
-                        // save received posts to list and notify adapter of new data
-                        allPosts.addAll(objects);
-                        adapter.notifyDataSetChanged();
-                        pbLoading.setVisibility(View.GONE);
-                    }
-                });
+                if(!queries.isEmpty()) {
+                    ParseQuery<Post> mainQuery = ParseQuery.or(queries);
+                    // show posts
+                    mainQuery.addDescendingOrder(Post.KEY_CREATED_AT);
+                    mainQuery.setLimit(20);
+                    mainQuery.include(Post.KEY_USER);
+                    mainQuery.include(Post.KEY_CREATED_AT);
+                    mainQuery.findInBackground(new FindCallback<Post>() {
+                        @Override
+                        public void done(List<Post> objects, ParseException e) {
+                            // save received posts to list and notify adapter of new data
+                            allPosts.addAll(objects);
+                            adapter.notifyDataSetChanged();
+                            pbLoading.setVisibility(View.GONE);
+                        }
+                    });
+                }
+                else {
+                    tvNoPosts.setVisibility(View.VISIBLE);
+                    pbLoading.setVisibility(View.GONE);
+                }
             }
         });
     }
