@@ -55,7 +55,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
@@ -66,23 +65,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // initialize views
         rvPosts = view.findViewById(R.id.rvPosts);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoPosts = view.findViewById(R.id.tvNoPosts);
-
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(getContext(), allPosts);
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-
         // set the adapter on the recycler view
         rvPosts.setAdapter(adapter);
         // set the layout manager on the recycler view
         rvPosts.setLayoutManager(linearLayoutManager);
-
         // query posts in user groups
         queryPosts();
     }
@@ -108,8 +102,12 @@ public class HomeFragment extends Fragment {
                     Log.e(TAG, "Query posts error", e);
                     return;
                 }
-                allPosts.addAll(objects);
-                adapter.notifyDataSetChanged();
+                if (objects.isEmpty()) {
+                    tvNoPosts.setVisibility(View.VISIBLE);
+                } else {
+                    allPosts.addAll(objects);
+                    adapter.notifyDataSetChanged();
+                }
                 pbLoading.setVisibility(View.GONE);
             }
         });

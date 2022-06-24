@@ -17,4 +17,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
 
+    <TextView
+        android:id="@+id/tvNoGroups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="You are not in any groups!"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

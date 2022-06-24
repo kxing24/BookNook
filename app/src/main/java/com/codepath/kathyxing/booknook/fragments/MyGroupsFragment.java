@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -48,6 +49,7 @@ public class MyGroupsFragment extends Fragment {
     private GroupAdapter groupAdapter;
     private ArrayList<Group> myGroups;
     private ProgressBar pbLoading;
+    private TextView tvNoGroups;
 
     // Required empty public constructor
     public MyGroupsFragment() {}
@@ -73,23 +75,19 @@ public class MyGroupsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // initialize fields
         rvMyGroups = view.findViewById(R.id.rvMyGroups);
         myGroups = new ArrayList<>();
         groupAdapter = new GroupAdapter(getContext(), myGroups);
-
         pbLoading = view.findViewById(R.id.pbLoading);
-
+        tvNoGroups = view.findViewById(R.id.tvNoGroups);
         // set up a click handler for bookAdapter
         groupAdapter.setOnItemClickListener(new GroupAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
-
                 // get the group clicked
                 Group group = myGroups.get(position);
-
                 // Get the group's book using an API call
                 // After getting the book, go to the group's feed
                 BookClient client = new BookClient();
@@ -98,7 +96,6 @@ public class MyGroupsFragment extends Fragment {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Book book = Book.fromJson(json.jsonObject);
-
                             // go to the group's feed
                             Intent i = new Intent(getContext(), GroupFeedActivity.class);
                             i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
@@ -116,15 +113,11 @@ public class MyGroupsFragment extends Fragment {
                 }
             }
         });
-
         // Attach the adapter to the RecyclerView
         rvMyGroups.setAdapter(groupAdapter);
-
         // Set layout manager to position the items
         rvMyGroups.setLayoutManager(new LinearLayoutManager(getContext()));
-
         queryGroups();
-
     }
 
     // get the groups and add them to the myGroups list
@@ -144,12 +137,15 @@ public class MyGroupsFragment extends Fragment {
                     Log.e(TAG, "Issue with getting groups", e);
                     return;
                 }
-
-                // save received groups to list and notify adapter of new data
-                for(Member member : memberList) {
-                    myGroups.add(member.getTo());
+                if (memberList.isEmpty()) {
+                    tvNoGroups.setVisibility(View.VISIBLE);
+                } else {
+                    // save received groups to list and notify adapter of new data
+                    for(Member member : memberList) {
+                        myGroups.add(member.getTo());
+                    }
+                    groupAdapter.notifyDataSetChanged();
                 }
-                groupAdapter.notifyDataSetChanged();
                 pbLoading.setVisibility(View.GONE);
             }
         });
