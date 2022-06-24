@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.R;
@@ -40,6 +42,7 @@ public class SearchResultsFragment extends Fragment {
     public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
     private ProgressBar pbLoading;
+    private TextView tvNoResults;
     private Button btnPrevPage;
     private Button btnNextPage;
     private TextView tvPageNumber;
@@ -47,6 +50,7 @@ public class SearchResultsFragment extends Fragment {
     private BookClient client;
     private ArrayList<Book> books;
     private int pageNumber = 0;
+    private int totalItems;
     private String anyField;
     private String title;
     private String author;
@@ -64,6 +68,16 @@ public class SearchResultsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search_results, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle("Search Results");
+        }
     }
 
     @Override
@@ -86,6 +100,7 @@ public class SearchResultsFragment extends Fragment {
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
+        tvNoResults = view.findViewById(R.id.tvNoResults);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
         btnPrevPage = view.findViewById(R.id.btnPrevPage);
         btnNextPage = view.findViewById(R.id.btnNextPage);
@@ -158,32 +173,38 @@ public class SearchResultsFragment extends Fragment {
         // initialize a book client to get API data
         client = new BookClient();
         client.getBooks(savedQuery, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
-
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON response) {
                 try {
                     JSONArray items;
                     if (response != null) {
-                        // Get the items json array
-                        items = response.jsonObject.getJSONArray("items");
-                        // Parse json array into array of model objects
-                        final ArrayList<Book> b = Book.fromJson(items);
-                        // Load model objects into the adapter
-                        for (Book book : b) {
-                            books.add(book); // add book through the adapter
+                        // Set the total items
+                        totalItems = response.jsonObject.getInt("totalItems");
+                        if(totalItems == 0) {
+                            tvNoResults.setVisibility(View.VISIBLE);
                         }
-
-                        bookAdapter.notifyDataSetChanged();
-
-                        // Set view visibilities
+                        else {
+                            // Get the items json array
+                            items = response.jsonObject.getJSONArray("items");
+                            // Parse json array into array of model objects
+                            final ArrayList<Book> b = Book.fromJson(items);
+                            // Load model objects into the adapter
+                            for (Book book : b) {
+                                books.add(book); // add book through the adapter
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            // Set view visibilities
+                            btnNextPage.setVisibility(View.VISIBLE);
+                            if(pageNumber > 0) {
+                                btnPrevPage.setVisibility(View.VISIBLE);
+                            }
+                            if(totalItems - startIndex <= 10) {
+                                btnNextPage.setVisibility(View.GONE);
+                            }
+                            tvPageNumber.setText("Page " + (pageNumber + 1));
+                            tvPageNumber.setVisibility(View.VISIBLE);
+                        }
                         pbLoading.setVisibility(View.GONE);
-                        btnNextPage.setVisibility(View.VISIBLE);
-                        if(pageNumber > 0) {
-                            btnPrevPage.setVisibility(View.VISIBLE);
-                        }
-                        tvPageNumber.setText("Page " + (pageNumber + 1));
-                        tvPageNumber.setVisibility(View.VISIBLE);
-
                         Log.i(TAG, "fetch books success");
                     }
                 } catch (JSONException e) {
@@ -192,11 +213,24 @@ public class SearchResultsFragment extends Fragment {
                     //TODO: handle the case "no value for items"
                 }
             }
-
             @Override
             public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
                 // Handle failed request here
+                if(statusCode == 400) {
+                    // query missing
+                    Toast.makeText(getContext(), "Did not receive a query, try again!", Toast.LENGTH_SHORT);
+                }
+                else {
+                    Toast.makeText(getContext(), "Issue with query, try again!", Toast.LENGTH_SHORT);
+                }
+                pbLoading.setVisibility(View.GONE);
                 Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
+                // swap in the advanced search fragment
+                AdvancedSearchFragment nextFragment= new AdvancedSearchFragment();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
     }

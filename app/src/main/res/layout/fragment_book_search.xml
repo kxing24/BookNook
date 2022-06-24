@@ -77,4 +77,18 @@
         android:text="@string/advanced_search"
         android:textColor="#0000EE" />
 
+    <TextView
+        android:id="@+id/tvNoResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="No results from your search!"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

@@ -46,6 +46,7 @@ public class BookSearchFragment extends Fragment {
     public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
     private ProgressBar pbLoading;
+    private TextView tvNoResults;
     private Button btnAdvancedSearch;
     private Button btnPrevPage;
     private Button btnNextPage;
@@ -55,6 +56,7 @@ public class BookSearchFragment extends Fragment {
     private ArrayList<Book> books;
     private String savedQuery;
     private int pageNumber = 0;
+    private int totalItems;
 
     // Required empty public constructor
     public BookSearchFragment() {}
@@ -95,6 +97,7 @@ public class BookSearchFragment extends Fragment {
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
+        tvNoResults = view.findViewById(R.id.tvNoResults);
         btnAdvancedSearch = view.findViewById(R.id.btnAdvancedSearch);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
         btnPrevPage = view.findViewById(R.id.btnPrevPage);
@@ -169,8 +172,6 @@ public class BookSearchFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
-        // TODO: user can search for query in author, in title, etc. (and/or)
-
         // set actions for when the searchItem expands and collapses
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -182,6 +183,7 @@ public class BookSearchFragment extends Fragment {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                tvNoResults.setVisibility(View.GONE);
                 // show the advanced search button
                 btnAdvancedSearch.setVisibility(View.VISIBLE);
                 // clear the items from the adapter
@@ -202,12 +204,11 @@ public class BookSearchFragment extends Fragment {
                 searchView.clearFocus();
                 // save the query
                 savedQuery = query;
-
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
+                tvNoResults.setVisibility(View.GONE);
                 return false;
             }
         });
@@ -240,26 +241,32 @@ public class BookSearchFragment extends Fragment {
                 try {
                     JSONArray items;
                     if (response != null) {
-                        // Get the items json array
-                        items = response.jsonObject.getJSONArray("items");
-                        // Parse json array into array of model objects
-                        final ArrayList<Book> b = Book.fromJson(items);
-                        // Load model objects into the adapter
-                        for (Book book : b) {
-                            books.add(book); // add book through the adapter
+                        totalItems = response.jsonObject.getInt("totalItems");
+                        if(totalItems == 0) {
+                            tvNoResults.setVisibility(View.VISIBLE);
                         }
-
-                        bookAdapter.notifyDataSetChanged();
-
-                        // Set view visibilities
+                        else {
+                            // Get the items json array
+                            items = response.jsonObject.getJSONArray("items");
+                            // Parse json array into array of model objects
+                            final ArrayList<Book> b = Book.fromJson(items);
+                            // Load model objects into the adapter
+                            for (Book book : b) {
+                                books.add(book); // add book through the adapter
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            // Set view visibilities
+                            btnNextPage.setVisibility(View.VISIBLE);
+                            if(pageNumber > 0) {
+                                btnPrevPage.setVisibility(View.VISIBLE);
+                            }
+                            if(totalItems - startIndex <= 10) {
+                                btnNextPage.setVisibility(View.GONE);
+                            }
+                            tvPageNumber.setText("Page " + (pageNumber + 1));
+                            tvPageNumber.setVisibility(View.VISIBLE);
+                        }
                         pbLoading.setVisibility(View.GONE);
-                        btnNextPage.setVisibility(View.VISIBLE);
-                        if(pageNumber > 0) {
-                            btnPrevPage.setVisibility(View.VISIBLE);
-                        }
-                        tvPageNumber.setText("Page " + (pageNumber + 1));
-                        tvPageNumber.setVisibility(View.VISIBLE);
-
                         Log.i(TAG, "fetch books success");
                     }
                 } catch (JSONException e) {

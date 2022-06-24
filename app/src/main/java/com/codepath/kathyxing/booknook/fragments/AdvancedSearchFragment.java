@@ -1,16 +1,16 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.codepath.kathyxing.booknook.R;
 
@@ -30,7 +30,8 @@ public class AdvancedSearchFragment extends Fragment {
     private Button btnSearch;
 
     // Required empty public constructor
-    public AdvancedSearchFragment() {}
+    public AdvancedSearchFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,7 +43,6 @@ public class AdvancedSearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // initialize parameters
         etAnyField = view.findViewById(R.id.etAnyField);
         etTitle = view.findViewById(R.id.etTitle);
@@ -51,7 +51,6 @@ public class AdvancedSearchFragment extends Fragment {
         etSubject = view.findViewById(R.id.etSubject);
         etIsbn = view.findViewById(R.id.etIsbn);
         btnSearch = view.findViewById(R.id.btnSearch);
-
         // set click handler for search button
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,21 +62,27 @@ public class AdvancedSearchFragment extends Fragment {
                 String publisher = etPublisher.getText().toString();
                 String subject = etSubject.getText().toString();
                 String isbn = etIsbn.getText().toString();
-
-                // swap in the search results fragment
-                SearchResultsFragment nextFragment = new SearchResultsFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("anyField", anyField);
-                bundle.putString("title", title);
-                bundle.putString("author", author);
-                bundle.putString("publisher", publisher);
-                bundle.putString("subject", subject);
-                bundle.putString("isbn", isbn);
-                nextFragment.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
-                        .addToBackStack(null)
-                        .commit();
+                // if every EditText is empty, make a Toast message
+                if(anyField.equals("") && title.equals("") && author.equals("") &&
+                        publisher.equals("") && subject.equals("") && isbn.equals("")) {
+                    Toast.makeText(getContext(), "Make a query!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    // swap in the search results fragment
+                    SearchResultsFragment nextFragment = new SearchResultsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("anyField", anyField);
+                    bundle.putString("title", title);
+                    bundle.putString("author", author);
+                    bundle.putString("publisher", publisher);
+                    bundle.putString("subject", subject);
+                    bundle.putString("isbn", isbn);
+                    nextFragment.setArguments(bundle);
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
     }

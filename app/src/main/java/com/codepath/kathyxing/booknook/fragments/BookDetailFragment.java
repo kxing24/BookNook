@@ -41,7 +41,6 @@ public class BookDetailFragment extends Fragment {
 
     // fragment parameters
     public static final String TAG = "BookDetailActivity";
-
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
@@ -50,7 +49,6 @@ public class BookDetailFragment extends Fragment {
     private Button btnCreateGroup;
     private Button btnGoToGroup;
     private ProgressBar pbLoading;
-
     private Book book;
     private Group bookGroup;
 
@@ -67,7 +65,6 @@ public class BookDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
@@ -78,7 +75,6 @@ public class BookDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // Initialize views
         ivBookCover = (ImageView) view.findViewById(R.id.ivBookCover);
         tvTitle = (TextView) view.findViewById(R.id.tvGroupTitle);
@@ -88,19 +84,15 @@ public class BookDetailFragment extends Fragment {
         btnCreateGroup = (Button) view.findViewById(R.id.btnCreateGroup);
         btnGoToGroup = (Button) view.findViewById(R.id.btnGotoGroup);
         pbLoading = (ProgressBar) view.findViewById(R.id.pbLoading);
-
         // Extract book object from the bundle
         Bundle bundle = this.getArguments();
         book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
-
         // Check if the book group exists and whether the user is already in the group
         bookGroupStatusAsync(book);
-
         // Set view text
         tvTitle.setText(book.getTitle());
         tvAuthor.setText("by " + book.getAuthor());
         tvDescription.setText(book.getDescription());
-
         // Load in the cover image
         if(book.getCoverUrl() != null) {
             Glide.with(this)
@@ -112,7 +104,6 @@ public class BookDetailFragment extends Fragment {
         else {
             Glide.with(this).load(R.drawable.ic_nocover).into(ivBookCover);
         }
-
         // Click handler for the create group button
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,7 +114,6 @@ public class BookDetailFragment extends Fragment {
                 btnCreateGroup.setVisibility(View.GONE);
             }
         });
-
         // Click handler for join group button
         btnJoinGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,7 +124,6 @@ public class BookDetailFragment extends Fragment {
                 btnJoinGroup.setVisibility(View.GONE);
             }
         });
-
         // Click handler for goto group button
         btnGoToGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,9 +137,9 @@ public class BookDetailFragment extends Fragment {
     // Check if the book group exists
     // If the book group exists, check if the user is in the group
     // Set the visibility of the join group, create group, and goto group buttons based on results
-    private void bookGroupStatusAsync(Book book) {
+    private void bookGroupStatusAsync(@NonNull Book book) {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
-        query.whereEqualTo("bookId", book.getId());
+        query.whereEqualTo(Group.KEY_BOOK_ID, book.getId());
         query.getFirstInBackground(new GetCallback<Group>() {
             @Override
             public void done(Group object, ParseException e) {
@@ -179,7 +168,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     // Creates the group and adds the first user
-    private void bookGroupCreate(Book book, User user) {
+    private void bookGroupCreate(@NonNull Book book, @NonNull User user) {
         // creates the group
         Group group = new Group();
         group.setBookId(book.getId());
@@ -204,7 +193,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     // Add a user to a group
-    private void addMemberAsync(Group group, User user) {
+    private void addMemberAsync(@NonNull Group group, @NonNull User user) {
         // Create a new member
         Member member = new Member();
         member.setFrom(user);
@@ -231,7 +220,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     // Add a user to a group given the book
-    private void addMemberAsync(Book book, User user) {
+    private void addMemberAsync(@NonNull Book book, @NonNull User user) {
         // create the query
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
