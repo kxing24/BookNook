@@ -1,7 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,10 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-import com.codepath.kathyxing.booknook.activities.AdvancedSearchActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.BookDetailActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 
@@ -115,9 +112,12 @@ public class BookSearchFragment extends Fragment {
         btnAdvancedSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // launch the advanced search activity
-                Intent intent = new Intent(getActivity().getBaseContext(), AdvancedSearchActivity.class);
-                startActivity(intent);
+                // swap in the advanced search fragment
+                AdvancedSearchFragment nextFragment= new AdvancedSearchFragment();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
@@ -127,10 +127,15 @@ public class BookSearchFragment extends Fragment {
             public void onItemClick(View itemView, int position) {
                 // get the book clicked
                 Book book = books.get(position);
-                // launch the book detail activity
-                Intent selectedItemIntent = new Intent(getActivity().getBaseContext(), BookDetailActivity.class);
-                selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
-                startActivity(selectedItemIntent);
+                // swap in the book detail fragment
+                BookDetailFragment nextFragment = new BookDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+                nextFragment.setArguments(bundle);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 

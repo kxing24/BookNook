@@ -1,13 +1,18 @@
-package com.codepath.kathyxing.booknook.activities;
+package com.codepath.kathyxing.booknook.fragments;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -17,11 +22,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.User;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -29,10 +34,12 @@ import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
-import java.util.List;
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class BookDetailFragment extends Fragment {
 
-public class BookDetailActivity extends AppCompatActivity {
-
+    // fragment parameters
     public static final String TAG = "BookDetailActivity";
 
     private ImageView ivBookCover;
@@ -47,39 +54,44 @@ public class BookDetailActivity extends AppCompatActivity {
     private Book book;
     private Group bookGroup;
 
+    // Required empty public constructor
+    public BookDetailFragment() {}
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_detail);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_book_detail, container, false);
+    }
 
-        // set up the toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Book Details");
+    @Override
+    public void onResume() {
+        super.onResume();
 
-        // have the toolbar show a back button
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle("Book Details");
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         // Initialize views
-        ivBookCover = (ImageView) findViewById(R.id.ivBookCover);
-        tvTitle = (TextView) findViewById(R.id.tvGroupTitle);
-        tvAuthor = (TextView) findViewById(R.id.tvAuthor);
-        tvDescription = (TextView) findViewById(R.id.tvDescription);
-        btnJoinGroup = (Button) findViewById(R.id.btnJoinGroup);
-        btnCreateGroup = (Button) findViewById(R.id.btnCreateGroup);
-        btnGoToGroup = (Button) findViewById(R.id.btnGotoGroup);
-        pbLoading = (ProgressBar) findViewById(R.id.pbLoading);
+        ivBookCover = (ImageView) view.findViewById(R.id.ivBookCover);
+        tvTitle = (TextView) view.findViewById(R.id.tvGroupTitle);
+        tvAuthor = (TextView) view.findViewById(R.id.tvAuthor);
+        tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        btnJoinGroup = (Button) view.findViewById(R.id.btnJoinGroup);
+        btnCreateGroup = (Button) view.findViewById(R.id.btnCreateGroup);
+        btnGoToGroup = (Button) view.findViewById(R.id.btnGotoGroup);
+        pbLoading = (ProgressBar) view.findViewById(R.id.pbLoading);
 
-        // Extract book object from intent extras
-        book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
+        // Extract book object from the bundle
+        Bundle bundle = this.getArguments();
+        book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
 
         // Check if the book group exists and whether the user is already in the group
         bookGroupStatusAsync(book);
@@ -127,7 +139,7 @@ public class BookDetailActivity extends AppCompatActivity {
         btnGoToGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(BookDetailActivity.this, "Going to group!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
                 goGroupFeedActivity();
             }
         });
@@ -177,7 +189,7 @@ public class BookDetailActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "Error while creating group", e);
-                    Toast.makeText(BookDetailActivity.this, "Error while creating group!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error while creating group!", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Log.i(TAG, "Successfully created group for " + group.getBookId());
@@ -204,12 +216,12 @@ public class BookDetailActivity extends AppCompatActivity {
                 // Error while creating member
                 if (e != null) {
                     Log.e(TAG, "Error while creating member", e);
-                    Toast.makeText(BookDetailActivity.this, "Failed to join group!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to join group!", Toast.LENGTH_SHORT).show();
                 }
                 // Successfully created member
                 else {
                     Log.i(TAG, "Successfully added " + user.getUsername() + " to " + group.getBookId());
-                    Toast.makeText(BookDetailActivity.this, "Joined group!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
 
                     // User is now a member of the group: adjust visibility of buttons
                     btnGoToGroup.setVisibility(View.VISIBLE);
@@ -278,11 +290,9 @@ public class BookDetailActivity extends AppCompatActivity {
     }
 
     private void goGroupFeedActivity() {
-        Intent i = new Intent(this, GroupFeedActivity.class);
+        Intent i = new Intent(getContext(), GroupFeedActivity.class);
         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
         i.putExtra("group", bookGroup);
         startActivity(i);
     }
-
-
 }

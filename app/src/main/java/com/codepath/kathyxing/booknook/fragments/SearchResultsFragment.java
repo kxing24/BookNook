@@ -1,13 +1,17 @@
-package com.codepath.kathyxing.booknook.activities;
+package com.codepath.kathyxing.booknook.fragments;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,10 +30,13 @@ import java.util.ArrayList;
 
 import okhttp3.Headers;
 
-public class SearchResultsActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class SearchResultsFragment extends Fragment {
 
     // activity parameters
-    public static final String TAG = "SearchResultsActivity";
+    public static final String TAG = "SearchResultsFragment";
     public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
     private ProgressBar pbLoading;
@@ -49,37 +56,47 @@ public class SearchResultsActivity extends AppCompatActivity {
     private String savedQuery = "";
     private boolean firstParameter = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_results);
+    // Required empty public constructor
+    public SearchResultsFragment() {}
 
-        // extract the extras from the intent
-        anyField = getIntent().getExtras().getString("anyField");
-        title = getIntent().getExtras().getString("title");
-        author = getIntent().getExtras().getString("author");
-        publisher = getIntent().getExtras().getString("publisher");
-        subject = getIntent().getExtras().getString("subject");
-        isbn = getIntent().getExtras().getString("isbn");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_search_results, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Extract strings from the bundle
+        Bundle bundle = this.getArguments();
+        anyField = bundle.getString("anyField");
+        title = bundle.getString("title");
+        author = bundle.getString("author");
+        publisher = bundle.getString("publisher");
+        subject = bundle.getString("subject");
+        isbn = bundle.getString("isbn");
 
         // set the query based on the extras
         setQuery();
         Log.i(TAG, "query is: " + savedQuery);
 
         // initialize fields
-        rvBooks = findViewById(R.id.rvBooks);
-        pbLoading = findViewById(R.id.pbLoading);
-        tvPageNumber = findViewById(R.id.tvPageNumber);
-        btnPrevPage = findViewById(R.id.btnPrevPage);
-        btnNextPage = findViewById(R.id.btnNextPage);
+        rvBooks = view.findViewById(R.id.rvBooks);
+        pbLoading = view.findViewById(R.id.pbLoading);
+        tvPageNumber = view.findViewById(R.id.tvPageNumber);
+        btnPrevPage = view.findViewById(R.id.btnPrevPage);
+        btnNextPage = view.findViewById(R.id.btnNextPage);
         books = new ArrayList<>();
-        bookAdapter = new BookAdapter(this, books);
+        bookAdapter = new BookAdapter(getContext(), books);
 
         // Attach the adapter to the RecyclerView
         rvBooks.setAdapter(bookAdapter);
 
         // Set layout manager to position the items
-        rvBooks.setLayoutManager(new LinearLayoutManager(this));
+        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
@@ -87,10 +104,15 @@ public class SearchResultsActivity extends AppCompatActivity {
             public void onItemClick(View itemView, int position) {
                 // get the book clicked
                 Book book = books.get(position);
-                // launch the book detail activity
-                Intent selectedItemIntent = new Intent(SearchResultsActivity.this, BookDetailActivity.class);
-                selectedItemIntent.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
-                startActivity(selectedItemIntent);
+                // swap in the book detail fragment
+                BookDetailFragment nextFragment = new BookDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+                nextFragment.setArguments(bundle);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
