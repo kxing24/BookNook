@@ -1,11 +1,16 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +26,7 @@ public class AdvancedSearchFragment extends Fragment {
 
     // activity parameters
     public static final String TAG = "AdvancedSearchFragment";
+    private RelativeLayout rlAdvancedSearch;
     private EditText etAnyField;
     private EditText etTitle;
     private EditText etAuthor;
@@ -44,6 +50,7 @@ public class AdvancedSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // initialize parameters
+        rlAdvancedSearch = view.findViewById(R.id.rlAdvancedSearch);
         etAnyField = view.findViewById(R.id.etAnyField);
         etTitle = view.findViewById(R.id.etTitle);
         etAuthor = view.findViewById(R.id.etAuthor);
@@ -83,6 +90,15 @@ public class AdvancedSearchFragment extends Fragment {
                             .addToBackStack(null)
                             .commit();
                 }
+            }
+        });
+        // hide keyboard when the relative layout is touched
+        rlAdvancedSearch.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+                return true;
             }
         });
     }
