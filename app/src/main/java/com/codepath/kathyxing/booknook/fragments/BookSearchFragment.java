@@ -198,6 +198,8 @@ public class BookSearchFragment extends Fragment {
             // TODO: results show up as user types
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // set the page number back to 0
+                pageNumber = 0;
                 // perform query here
                 fetchBooks(query, pageNumber);
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
