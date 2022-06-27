@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -68,15 +69,33 @@ public class LoginActivity extends AppCompatActivity {
             public void done(ParseUser user, ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "Issues with login", e);
-                    Toast.makeText(LoginActivity.this, "Issue with login!", Toast.LENGTH_SHORT).show();
+                    showAlert("Login Fail", e.getMessage() + " Please try again.", true);
                     return;
                 }
                 else {
+                    showAlert("Login Successful", "Welcome, " + username + "!", false);
                     goMainActivity();
                     Log.i(TAG, "Successfully logged in");
                 }
             }
         });
+    }
+
+    private void showAlert(String title, String message, boolean error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                    // don't forget to change the line below with the names of your Activities
+                    if (!error) {
+                        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                });
+        AlertDialog ok = builder.create();
+        ok.show();
     }
 
     private void goMainActivity() {

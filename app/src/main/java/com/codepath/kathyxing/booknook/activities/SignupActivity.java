@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,12 +14,14 @@ import android.widget.Toast;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 public class SignupActivity extends AppCompatActivity {
 
     public static final String TAG = "SignupActivity";
     private EditText etUsername;
+    private EditText etEmail;
     private EditText etPassword;
     private EditText etConfirmPassword;
     private Button btnSignup;
@@ -31,6 +34,7 @@ public class SignupActivity extends AppCompatActivity {
 
         // initialize views
         etUsername = findViewById(R.id.etUsername);
+        etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnGoLogin = findViewById(R.id.btnGoLogin);
@@ -51,16 +55,21 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.i(TAG, "onClick signup button");
                 String username = etUsername.getText().toString();
+                String email = etEmail.getText().toString();
                 String password = etPassword.getText().toString();
                 String confirmPassword = etConfirmPassword.getText().toString();
-                signupUser(username, password, confirmPassword);
+                signupUser(username, email, password, confirmPassword);
             }
         });
     }
 
-    private void signupUser(String username, String password, String confirmPassword) {
+    private void signupUser(String username, String email, String password, String confirmPassword) {
         if (username.equals("")) {
             Toast.makeText(SignupActivity.this, "You cannot have an empty username!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else if (email.equals("")) {
+            Toast.makeText(SignupActivity.this, "You cannot have an empty email!", Toast.LENGTH_SHORT).show();
             return;
         }
         else if (password.equals("")) {
@@ -83,20 +92,43 @@ public class SignupActivity extends AppCompatActivity {
         // Set core properties
         user.setUsername(username);
         user.setPassword(password);
+        user.setEmail(email);
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
                     // Hooray! Let them use the app now.
-                    Toast.makeText(SignupActivity.this, "You have signed up for an account!", Toast.LENGTH_SHORT).show();
-                    goMainActivity();
+                    ParseUser.logOut();
+                    showAlert("Account Created Successfully!", "Please verify your email before Login", false);
+                    //goMainActivity();
                 } else {
-                    // Sign up didn't succeed. Look at the ParseException
-                    // to figure out what went wrong
+                    // Sign up didn't succeed, look at the ParseException
                     Log.e(TAG, "Issue with signup!", e);
+                    showAlert("Account Creation failed", "Account could not be created" + " : " + e.getMessage(), true);
+                    etUsername.getText().clear();
+                    etEmail.getText().clear();
+                    etPassword.getText().clear();
+                    etConfirmPassword.getText().clear();
                 }
             }
         });
+    }
+
+    private void showAlert(String title, String message, boolean error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.cancel();
+                    // don't forget to change the line below with the names of your Activities
+                    if (!error) {
+                        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                });
+        AlertDialog ok = builder.create();
+        ok.show();
     }
 
     private void goLoginActivity() {
