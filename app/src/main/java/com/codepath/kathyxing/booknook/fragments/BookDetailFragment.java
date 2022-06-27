@@ -30,8 +30,6 @@ import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
@@ -90,7 +88,7 @@ public class BookDetailFragment extends Fragment {
                 ParseQueryUtilities.userInGroupAsync(book, (User) User.getCurrentUser(), userInGroupCallback);
             }
             else {
-                // object doesn't exist
+                // book group doesn't exist
                 if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
                 {
                     // set the create group button to visible
@@ -175,7 +173,6 @@ public class BookDetailFragment extends Fragment {
         book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
         // Check if the book group exists and whether the user is already in the group
         ParseQueryUtilities.bookGroupStatusAsync(book, bookGroupStatusCallback);
-        //bookGroupStatusAsync(book);
         // Set view text
         tvTitle.setText(book.getTitle());
         tvAuthor.setText("by " + book.getAuthor());

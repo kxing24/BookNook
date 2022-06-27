@@ -16,43 +16,24 @@ import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 public final class ParseQueryUtilities {
-    // Check if the book group exists
-    // If the book group exists, check if the user is in the group
-    // Set the visibility of the join group, create group, and goto group buttons based on results
+    /**
+     * Check if the book group exists
+     * @param book
+     * @param bookGroupStatusCallback
+     */
     public static void bookGroupStatusAsync(@NonNull Book book, GetCallback bookGroupStatusCallback) {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         query.whereEqualTo(Group.KEY_BOOK_ID, book.getId());
         query.getFirstInBackground(bookGroupStatusCallback);
     }
 
-    /*
-    // Creates the group and adds the first user
-    public static void bookGroupCreate(@NonNull Book book, @NonNull User user) {
-        // creates the group
-        Group group = new Group();
-        group.setBookId(book.getId());
-        group.setGroupName(book.getTitle() + " Group");
-        group.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while creating group", e);
-                    Toast.makeText(getContext(), "Error while creating group!", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Log.i(TAG, "Successfully created group for " + group.getBookId());
-                    // set the group
-                    bookGroup = group;
-                    // make the user a member of the group
-                    addMemberWithGroupAsync(group, user);
-                }
-            }
-        });
-    }
-
+    /**
+     * Add a user to a group given the group
+     * @param group
+     * @param user
+     * @param book
+     * @param addMemberWithGroupCallback
      */
-
-    // Add a user to a group
     public static void addMemberWithGroupAsync(@NonNull Group group, @NonNull User user, @NonNull Book book,
                                                @NonNull SaveCallback addMemberWithGroupCallback) {
         // Create a new member
@@ -63,7 +44,12 @@ public final class ParseQueryUtilities {
         member.saveInBackground(addMemberWithGroupCallback);
     }
 
-    // Add a user to a group given the book
+    /**
+     * Add a user to a group given the book
+     * @param book
+     * @param user
+     * @param addMemberWithBookCallback
+     */
     public static void addMemberWithBookAsync(@NonNull Book book, @NonNull User user,
                                               @NonNull GetCallback addMemberWithBookCallback) {
         // create the query
@@ -74,8 +60,12 @@ public final class ParseQueryUtilities {
         query.getFirstInBackground(addMemberWithBookCallback);
     }
 
-    // checks if a user is in a group given the book
-    // set the goto group and join group buttons accordingly
+    /**
+     * Check if a user is in a group given the book
+     * @param book
+     * @param user
+     * @param userInGroupCallback
+     */
     public static void userInGroupAsync(@NonNull Book book, @NonNull User user,
                                   @NonNull GetCallback userInGroupCallback) {
         // create the query
