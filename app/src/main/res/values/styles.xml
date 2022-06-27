@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="JoinGroupDialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <!-- Define window properties as desired -->
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+</resources>

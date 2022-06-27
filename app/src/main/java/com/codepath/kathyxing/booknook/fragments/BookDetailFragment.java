@@ -51,90 +51,6 @@ public class BookDetailFragment extends Fragment {
     private ProgressBar pbLoading;
     private Book book;
     private Group bookGroup;
-    // Create a callback for userInGroupAsync
-    private GetCallback userInGroupCallback = new GetCallback<Member>() {
-        @Override
-        public void done(Member object, ParseException e) {
-            if (e == null) {
-                // user is in the group
-                // set the go to group button to be visible
-                btnGoToGroup.setVisibility(View.VISIBLE);
-                pbLoading.setVisibility(View.GONE);
-            }
-            else {
-                if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
-                {
-                    // user is not in the group
-                    // set the join group button to be visible
-                    btnJoinGroup.setVisibility(View.VISIBLE);
-                    pbLoading.setVisibility(View.GONE);
-                }
-                else
-                {
-                    // unknown error, debug
-                    Log.e(TAG, "Query failed", e);
-                }
-            }
-        }
-    };
-    // Create a callback for bookGroupStatusAsync
-    private GetCallback bookGroupStatusCallback = new GetCallback<Group>() {
-        @Override
-        public void done(Group object, ParseException e) {
-            // book group exists
-            if (e == null) {
-                // book group exists, set the group and check if the user is in the group
-                bookGroup = object;
-                ParseQueryUtilities.userInGroupAsync(book, (User) User.getCurrentUser(), userInGroupCallback);
-            }
-            else {
-                // book group doesn't exist
-                if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
-                {
-                    // set the create group button to visible
-                    btnCreateGroup.setVisibility(View.VISIBLE);
-                    pbLoading.setVisibility(View.GONE);
-                }
-                // unknown error, debug
-                else
-                {
-                    Log.e(TAG, "Query failed", e);
-                }
-            }
-        }
-    };
-    // create a callback for addMemberWithGroup
-    SaveCallback addMemberWithGroupCallback = new SaveCallback() {
-        @Override
-        public void done(ParseException e) {
-            // Error while creating member
-            if (e != null) {
-                Log.e(TAG, "Error while creating member", e);
-                Toast.makeText(getContext(), "Failed to join group!", Toast.LENGTH_SHORT).show();
-            }
-            // Successfully created member
-            else {
-                Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
-                // User is now a member of the group: adjust visibility of buttons
-                btnGoToGroup.setVisibility(View.VISIBLE);
-            }
-        }
-    };
-    // create a callback for addMemberWithBook
-    private GetCallback addMemberWithBookCallback = new GetCallback<Group>() {
-        @Override
-        public void done(Group group, ParseException e) {
-            // get the group and create a member with the group and user
-            if (e == null) {
-                ParseQueryUtilities.addMemberWithGroupAsync(group,
-                        (User) User.getCurrentUser(), book, addMemberWithGroupCallback);
-            }
-            // an error occurred
-            else {
-                Log.e(TAG, "Issue getting group", e);
-            }
-        }
-    };
 
     // Required empty public constructor
     public BookDetailFragment() {}
@@ -172,7 +88,7 @@ public class BookDetailFragment extends Fragment {
         Bundle bundle = this.getArguments();
         book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
         // Check if the book group exists and whether the user is already in the group
-        ParseQueryUtilities.bookGroupStatusAsync(book, bookGroupStatusCallback);
+        bookGroupStatus();
         // Set view text
         tvTitle.setText(book.getTitle());
         tvAuthor.setText("by " + book.getAuthor());
@@ -203,8 +119,7 @@ public class BookDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // make the user a member of the group
-                ParseQueryUtilities.addMemberWithBookAsync(book, (User) User.getCurrentUser(),
-                        addMemberWithBookCallback);
+                addMemberWithBook();
                 // set button visibility
                 btnJoinGroup.setVisibility(View.GONE);
             }
@@ -217,6 +132,107 @@ public class BookDetailFragment extends Fragment {
                 goGroupFeedActivity();
             }
         });
+    }
+
+    private void bookGroupStatus() {
+        // Create a callback for bookGroupStatusAsync
+        GetCallback bookGroupStatusCallback = new GetCallback<Group>() {
+            @Override
+            public void done(Group object, ParseException e) {
+                // book group exists
+                if (e == null) {
+                    // book group exists, set the group and check if the user is in the group
+                    bookGroup = object;
+                    userInGroup();
+                }
+                else {
+                    // book group doesn't exist
+                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
+                    {
+                        // set the create group button to visible
+                        btnCreateGroup.setVisibility(View.VISIBLE);
+                        pbLoading.setVisibility(View.GONE);
+                    }
+                    // unknown error, debug
+                    else
+                    {
+                        Log.e(TAG, "Query failed", e);
+                    }
+                }
+            }
+        };
+        ParseQueryUtilities.bookGroupStatusAsync(book, bookGroupStatusCallback);
+    }
+
+    private void userInGroup() {
+        // Create a callback for userInGroupAsync
+        GetCallback userInGroupCallback = new GetCallback<Member>() {
+            @Override
+            public void done(Member object, ParseException e) {
+                if (e == null) {
+                    // user is in the group
+                    // set the go to group button to be visible
+                    btnGoToGroup.setVisibility(View.VISIBLE);
+                    pbLoading.setVisibility(View.GONE);
+                }
+                else {
+                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
+                    {
+                        // user is not in the group
+                        // set the join group button to be visible
+                        btnJoinGroup.setVisibility(View.VISIBLE);
+                        pbLoading.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        // unknown error, debug
+                        Log.e(TAG, "Query failed", e);
+                    }
+                }
+            }
+        };
+        ParseQueryUtilities.userInGroupAsync(book, (User) User.getCurrentUser(), userInGroupCallback);
+    }
+
+    private void addMemberWithBook() {
+        // create a callback for addMemberWithBook
+        GetCallback addMemberWithBookCallback = new GetCallback<Group>() {
+            @Override
+            public void done(Group group, ParseException e) {
+                // get the group and create a member with the group and user
+                if (e == null) {
+                    addMemberWithGroup(group);
+                }
+                // an error occurred
+                else {
+                    Log.e(TAG, "Issue getting group", e);
+                }
+            }
+        };
+        ParseQueryUtilities.addMemberWithBookAsync(book, (User) User.getCurrentUser(),
+                addMemberWithBookCallback);
+    }
+
+    private void addMemberWithGroup(@NonNull Group group) {
+        // create a callback for addMemberWithGroup
+        SaveCallback addMemberWithGroupCallback = new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                // Error while creating member
+                if (e != null) {
+                    Log.e(TAG, "Error while creating member", e);
+                    Toast.makeText(getContext(), "Failed to join group!", Toast.LENGTH_SHORT).show();
+                }
+                // Successfully created member
+                else {
+                    Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
+                    // User is now a member of the group: adjust visibility of buttons
+                    btnGoToGroup.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+        ParseQueryUtilities.addMemberWithGroupAsync(group,
+                (User) User.getCurrentUser(), book.getId(), addMemberWithGroupCallback);
     }
 
     // Creates the group and adds the first user
@@ -237,11 +253,10 @@ public class BookDetailFragment extends Fragment {
                     // set the group
                     bookGroup = group;
                     // make the user a member of the group
-                    ParseQueryUtilities.addMemberWithGroupAsync(group, user, book, addMemberWithGroupCallback);
+                    addMemberWithGroup(group);
                 }
             }
         });
-
     }
 
     private void goGroupFeedActivity() {

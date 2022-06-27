@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
@@ -83,19 +84,7 @@ public class HomeFragment extends Fragment {
 
     // get the posts from the user's groups and display them
     private void queryPosts() {
-        // first query the groups from the user
-        ParseQuery<Member> memberQuery = ParseQuery.getQuery(Member.class);
-        memberQuery.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
-        // query the groups from the posts
-        ParseQuery<Post> postQuery = ParseQuery.getQuery(Post.class);
-        postQuery.include(Post.KEY_CREATED_AT);
-        postQuery.include(Post.KEY_USER);
-        // find the results where the groups match across queries
-        // this yield the posts of the groups that the user is in
-        postQuery.whereMatchesKeyInQuery(Post.KEY_GROUP, Member.KEY_TO, memberQuery);
-        // sort the posts in descending order by creation date
-        postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
-        postQuery.findInBackground(new FindCallback<Post>() {
+        FindCallback queryPostsCallback = new FindCallback<Post>() {
             @Override
             public void done(List<Post> objects, ParseException e) {
                 if (e != null) {
@@ -110,6 +99,7 @@ public class HomeFragment extends Fragment {
                 }
                 pbLoading.setVisibility(View.GONE);
             }
-        });
+        };
+        ParseQueryUtilities.queryHomeFeedPostsAsync(queryPostsCallback);
     }
 }

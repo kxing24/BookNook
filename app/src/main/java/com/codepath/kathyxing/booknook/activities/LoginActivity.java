@@ -73,7 +73,6 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 else {
-                    showAlert("Login Successful", "Welcome, " + username + "!", false);
                     goMainActivity();
                     Log.i(TAG, "Successfully logged in");
                 }
@@ -87,7 +86,6 @@ public class LoginActivity extends AppCompatActivity {
                 .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> {
                     dialog.cancel();
-                    // don't forget to change the line below with the names of your Activities
                     if (!error) {
                         Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

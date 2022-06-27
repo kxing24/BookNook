@@ -15,10 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.activities.JoinGroupActivity;
+import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
@@ -45,11 +48,14 @@ public class MyGroupsFragment extends Fragment {
 
     // the fragment parameters
     public static final String TAG = "MyGroupsFragment";
+    private static final int ADD_GROUP = 30;
     private RecyclerView rvMyGroups;
     private GroupAdapter groupAdapter;
     private ArrayList<Group> myGroups;
     private ProgressBar pbLoading;
     private TextView tvNoGroups;
+    private RelativeLayout rlJoinGroup;
+
 
     // Required empty public constructor
     public MyGroupsFragment() {}
@@ -81,6 +87,14 @@ public class MyGroupsFragment extends Fragment {
         groupAdapter = new GroupAdapter(getContext(), myGroups);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoGroups = view.findViewById(R.id.tvNoGroups);
+        rlJoinGroup = view.findViewById(R.id.rlJoinGroup);
+        // set up a click handler for rlJoinGroup
+        rlJoinGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goJoinGroupActivity();
+            }
+        });
         // set up a click handler for bookAdapter
         groupAdapter.setOnItemClickListener(new GroupAdapter.OnItemClickListener() {
             @Override
@@ -120,6 +134,22 @@ public class MyGroupsFragment extends Fragment {
         queryGroups();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == ADD_GROUP && resultCode == getActivity().RESULT_OK) {
+            // Get data from the intent (group)
+            Group group = (Group) data.getExtras().get("group");
+            // Update the RV with the group
+            // Modify data source of groups
+            myGroups.add(0, group);
+            // Update the adapter
+            groupAdapter.notifyItemInserted(0);
+            rvMyGroups.smoothScrollToPosition(0);
+            tvNoGroups.setVisibility(View.GONE);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     // get the groups and add them to the myGroups list
     private void queryGroups() {
         // specify what type of data we want to query - Groups.class
@@ -149,6 +179,11 @@ public class MyGroupsFragment extends Fragment {
                 pbLoading.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void goJoinGroupActivity() {
+        Intent i = new Intent(getContext(), JoinGroupActivity.class);
+        startActivityForResult(i, ADD_GROUP);
     }
 
 }

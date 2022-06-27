@@ -99,8 +99,7 @@ public class SignupActivity extends AppCompatActivity {
                 if (e == null) {
                     // Hooray! Let them use the app now.
                     ParseUser.logOut();
-                    showAlert("Account Created Successfully!", "Please verify your email before Login", false);
-                    //goMainActivity();
+                    showAlert("Account Created Successfully!", "Please verify your email before login", false);
                 } else {
                     // Sign up didn't succeed, look at the ParseException
                     Log.e(TAG, "Issue with signup!", e);
@@ -120,7 +119,6 @@ public class SignupActivity extends AppCompatActivity {
                 .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> {
                     dialog.cancel();
-                    // don't forget to change the line below with the names of your Activities
                     if (!error) {
                         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
