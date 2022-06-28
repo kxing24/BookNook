@@ -14,10 +14,15 @@ import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ParseQueryUtilities {
     /**
@@ -125,6 +130,46 @@ public final class ParseQueryUtilities {
     }
 
     /**
+     * Get the current user's groups
+     * @param queryGroupsCallback
+     */
+    public static void queryGroupsAsync(@NonNull FindCallback queryGroupsCallback) {
+        // specify what type of data we want to query - Groups.class
+        ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
+        // get data where the "from" (user) parameter matches the current user
+        query.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // start an asynchronous call for groups
+        query.findInBackground(queryGroupsCallback);
+    }
+
+    /**
+     * Get the current user's friends
+     * @param queryFriendsCallback
+     */
+    public static void queryFriendsAsync(@NonNull FindCallback queryFriendsCallback) {
+        // query friends where the current user requested and the friend received
+        ParseQuery<Friend> queryFriendRequest = ParseQuery.getQuery(Friend.class);
+        ParseQuery<User> queryUserRequest = ParseQuery.getQuery(User.class);
+        queryFriendRequest.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryFriendRequest.whereEqualTo(Friend.KEY_ACCEPTED, true);
+        queryUserRequest.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_RECEIVING_USER, queryFriendRequest);
+        // query friends where the current user received and the friend requested
+        ParseQuery<Friend> queryFriendReceive = ParseQuery.getQuery(Friend.class);
+        ParseQuery<User> queryUserReceive = ParseQuery.getQuery(User.class);
+        queryFriendReceive.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryFriendReceive.whereEqualTo(Friend.KEY_ACCEPTED, true);
+        queryUserReceive.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_REQUESTING_USER, queryFriendReceive);
+        // Combine queries and get result
+        List<ParseQuery<User>> queries = new ArrayList<>();
+        queries.add(queryUserRequest);
+        queries.add(queryUserReceive);
+        ParseQuery<User> mainQuery = ParseQuery.or(queries);
+        mainQuery.findInBackground(queryFriendsCallback);
+    }
+
+    /**
      * query for friend where current user is the requesting user and other user is the receiving user
      * @param user
      * @param getRequestingFriendStatusCallback
@@ -132,8 +177,8 @@ public final class ParseQueryUtilities {
     public static void getRequestingFriendStatusAsync(@NonNull User user, @NonNull GetCallback getRequestingFriendStatusCallback) {
         ParseQuery<Friend> query = ParseQuery.getQuery(Friend.class);
         query.include(Friend.KEY_ACCEPTED);
-        query.whereEqualTo(Friend.KEY_REQUESTING_USER, ParseUser.getCurrentUser());
-        query.whereEqualTo(Friend.KEY_RECEIVING_USER, user);
+        query.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, user.getObjectId());
         query.getFirstInBackground(getRequestingFriendStatusCallback);
     }
 
@@ -145,8 +190,31 @@ public final class ParseQueryUtilities {
     public static void getReceivingFriendStatusAsync(@NonNull User user, @NonNull GetCallback getReceivingFriendStatusCallback) {
         ParseQuery<Friend> query = ParseQuery.getQuery(Friend.class);
         query.include(Friend.KEY_ACCEPTED);
-        query.whereEqualTo(Friend.KEY_REQUESTING_USER, user);
-        query.whereEqualTo(Friend.KEY_RECEIVING_USER, ParseUser.getCurrentUser());
+        query.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, user.getObjectId());
+        query.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.getFirstInBackground(getReceivingFriendStatusCallback);
+    }
+
+    /**
+     * query for friend between current user and other user
+     * @param user
+     * @param getFriendStatusCallback
+     */
+    public static void getFriendStatus(@NonNull User user, @NonNull GetCallback getFriendStatusCallback) {
+        // Get results where current user is requesting other user
+        ParseQuery<Friend> queryRequesting = ParseQuery.getQuery(Friend.class);
+        queryRequesting.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryRequesting.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, user.getObjectId());
+        // Get results where current user is receiving other user
+        ParseQuery<Friend> queryReceiving = ParseQuery.getQuery(Friend.class);
+        queryReceiving.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, user.getObjectId());
+        queryReceiving.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        // Combine queries and get result
+        List<ParseQuery<Friend>> queries = new ArrayList<>();
+        queries.add(queryRequesting);
+        queries.add(queryReceiving);
+        ParseQuery<Friend> mainQuery = ParseQuery.or(queries);
+        mainQuery.include(Friend.KEY_ACCEPTED);
+        mainQuery.getFirstInBackground(getFriendStatusCallback);
     }
 }

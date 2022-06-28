@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.fragments.BookSearchFragment;
+import com.codepath.kathyxing.booknook.fragments.FriendsFragment;
 import com.codepath.kathyxing.booknook.fragments.HomeFragment;
 import com.codepath.kathyxing.booknook.fragments.MyGroupsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -28,21 +29,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // set up the toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         final FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // define your fragments here
-        final Fragment fragment1 = new HomeFragment();
-        final Fragment fragment2 = new BookSearchFragment();
-        final Fragment fragment3 = new MyGroupsFragment();
-
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-
-
         // handle navigation selection
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
 
@@ -51,13 +42,16 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_home:
-                        fragment = fragment1;
+                        fragment = new HomeFragment();
                         break;
                     case R.id.action_book_search:
-                        fragment = fragment2;
+                        fragment = new BookSearchFragment();
+                        break;
+                    case R.id.action_friends:
+                        fragment = new FriendsFragment();
                         break;
                     case R.id.action_my_groups:
-                        fragment = fragment3;
+                        fragment = new MyGroupsFragment();
                         break;
                     default: return true;
                 }
@@ -93,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings:
                 return true;

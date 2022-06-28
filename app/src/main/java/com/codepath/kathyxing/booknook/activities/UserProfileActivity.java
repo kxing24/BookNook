@@ -50,35 +50,70 @@ public class UserProfileActivity extends AppCompatActivity {
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(this).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);
-        // get friend status and set view visibility
+        // set view visibility
         if (!user.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
             Log.i(TAG, "user is " + user.getObjectId() + ", current user is " + ParseUser.getCurrentUser().getObjectId());
-            getFriendStatus();
+            setBtnAddFriendVisibility();
+            setBtnAcceptFriendVisibility();
+            setTvFriendRequestSentVisibility();
+            setTvFriendsVisibility();
         }
     }
 
-    private void getFriendStatus() {
+    private void setBtnAddFriendVisibility() {
+        GetCallback getFriendStatusCallback = new GetCallback<Friend>() {
+            @Override
+            public void done(Friend object, ParseException e) {
+                if (e != null) {
+                    if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                        // friend doesn't exist
+                        btnAddFriend.setVisibility(View.VISIBLE);
+                    } else {
+                        // error is something other than the friend not existing
+                        Log.e(TAG, "Error setting add friend button visibility", e);
+                    }
+                }
+            }
+        };
+        ParseQueryUtilities.getFriendStatus(user, getFriendStatusCallback);
+    }
+
+    private void setBtnAcceptFriendVisibility() {
+        GetCallback getReceivingFriendStatusCallback = new GetCallback<Friend>() {
+            @Override
+            public void done(Friend object, ParseException e) {
+                if (e == null) {
+                    // no error, friend exists
+                    if (!object.getAccepted()) {
+                        // current user receiving friend
+                        btnAcceptFriend.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    if (e.getCode() != ParseException.OBJECT_NOT_FOUND) {
+                        // error is something other than the friend not existing, debug
+                        Log.e(TAG, "Error setting accept friend button visibility", e);
+                    }
+                }
+            }
+        };
+        ParseQueryUtilities.getReceivingFriendStatusAsync(user, getReceivingFriendStatusCallback);
+    }
+
+    private void setTvFriendRequestSentVisibility() {
         GetCallback getRequestingFriendStatusCallback = new GetCallback<Friend>() {
             @Override
             public void done(Friend object, ParseException e) {
                 if (e == null) {
                     // no error, friend exists
-                    if (object.getAccepted()) {
-                        // users are friends
-                        tvFriends.setVisibility(View.VISIBLE);
-                    } else {
+                    if (!object.getAccepted()) {
                         // current user requesting friend
-                        tvFriendRequestSent.setVisibility(View.VISIBLE);
+                        btnAcceptFriend.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    // error
-                    if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                        // friend does not exist
-                        // check the case where current user is the receiving user
-                        getReceivingFriendStatus();
-                    } else {
-                        // unknown error, debug
-                        Log.e(TAG, "Issue getting friend status", e);
+                    // error is something other than the friend not existing
+                    if (e.getCode() != ParseException.OBJECT_NOT_FOUND) {
+                        // debug
+                        Log.e(TAG, "Error setting accept friend button visibility", e);
                     }
                 }
             }
@@ -86,31 +121,24 @@ public class UserProfileActivity extends AppCompatActivity {
         ParseQueryUtilities.getRequestingFriendStatusAsync(user, getRequestingFriendStatusCallback);
     }
 
-    private void getReceivingFriendStatus() {
-        GetCallback getReceivingFriendStatusCallback = new GetCallback<Friend>() {
+    private void setTvFriendsVisibility() {
+        GetCallback getFriendStatusCallback = new GetCallback<Friend>() {
             @Override
             public void done(Friend object, ParseException e) {
                 if (e == null) {
                     // no error, friend exists
                     if (object.getAccepted()) {
-                        // users are friends
+                        // current user and other user are friends
                         tvFriends.setVisibility(View.VISIBLE);
-                    } else {
-                        // current user receiving friend
-                        btnAcceptFriend.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    // error
-                    if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                        // friend does not exist
-                        btnAddFriend.setVisibility(View.VISIBLE);
-                    } else {
-                        // unknown error, debug
-                        Log.e(TAG, "Issue getting friend status", e);
+                    // error is something other than the friend not existing
+                    if (e.getCode() != ParseException.OBJECT_NOT_FOUND) {
+                        // debug
+                        Log.e(TAG, "Error setting accept friend button visibility", e);
                     }
                 }
             }
         };
-        ParseQueryUtilities.getReceivingFriendStatusAsync(user, getReceivingFriendStatusCallback);
     }
 }

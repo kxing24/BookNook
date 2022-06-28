@@ -15,6 +15,12 @@
         android:title="@string/book_search"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_friends"
+        android:enabled="true"
+        android:icon="@drawable/icon_friends"
+        android:title="@string/friends"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_my_groups"
         android:enabled="true"
         android:icon="@drawable/icon_my_groups"

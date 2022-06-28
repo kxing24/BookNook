@@ -9,6 +9,8 @@ import com.parse.ParseObject;
 public class Friend extends ParseObject implements Parcelable {
     public static final String KEY_REQUESTING_USER = "requestingUser";
     public static final String KEY_RECEIVING_USER = "receivingUser";
+    public static final String KEY_REQUESTING_USER_ID = "requestingUserId";
+    public static final String KEY_RECEIVING_USER_ID = "receivingUserId";
     public static final String KEY_ACCEPTED = "accepted";
 
     public User getRequestingUser() { return (User) getParseUser(KEY_REQUESTING_USER); }
@@ -18,6 +20,14 @@ public class Friend extends ParseObject implements Parcelable {
     public User getReceivingUser() { return (User) getParseUser(KEY_RECEIVING_USER); }
 
     public void setKeyReceivingUser(User user) { put(KEY_RECEIVING_USER, user); }
+
+    public String getRequestingUserId() { return getString(KEY_REQUESTING_USER_ID); }
+
+    public void setRequestingUserId(String userId) { put(KEY_REQUESTING_USER_ID, userId); }
+
+    public String getReceivingUserId() { return getString(KEY_RECEIVING_USER_ID); }
+
+    public void setKeyReceivingUserId(String userId) { put(KEY_RECEIVING_USER_ID, userId); }
 
     public Boolean getAccepted() { return getBoolean(KEY_ACCEPTED); }
 

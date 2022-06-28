@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.activities.JoinGroupActivity;
 import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
@@ -152,14 +153,7 @@ public class MyGroupsFragment extends Fragment {
 
     // get the groups and add them to the myGroups list
     private void queryGroups() {
-        // specify what type of data we want to query - Groups.class
-        ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
-        // get data where the "from" (user) parameter matches the current user
-        query.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // start an asynchronous call for groups
-        query.findInBackground(new FindCallback<Member>() {
+        FindCallback queryGroupsCallback = new FindCallback<Member>() {
             @Override
             public void done(List<Member> memberList, ParseException e) {
                 // check for errors
@@ -178,7 +172,8 @@ public class MyGroupsFragment extends Fragment {
                 }
                 pbLoading.setVisibility(View.GONE);
             }
-        });
+        };
+        ParseQueryUtilities.queryGroupsAsync(queryGroupsCallback);
     }
 
     private void goJoinGroupActivity() {
