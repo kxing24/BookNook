@@ -100,7 +100,7 @@ public class MyFriendsFragment extends Fragment {
                 if (users.isEmpty()) {
                     tvNoFriends.setVisibility(View.VISIBLE);
                 } else {
-                    // save received groups to list and notify adapter of new data
+                    // save received users to list and notify adapter of new data
                     myFriends.addAll(users);
                     userAdapter.notifyDataSetChanged();
                 }

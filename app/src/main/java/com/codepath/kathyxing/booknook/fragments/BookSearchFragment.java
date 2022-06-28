@@ -93,7 +93,6 @@ public class BookSearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
@@ -104,18 +103,14 @@ public class BookSearchFragment extends Fragment {
         btnNextPage = view.findViewById(R.id.btnNextPage);
         books = new ArrayList<>();
         bookAdapter = new BookAdapter(getContext(), books);
-
         // Attach the adapter to the RecyclerView
         rvBooks.setAdapter(bookAdapter);
-
         // Set layout manager to position the items
         rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
-
         // set up a click handler for the advanced search button
-        btnAdvancedSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // swap in the advanced search fragment
+        btnAdvancedSearch.setOnClickListener(v -> {
+            // swap in the advanced search fragment
+            if(getActivity() != null && getView() != null) {
                 AdvancedSearchFragment nextFragment= new AdvancedSearchFragment();
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
@@ -123,55 +118,40 @@ public class BookSearchFragment extends Fragment {
                         .commit();
             }
         });
-
         // set up a click handler for bookAdapter
-        bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                // get the book clicked
-                Book book = books.get(position);
-                // swap in the book detail fragment
-                BookDetailFragment nextFragment = new BookDetailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
-                nextFragment.setArguments(bundle);
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+        bookAdapter.setOnItemClickListener((itemView, position) -> {
+            // get the book clicked
+            Book book = books.get(position);
+            // swap in the book detail fragment
+            BookDetailFragment nextFragment = new BookDetailFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+            nextFragment.setArguments(bundle);
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
-
         // set up a click handler for the prev page button
-        btnPrevPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber--;
-                // Get the new books
-                fetchBooks(savedQuery, pageNumber);
-            }
+        btnPrevPage.setOnClickListener(v -> {
+            pageNumber--;
+            // Get the new books
+            fetchBooks(savedQuery, pageNumber);
         });
-
         // set up a click handler for the next page button
-        btnNextPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                // Get the new books
-                fetchBooks(savedQuery, pageNumber);
-            }
+        btnNextPage.setOnClickListener(v -> {
+            pageNumber++;
+            // Get the new books
+            fetchBooks(savedQuery, pageNumber);
         });
-
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_book_search, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-
         // set actions for when the searchItem expands and collapses
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -180,7 +160,6 @@ public class BookSearchFragment extends Fragment {
                 btnAdvancedSearch.setVisibility(View.GONE);
                 return true;
             }
-
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 tvNoResults.setVisibility(View.GONE);
@@ -188,11 +167,9 @@ public class BookSearchFragment extends Fragment {
                 btnAdvancedSearch.setVisibility(View.VISIBLE);
                 // clear the items from the adapter
                 bookAdapter.clear();
-                bookAdapter.notifyDataSetChanged();
                 return true;
             }
         });
-
         // Set the textlistener for the searchview
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             // TODO: results show up as user types
@@ -214,7 +191,6 @@ public class BookSearchFragment extends Fragment {
                 return false;
             }
         });
-
         super.onCreateOptionsMenu(menu,inflater);
     }
 
@@ -224,7 +200,6 @@ public class BookSearchFragment extends Fragment {
         pbLoading.setVisibility(View.VISIBLE);
         int startIndex = pageNumber * MAX_RESULTS;
         Log.i(TAG, "startIndex is " + startIndex);
-
         // smooth scroll to top
         rvBooks.smoothScrollToPosition(0);
         // adjust view visibility
@@ -233,11 +208,9 @@ public class BookSearchFragment extends Fragment {
         btnPrevPage.setVisibility(View.GONE);
         // Remove books from the adapter
         bookAdapter.clear();
-
         // initialize a book client to get API data
         client = new BookClient();
         client.getBooks(query, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
-
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON response) {
                 try {
@@ -253,9 +226,7 @@ public class BookSearchFragment extends Fragment {
                             // Parse json array into array of model objects
                             final ArrayList<Book> b = Book.fromJson(items);
                             // Load model objects into the adapter
-                            for (Book book : b) {
-                                books.add(book); // add book through the adapter
-                            }
+                            books.addAll(b);
                             bookAdapter.notifyDataSetChanged();
                             // Set view visibilities
                             btnNextPage.setVisibility(View.VISIBLE);
@@ -276,7 +247,6 @@ public class BookSearchFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-
             @Override
             public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
                 // Handle failed request here

@@ -1,60 +1,58 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
+import com.codepath.kathyxing.booknook.adapters.UserAdapter;
+import com.codepath.kathyxing.booknook.models.Book;
+import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+
+import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FindUserFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class FindUserFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    // fragment parameters
+    public static final String TAG = "FindUserFragment";
+    private RecyclerView rvUsers;
+    private ProgressBar pbLoading;
+    private TextView tvNoResults;
+    private SearchView svSearch;
+    private ArrayList<User> users;
+    private UserAdapter userAdapter;
 
     public FindUserFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FindUserFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FindUserFragment newInstance(String param1, String param2) {
-        FindUserFragment fragment = new FindUserFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -62,5 +60,73 @@ public class FindUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_find_user, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // initialize views
+        rvUsers = view.findViewById(R.id.rvUsers);
+        pbLoading = view.findViewById(R.id.pbLoading);
+        tvNoResults = view.findViewById(R.id.tvNoResults);
+        svSearch = view.findViewById(R.id.svSearch);
+        users = new ArrayList<>();
+        userAdapter = new UserAdapter(getContext(), users);
+        // Attach the adapter to the RecyclerView
+        rvUsers.setAdapter(userAdapter);
+        // Set layout manager to position the items
+        rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
+        // set up a click handler for bookAdapter
+        userAdapter.setOnItemClickListener((itemView, position) -> {
+            // get the book clicked
+            User user = users.get(position);
+            // TODO: make userprofileactivity a fragment
+            Intent intent = new Intent(getContext(), UserProfileActivity.class);
+            intent.putExtra("user", user);
+            getContext().startActivity(intent);
+        });
+        // Set the textlistener for the searchview
+        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // perform query here
+                queryUsers(query);
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                svSearch.clearFocus();
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                tvNoResults.setVisibility(View.GONE);
+                return false;
+            }
+        });
+    }
+
+    private void queryUsers(String query) {
+        pbLoading.setVisibility(View.VISIBLE);
+        // smooth scroll to top
+        rvUsers.smoothScrollToPosition(0);
+        // Remove users from the adapter
+        userAdapter.clear();
+        FindCallback queryUsersCallback = new FindCallback<User>() {
+            @Override
+            public void done(List<User> objects, ParseException e) {
+                // check for errors
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting users", e);
+                    return;
+                }
+                if (objects.isEmpty()) {
+                    tvNoResults.setVisibility(View.VISIBLE);
+                } else {
+                    // save received users to list and notify adapter of new data
+                    users.addAll(objects);
+                    userAdapter.notifyDataSetChanged();
+                }
+                pbLoading.setVisibility(View.GONE);
+            }
+        };
+        ParseQueryUtilities.queryUsersAsync(query, queryUsersCallback);
     }
 }

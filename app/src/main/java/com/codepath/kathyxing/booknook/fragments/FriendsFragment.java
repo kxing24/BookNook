@@ -1,16 +1,15 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.FriendsTabsAdapter;
@@ -27,7 +26,8 @@ public class FriendsFragment extends Fragment {
     private ViewPager viewPager;
 
     // Required empty public constructor
-    public FriendsFragment() {}
+    public FriendsFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +47,8 @@ public class FriendsFragment extends Fragment {
         tlTabs.addTab(tlTabs.newTab().setText("Incoming Requests"));
         tlTabs.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final FriendsTabsAdapter adapter = new FriendsTabsAdapter(getContext(), getActivity().getSupportFragmentManager(), tlTabs.getTabCount());
+        final FriendsTabsAdapter adapter = new FriendsTabsAdapter(getContext(),
+                getChildFragmentManager(), tlTabs.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tlTabs));
         tlTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -56,9 +57,11 @@ public class FriendsFragment extends Fragment {
                 Log.i(TAG, "switched to tab at position " + tab.getPosition());
                 viewPager.setCurrentItem(tab.getPosition());
             }
+
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
             }
+
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
             }

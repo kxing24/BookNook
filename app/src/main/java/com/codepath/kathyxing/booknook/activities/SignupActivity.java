@@ -17,6 +17,8 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import java.util.Locale;
+
 public class SignupActivity extends AppCompatActivity {
 
     public static final String TAG = "SignupActivity";
@@ -91,8 +93,9 @@ public class SignupActivity extends AppCompatActivity {
         User user = new User();
         // Set core properties
         user.setUsername(username);
+        user.setUsernameLowercase(username.toLowerCase(Locale.ROOT));
         user.setPassword(password);
-        user.setEmail(email);
+        user.setEmail(email.toLowerCase(Locale.ROOT));
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {

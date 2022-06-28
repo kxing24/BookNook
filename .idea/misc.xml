@@ -35,6 +35,7 @@
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/menu/menu_group_feed.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.2786458333333333" />
+        <entry key="app/src/main/res/menu/menu_user_search.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/xml/fileprovider.xml" value="0.1" />
       </map>
     </option>

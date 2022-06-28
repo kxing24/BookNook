@@ -1,18 +1,9 @@
 package com.codepath.kathyxing.booknook.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.Movie;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +12,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.codepath.kathyxing.booknook.ImageSelectionUtilities;
 import com.codepath.kathyxing.booknook.R;
@@ -35,19 +30,16 @@ import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ComposeActivity extends AppCompatActivity {
     // TODO: add a button to remove the image
 
     public static final String TAG = "ComposeActivity";
-
-    public final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public final static int PICK_PHOTO_CODE = 1046;
+    public final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public String photoFileName = "photo.jpg";
     private EditText etDescription;
     private Button btnCaptureImage;
     private Button btnGetImageFromGallery;
@@ -57,7 +49,6 @@ public class ComposeActivity extends AppCompatActivity {
     private ProgressBar pbLoading;
     private Group group;
     private Book book;
-    public String photoFileName = "photo.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,8 +166,7 @@ public class ComposeActivity extends AppCompatActivity {
                 if (e != null) {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ComposeActivity.this, "Error while saving!", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     Log.i(TAG, "Post save was successful!");
                 }
                 // set the activity's views
@@ -221,8 +211,7 @@ public class ComposeActivity extends AppCompatActivity {
                 ivPostImage.setVisibility(View.VISIBLE);
 
             }
-        }
-        else {
+        } else {
             Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();
         }
     }
