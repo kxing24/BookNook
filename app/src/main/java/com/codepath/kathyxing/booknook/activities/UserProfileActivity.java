@@ -16,11 +16,15 @@ import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -65,7 +69,7 @@ public class UserProfileActivity extends AppCompatActivity {
         // set the views
         tvUsername.setText(user.getUsername());
         Log.i(TAG, "user's email is " + user.getEmail());
-        tvEmail.setText(user.getEmail());
+        tvEmail.setText(user.getEmailPublic());
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(this).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);

@@ -100,7 +100,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         User user = users.get(position);
         // Populate data into the views
         holder.tvUsername.setText(user.getUsername());
-        holder.tvEmail.setText(user.getEmail());
+        holder.tvEmail.setText(user.getEmailPublic());
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(context).load(profilePicture.getUrl()).circleCrop().into(holder.ivProfilePicture);

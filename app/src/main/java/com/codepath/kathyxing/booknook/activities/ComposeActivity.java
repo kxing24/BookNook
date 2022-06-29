@@ -78,6 +78,7 @@ public class ComposeActivity extends AppCompatActivity {
 
         // click handler for submit button
         btnSubmit.setOnClickListener(v -> {
+            btnSubmit.setVisibility(View.GONE);
             String description = etDescription.getText().toString();
             if (description.isEmpty()) {
                 Toast.makeText(ComposeActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
@@ -135,7 +136,6 @@ public class ComposeActivity extends AppCompatActivity {
     // save a post to parse
     private void savePost(String description, ParseUser currentUser, File photoFile) {
         pbLoading.setVisibility(View.VISIBLE);
-
         // create a new post
         Post post = new Post();
         // set the post's parameters
@@ -153,6 +153,7 @@ public class ComposeActivity extends AppCompatActivity {
                 if (e != null) {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ComposeActivity.this, "Error while saving!", Toast.LENGTH_SHORT).show();
+                    btnSubmit.setVisibility(View.VISIBLE);
                 } else {
                     Log.i(TAG, "Post save was successful!");
                 }

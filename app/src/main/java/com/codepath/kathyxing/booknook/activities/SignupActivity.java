@@ -45,6 +45,7 @@ public class SignupActivity extends AppCompatActivity {
         // click handler for signup button
         btnSignup.setOnClickListener(v -> {
             Log.i(TAG, "onClick signup button");
+            // TODO: remove username trailing spaces
             String username = etUsername.getText().toString();
             String email = etEmail.getText().toString();
             String password = etPassword.getText().toString();
@@ -79,6 +80,7 @@ public class SignupActivity extends AppCompatActivity {
         user.setUsernameLowercase(username.toLowerCase(Locale.ROOT));
         user.setPassword(password);
         user.setEmail(email.toLowerCase(Locale.ROOT));
+        user.setEmailPublic(email.toLowerCase(Locale.ROOT));
         // Invoke signUpInBackground
         user.signUpInBackground(e -> {
             if (e == null) {
