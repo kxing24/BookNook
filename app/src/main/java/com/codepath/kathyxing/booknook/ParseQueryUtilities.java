@@ -348,10 +348,11 @@ public final class ParseQueryUtilities {
         queries.add(queryUserRequest);
         queries.add(queryUserReceive);
         ParseQuery<User> queryFriends = ParseQuery.or(queries);
-        // Get the friends not in the group
+        // Get the members in the group
         ParseQuery<Member> queryMembers = ParseQuery.getQuery(Member.class);
-        queryMembers.whereNotEqualTo(Member.KEY_BOOK_ID, bookId);
-        queryFriends.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Member.KEY_USER_ID, queryMembers);
+        queryMembers.whereEqualTo(Member.KEY_BOOK_ID, bookId);
+        // Get the friends that are not members in the group
+        queryFriends.whereDoesNotMatchKeyInQuery(User.KEY_OBJECT_ID, Member.KEY_USER_ID, queryMembers);
         queryFriends.findInBackground(getFriendsNotInGroupCallback);
     }
 }

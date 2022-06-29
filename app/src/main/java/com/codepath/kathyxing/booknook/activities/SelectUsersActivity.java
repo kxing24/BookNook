@@ -33,17 +33,23 @@ import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class SelectUsersActivity extends AppCompatActivity {
 
-    public static final String TAG = "GroupFeedActivity";
+    public static final String TAG = "SelectUsersActivity";
     protected UserSelectionAdapter adapter;
     protected ArrayList<User> users;
     private RecyclerView rvSelectUsers;
@@ -168,8 +174,7 @@ public class SelectUsersActivity extends AppCompatActivity {
                             "Choose at least one friend to invite!", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    // TODO: send email
-                    finish();
+                    sendEmail();
                 }
                 break;
             case R.id.action_clear:
@@ -196,5 +201,44 @@ public class SelectUsersActivity extends AppCompatActivity {
             pbLoading.setVisibility(View.GONE);
         };
         ParseQueryUtilities.getFriendsNotInGroupAsync(group.getBookId(), getFriendsNotInGroupCallback);
+    }
+
+    private void sendEmail() {
+        pbLoading.setVisibility(View.VISIBLE);
+        Map<String, Object> params = new HashMap<>();
+        // Create the fields "recipients", "emailSubject" and "emailBody"
+        ArrayList<String> recipientIds = new ArrayList<>();
+        for(int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            if (selectionTracker.isSelected(user)) {
+                Log.i(TAG, "adding user " + user.getUsername());
+                recipientIds.add(user.getObjectId());
+            }
+        }
+        adapter.clear();
+        String emailSubject = "Invitation to " + group.getGroupName();
+        String emailBody = "Hi,\n \n" + "You have been invited to join " + group.getGroupName() + " by " + ParseUser.getCurrentUser().getUsername() + ".\n" + "\n To join, use the following group ID:\n" + "\t" + group.getObjectId();
+        // Add the fields to the requests
+        params.put("recipientIds", recipientIds);
+        params.put("subject", emailSubject);
+        params.put("body", emailBody);
+        ParseCloud.callFunctionInBackground("sendgridEmail", params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object response, ParseException e) {
+                if(e == null) {
+                    // The function executed, but still has to check the response
+                    Toast.makeText(SelectUsersActivity.this, "Invitation sent!",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else {
+                    // Something went wrong
+                    Log.e(TAG, "issue with sending email", e);
+                    Toast.makeText(SelectUsersActivity.this, "Issue sending invitation", Toast.LENGTH_SHORT).show();
+                    getFriendsNotInGroup();
+                }
+                pbLoading.setVisibility(View.GONE);
+            }
+        });
     }
 }

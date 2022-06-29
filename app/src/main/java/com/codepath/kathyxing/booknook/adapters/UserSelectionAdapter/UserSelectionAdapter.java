@@ -84,4 +84,10 @@ public class UserSelectionAdapter extends RecyclerView.Adapter<UserSelectionAdap
         }
     }
 
+    // Clean all elements of the recycler
+    public void clear() {
+        users.clear();
+        notifyDataSetChanged();
+    }
+
 }
