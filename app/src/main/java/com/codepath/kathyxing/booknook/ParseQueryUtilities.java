@@ -308,4 +308,19 @@ public final class ParseQueryUtilities {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Get the number of posts in a group
+     * @param group the group
+     * @param getNumPostsInGroupCallback the callback for the async function
+     */
+    public static void getNumPostsInGroupAsync(@NonNull Group group, @NonNull CountCallback getNumPostsInGroupCallback) {
+        try{
+            ParseQuery<Post> queryPosts = ParseQuery.getQuery(Post.class);
+            queryPosts.whereEqualTo(Post.KEY_BOOK_ID, group.fetchIfNeeded().getString(Group.KEY_BOOK_ID));
+            queryPosts.countInBackground(getNumPostsInGroupCallback);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 }

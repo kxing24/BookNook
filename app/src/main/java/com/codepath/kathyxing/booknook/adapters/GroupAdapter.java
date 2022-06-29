@@ -32,6 +32,7 @@ import okhttp3.Headers;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
+    public static final String TAG = "GroupAdapter";
     private List<Group> groups;
     private Context context;
     private Book book;
@@ -54,6 +55,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         public ImageView ivCover;
         public TextView tvGroupTitle;
         public TextView tvNumMembers;
+        public TextView tvNumPosts;
 
         public ViewHolder(final View itemView, final GroupAdapter.OnItemClickListener clickListener) {
             // Stores the itemView in a public final member variable that can be used
@@ -62,6 +64,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             ivCover = itemView.findViewById(R.id.ivBookCover);
             tvGroupTitle = itemView.findViewById(R.id.tvGroupTitle);
             tvNumMembers = itemView.findViewById(R.id.tvNumMembers);
+            tvNumPosts = itemView.findViewById(R.id.tvNumPosts);
             // set up click handler for the item
             itemView.setOnClickListener(v -> clickListener.onItemClick(itemView, getAdapterPosition()));
         }
@@ -92,14 +95,28 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, int position) {
         // Get the data model based on position
         Group group = groups.get(position);
-
         BookClient client = new BookClient();
         try {
             // Populate data into the views
             holder.tvGroupTitle.setText(group.fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
             // Query the group's number of members to set tvNumMembers
-            CountCallback getNumMembersInGroupCallback = (count, e) -> holder.tvNumMembers.setText(count + " members");
+            CountCallback getNumMembersInGroupCallback = (count, e) -> {
+                if(e == null) {
+                    holder.tvNumMembers.setText(count + " members");
+                } else {
+                    Log.e(TAG, "error getting num members", e);
+                }
+            };
             ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
+            // Query the groups' number of posts to set tvNumPosts
+            CountCallback getNumPostsInGroupCallback = (count, e) -> {
+                if (e == null) {
+                    holder.tvNumPosts.setText(count + " posts");
+                } else {
+                    Log.e(TAG, "error getting num posts", e);
+                }
+            };
+            ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
             // Get the group's book using an API call to set the book cover
             client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
                 @Override

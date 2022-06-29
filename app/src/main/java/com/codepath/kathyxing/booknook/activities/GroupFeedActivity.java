@@ -43,6 +43,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     private ProgressBar pbLoading;
     private TextView tvNoGroupPosts;
     private TextView tvNumMembers;
+    private TextView tvNumPosts;
     private final int ADD_POST = 20;
 
     @Override
@@ -71,6 +72,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         pbLoading = findViewById(R.id.pbLoading);
         tvNoGroupPosts = findViewById(R.id.tvNoGroupPosts);
         tvNumMembers = findViewById(R.id.tvNumMembers);
+        tvNumPosts = findViewById(R.id.tvNumPosts);
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(this, allPosts);
@@ -81,33 +83,51 @@ public class GroupFeedActivity extends AppCompatActivity {
         rvPosts.setLayoutManager(linearLayoutManager);
         // get the number of members in the group
         getNumMembers();
+        // get the number of posts in the group
+        getNumPosts();
         // query posts in group
         queryPosts();
     }
 
     private void getNumMembers() {
-        CountCallback getNumMembersInGroupCallback = (count, e) -> tvNumMembers.setText(count + " members");
+        CountCallback getNumMembersInGroupCallback = (count, e) -> {
+            if (e == null) {
+                tvNumMembers.setText(count + " members");
+            }
+            else {
+                Log.e(TAG, "error getting num members", e);
+            }
+        };
         ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
     }
 
-    private void queryPosts() {
-        FindCallback queryPostsCallback = new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> posts, ParseException e) {
-                // check for errors
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
-                    return;
-                }
-                // if there are no posts, set tvNoGroupPosts to visible
-                if (posts.isEmpty()) {
-                    tvNoGroupPosts.setVisibility(View.VISIBLE);
-                }
-                // save received posts to list and notify adapter of new data
-                allPosts.addAll(posts);
-                adapter.notifyDataSetChanged();
-                pbLoading.setVisibility(View.GONE);
+    private void getNumPosts() {
+        CountCallback getNumPostsInGroupCallback = (count, e) -> {
+            if (e == null) {
+                tvNumPosts.setText(count + " posts");
             }
+            else {
+                Log.e(TAG, "error getting num posts", e);
+            }
+        };
+        ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
+    }
+
+    private void queryPosts() {
+        FindCallback queryPostsCallback = (FindCallback<Post>) (posts, e) -> {
+            // check for errors
+            if (e != null) {
+                Log.e(TAG, "Issue with getting posts", e);
+                return;
+            }
+            // if there are no posts, set tvNoGroupPosts to visible
+            if (posts.isEmpty()) {
+                tvNoGroupPosts.setVisibility(View.VISIBLE);
+            }
+            // save received posts to list and notify adapter of new data
+            allPosts.addAll(posts);
+            adapter.notifyDataSetChanged();
+            pbLoading.setVisibility(View.GONE);
         };
         ParseQueryUtilities.queryGroupPostsAsync(book.getId(), queryPostsCallback);
     }
