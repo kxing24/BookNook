@@ -46,7 +46,7 @@ public class SignupActivity extends AppCompatActivity {
         btnSignup.setOnClickListener(v -> {
             Log.i(TAG, "onClick signup button");
             // TODO: remove username trailing spaces
-            String username = etUsername.getText().toString();
+            String username = etUsername.getText().toString().trim();
             String email = etEmail.getText().toString();
             String password = etPassword.getText().toString();
             String confirmPassword = etConfirmPassword.getText().toString();

@@ -51,8 +51,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     // View lookup cache
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView ivProfilePicture;
-        public TextView tvUsername;
+        private ImageView ivProfilePicture;
+        private TextView tvUsername;
 
         public ViewHolder(final View itemView, final UserAdapter.OnItemClickListener clickListener) {
             // Stores the itemView in a public final member variable that can be used
@@ -82,10 +82,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public UserAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-
         // Inflate the custom layout
         View groupView = inflater.inflate(R.layout.item_user, parent, false);
-
         // Return a new holder instance
         UserAdapter.ViewHolder viewHolder = new UserAdapter.ViewHolder(groupView, listener);
         return viewHolder;

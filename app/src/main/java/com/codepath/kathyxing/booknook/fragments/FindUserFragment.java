@@ -126,6 +126,6 @@ public class FindUserFragment extends Fragment {
                 pbLoading.setVisibility(View.GONE);
             }
         };
-        ParseQueryUtilities.queryUsersAsync(query, queryUsersCallback);
+        ParseQueryUtilities.queryUsersAsync(query.trim(), queryUsersCallback);
     }
 }

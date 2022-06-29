@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +35,17 @@ public class FriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_friends, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle(getString(R.string.friends));
+        }
     }
 
     @Override

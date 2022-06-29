@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/user_background.xml" value="0.222" />
         <entry key="app/src/main/res/layout/activity_advanced_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_book_search.xml" value="0.22056159420289856" />
@@ -13,6 +14,7 @@
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_search_results.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/activity_select_users.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/activity_user_profile.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.22056159420289856" />
@@ -36,6 +38,7 @@
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/menu/menu_group_feed.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.2786458333333333" />
+        <entry key="app/src/main/res/menu/menu_select_users.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/menu/menu_user_search.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/xml/fileprovider.xml" value="0.1" />
       </map>

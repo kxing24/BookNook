@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.adapters.UserSelectionAdapter.UserSelectionAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
@@ -61,12 +62,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         // initialize the views
         rvPosts = findViewById(R.id.rvPosts);
         pbLoading = findViewById(R.id.pbLoading);
@@ -152,7 +148,12 @@ public class GroupFeedActivity extends AppCompatActivity {
             return true;
         }
         if (item.getItemId() == R.id.inviteUser) {
-            // send an email to invite a user to the group
+            // Navigate to the select users activity
+            Intent intent = new Intent(this, SelectUsersActivity.class);
+            intent.putExtra("group", group);
+            startActivity(intent);
+            return true;
+
         }
         return super.onOptionsItemSelected(item);
     }

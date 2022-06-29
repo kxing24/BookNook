@@ -195,8 +195,8 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void addMemberWithBook() {
-        // create a callback for addMemberWithBook
-        GetCallback addMemberWithBookCallback = new GetCallback<Group>() {
+        // create a callback for getGroupFromBookCallback
+        GetCallback getGroupFromBookCallback = new GetCallback<Group>() {
             @Override
             public void done(Group group, ParseException e) {
                 // get the group and create a member with the group and user
@@ -209,8 +209,7 @@ public class BookDetailFragment extends Fragment {
                 }
             }
         };
-        ParseQueryUtilities.addMemberWithBookAsync(book, (User) User.getCurrentUser(),
-                addMemberWithBookCallback);
+        ParseQueryUtilities.getGroupFromBookAsync(book, getGroupFromBookCallback);
     }
 
     private void addMemberWithGroup(@NonNull Group group) {

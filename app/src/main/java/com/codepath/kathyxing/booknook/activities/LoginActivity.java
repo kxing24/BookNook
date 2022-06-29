@@ -28,18 +28,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         // If user is already logged in, don't show login screen
         if (ParseUser.getCurrentUser() != null) {
             goMainActivity();
         }
-
         // Initialize views
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoSignup = findViewById(R.id.btnGoSignup);
-
         // click handler for go sign up button
         btnGoSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,18 +45,13 @@ public class LoginActivity extends AppCompatActivity {
                 goSignupActivity();
             }
         });
-
         // click handler for login button
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG, "onClick login button");
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
-                loginUser(username, password);
-            }
+        btnLogin.setOnClickListener(v -> {
+            Log.i(TAG, "onClick login button");
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString();
+            loginUser(username, password);
         });
-
     }
 
     private void loginUser(String username, String password) {
@@ -71,8 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                     Log.e(TAG, "Issues with login", e);
                     showAlert("Login Fail", e.getMessage() + " Please try again.", true);
                     return;
-                }
-                else {
+                } else {
                     goMainActivity();
                     Log.i(TAG, "Successfully logged in");
                 }

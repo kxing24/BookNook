@@ -52,23 +52,23 @@ public final class ParseQueryUtilities {
         member.setFrom(user);
         member.setTo(group);
         member.setBookId(bookId);
+        member.setUserId(user.getObjectId());
         member.saveInBackground(addMemberWithGroupCallback);
     }
 
     /**
-     * Add a user to a group given the book
+     * Get the group given the book
      * @param book the group's book
-     * @param user the user being added to the group
-     * @param addMemberWithBookCallback the callback for the async function
+     * @param getGroupFromBookCallback the callback for the async function
      */
-    public static void addMemberWithBookAsync(@NonNull Book book, @NonNull User user,
-                                              @NonNull GetCallback addMemberWithBookCallback) {
+    public static void getGroupFromBookAsync(@NonNull Book book,
+                                             @NonNull GetCallback getGroupFromBookCallback) {
         // create the query
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
         // get results with the book id
         query.whereEqualTo(Group.KEY_BOOK_ID, book.getId());
         // get the group from the query
-        query.getFirstInBackground(addMemberWithBookCallback);
+        query.getFirstInBackground(getGroupFromBookCallback);
     }
 
     /**
@@ -322,5 +322,36 @@ public final class ParseQueryUtilities {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the current user's friends who are not in the group
+     * @param bookId the group's book id
+     * @param getFriendsNotInGroupCallback the callback for the async function
+     */
+    public static void getFriendsNotInGroupAsync(@NonNull String bookId,
+                                                 @NonNull FindCallback getFriendsNotInGroupCallback) {
+        // query friends where the current user requested and the friend received
+        ParseQuery<Friend> queryFriendRequest = ParseQuery.getQuery(Friend.class);
+        ParseQuery<User> queryUserRequest = ParseQuery.getQuery(User.class);
+        queryFriendRequest.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryFriendRequest.whereEqualTo(Friend.KEY_ACCEPTED, true);
+        queryUserRequest.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_RECEIVING_USER_ID, queryFriendRequest);
+        // query friends where the current user received and the friend requested
+        ParseQuery<Friend> queryFriendReceive = ParseQuery.getQuery(Friend.class);
+        ParseQuery<User> queryUserReceive = ParseQuery.getQuery(User.class);
+        queryFriendReceive.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryFriendReceive.whereEqualTo(Friend.KEY_ACCEPTED, true);
+        queryUserReceive.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_REQUESTING_USER_ID, queryFriendReceive);
+        // Combine queries and get result
+        List<ParseQuery<User>> queries = new ArrayList<>();
+        queries.add(queryUserRequest);
+        queries.add(queryUserReceive);
+        ParseQuery<User> queryFriends = ParseQuery.or(queries);
+        // Get the friends not in the group
+        ParseQuery<Member> queryMembers = ParseQuery.getQuery(Member.class);
+        queryMembers.whereNotEqualTo(Member.KEY_BOOK_ID, bookId);
+        queryFriends.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Member.KEY_USER_ID, queryMembers);
+        queryFriends.findInBackground(getFriendsNotInGroupCallback);
     }
 }
