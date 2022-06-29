@@ -53,7 +53,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivProfilePicture;
         public TextView tvUsername;
-        public TextView tvEmail;
 
         public ViewHolder(final View itemView, final UserAdapter.OnItemClickListener clickListener) {
             // Stores the itemView in a public final member variable that can be used
@@ -62,7 +61,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             // initialize views
             ivProfilePicture = itemView.findViewById(R.id.ivProfilePicture);
             tvUsername = itemView.findViewById(R.id.tvUsername);
-            tvEmail = itemView.findViewById(R.id.tvEmail);
             // set click handler for the itemview
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -100,7 +98,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         User user = users.get(position);
         // Populate data into the views
         holder.tvUsername.setText(user.getUsername());
-        holder.tvEmail.setText(user.getEmailPublic());
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(context).load(profilePicture.getUrl()).circleCrop().into(holder.ivProfilePicture);

@@ -80,7 +80,6 @@ public class FindUserFragment extends Fragment {
         userAdapter.setOnItemClickListener((itemView, position) -> {
             // get the user clicked
             User user = users.get(position);
-            // TODO: make userprofileactivity a fragment
             Intent intent = new Intent(getContext(), UserProfileActivity.class);
             intent.putExtra("user", user);
             getContext().startActivity(intent);

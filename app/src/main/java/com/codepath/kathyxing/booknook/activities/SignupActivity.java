@@ -80,7 +80,6 @@ public class SignupActivity extends AppCompatActivity {
         user.setUsernameLowercase(username.toLowerCase(Locale.ROOT));
         user.setPassword(password);
         user.setEmail(email.toLowerCase(Locale.ROOT));
-        user.setEmailPublic(email.toLowerCase(Locale.ROOT));
         // Invoke signUpInBackground
         user.signUpInBackground(e -> {
             if (e == null) {

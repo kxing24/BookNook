@@ -173,7 +173,7 @@ public final class ParseQueryUtilities {
     }
 
     /**
-     * Get the users with usernames or emails that contain a string
+     * Get the users with usernames contain a string
      * @param query the string
      * @param queryUsersCallback the callback for the async function
      */
@@ -181,19 +181,11 @@ public final class ParseQueryUtilities {
         // get results where query is in username
         ParseQuery<User> queryUsername = ParseQuery.getQuery(User.class);
         queryUsername.whereContains(User.KEY_USERNAME_LOWERCASE, query.toLowerCase(Locale.ROOT));
-        // get results where query is in email
-        ParseQuery<User> queryEmail = ParseQuery.getQuery(User.class);
-        queryEmail.whereContains(User.KEY_EMAIL, query.toLowerCase(Locale.ROOT));
-        // Combine queries and get result
-        List<ParseQuery<User>> queries = new ArrayList<>();
-        queries.add(queryUsername);
-        queries.add(queryEmail);
-        ParseQuery<User> mainQuery = ParseQuery.or(queries);
         // Exclude current user
-        mainQuery.whereNotEqualTo(User.KEY_USERNAME, ParseUser.getCurrentUser().getUsername());
+        queryUsername.whereNotEqualTo(User.KEY_USERNAME, ParseUser.getCurrentUser().getUsername());
         // Only include users with verified emails
-        mainQuery.whereEqualTo(User.KEY_EMAIL_VERIFIED, true);
-        mainQuery.findInBackground(queryUsersCallback);
+        queryUsername.whereEqualTo(User.KEY_EMAIL_VERIFIED, true);
+        queryUsername.findInBackground(queryUsersCallback);
     }
 
     /**

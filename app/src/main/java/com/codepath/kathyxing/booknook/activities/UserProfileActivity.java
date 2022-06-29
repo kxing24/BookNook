@@ -32,7 +32,6 @@ public class UserProfileActivity extends AppCompatActivity {
     public static final String TAG = "UserProfileActivity";
     private ImageView ivProfilePicture;
     private TextView tvUsername;
-    private TextView tvEmail;
     private Button btnAddFriend;
     private Button btnAcceptFriend;
     private TextView tvFriendRequestSent;
@@ -60,7 +59,6 @@ public class UserProfileActivity extends AppCompatActivity {
         // initialize views
         ivProfilePicture = findViewById(R.id.ivProfilePicture);
         tvUsername = findViewById(R.id.tvUsername);
-        tvEmail = findViewById(R.id.tvEmail);
         btnAddFriend = findViewById(R.id.btnAddFriend);
         btnAcceptFriend = findViewById(R.id.btnAcceptFriend);
         tvFriendRequestSent = findViewById(R.id.tvFriendRequestSent);
@@ -68,8 +66,6 @@ public class UserProfileActivity extends AppCompatActivity {
         user = (User) getIntent().getExtras().get("user");
         // set the views
         tvUsername.setText(user.getUsername());
-        Log.i(TAG, "user's email is " + user.getEmail());
-        tvEmail.setText(user.getEmailPublic());
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(this).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);
