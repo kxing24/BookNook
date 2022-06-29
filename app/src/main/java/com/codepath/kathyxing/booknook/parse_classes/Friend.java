@@ -19,7 +19,7 @@ public class Friend extends ParseObject implements Parcelable {
 
     public User getReceivingUser() { return (User) getParseUser(KEY_RECEIVING_USER); }
 
-    public void setKeyReceivingUser(User user) { put(KEY_RECEIVING_USER, user); }
+    public void setReceivingUser(User user) { put(KEY_RECEIVING_USER, user); }
 
     public String getRequestingUserId() { return getString(KEY_REQUESTING_USER_ID); }
 
@@ -27,7 +27,7 @@ public class Friend extends ParseObject implements Parcelable {
 
     public String getReceivingUserId() { return getString(KEY_RECEIVING_USER_ID); }
 
-    public void setKeyReceivingUserId(String userId) { put(KEY_RECEIVING_USER_ID, userId); }
+    public void setReceivingUserId(String userId) { put(KEY_RECEIVING_USER_ID, userId); }
 
     public Boolean getAccepted() { return getBoolean(KEY_ACCEPTED); }
 

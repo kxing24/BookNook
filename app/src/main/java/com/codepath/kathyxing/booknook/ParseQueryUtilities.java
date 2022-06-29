@@ -171,6 +171,11 @@ public final class ParseQueryUtilities {
         mainQuery.findInBackground(queryFriendsCallback);
     }
 
+    /**
+     * Get the users that contain a string
+     * @param query
+     * @param queryUsersCallback
+     */
     public static void queryUsersAsync(@NonNull String query, @NonNull FindCallback queryUsersCallback) {
         // get results where query is in username
         ParseQuery<User> queryUsername = ParseQuery.getQuery(User.class);
@@ -221,7 +226,7 @@ public final class ParseQueryUtilities {
      * @param user
      * @param getFriendStatusCallback
      */
-    public static void getFriendStatus(@NonNull User user, @NonNull GetCallback getFriendStatusCallback) {
+    public static void getFriendStatusAsync(@NonNull User user, @NonNull GetCallback getFriendStatusCallback) {
         // Get results where current user is requesting other user
         ParseQuery<Friend> queryRequesting = ParseQuery.getQuery(Friend.class);
         queryRequesting.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
@@ -237,5 +242,47 @@ public final class ParseQueryUtilities {
         ParseQuery<Friend> mainQuery = ParseQuery.or(queries);
         mainQuery.include(Friend.KEY_ACCEPTED);
         mainQuery.getFirstInBackground(getFriendStatusCallback);
+    }
+
+    /**
+     * The current user sends a friend request to the other user
+     * @param user
+     * @param requestFriendCallback
+     */
+    public static void requestFriendAsync(@NonNull User user, SaveCallback requestFriendCallback) {
+        // create the friend
+        Friend friend = new Friend();
+        // set the core properties
+        friend.setAccepted(false);
+        friend.setRequestingUser((User) ParseUser.getCurrentUser());
+        friend.setRequestingUserId(ParseUser.getCurrentUser().getObjectId());
+        friend.setReceivingUser(user);
+        friend.setReceivingUserId(user.getObjectId());
+        // invoke saveInBackground
+        friend.saveInBackground(requestFriendCallback);
+    }
+
+    /**
+     * The current user accepts the other user's friend request
+     * @param friend
+     * @param acceptFriendCallback
+     */
+    public static void acceptFriendAsync(@NonNull Friend friend,
+                                         @NonNull SaveCallback acceptFriendCallback) {
+        friend.setAccepted(true);
+        friend.saveInBackground(acceptFriendCallback);
+    }
+
+    /**
+     * Get the friend where the current user is receiving and the other user is requesting
+     * @param user
+     * @param getFriendReceivingCallback
+     */
+    public static void getFriendReceivingAsync(@NonNull User user,
+                                          @NonNull GetCallback getFriendReceivingCallback) {
+        ParseQuery<Friend> query = ParseQuery.getQuery(Friend.class);
+        query.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, user.getObjectId());
+        query.getFirstInBackground(getFriendReceivingCallback);
     }
 }

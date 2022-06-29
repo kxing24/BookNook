@@ -30,6 +30,7 @@
         <entry key="app/src/main/res/layout/item_friend.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_group.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/item_post.xml" value="0.2786458333333333" />
+        <entry key="app/src/main/res/layout/item_user.xml" value="0.1" />
         <entry key="app/src/main/res/menu/book_search_menu.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_book_search.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.2786458333333333" />

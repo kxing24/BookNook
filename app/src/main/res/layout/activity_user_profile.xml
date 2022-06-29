@@ -16,6 +16,15 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         tools:text="kathy" />
 
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvUsername"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        tools:text="kathyxing02@gmail.com" />
+
     <ImageView
         android:id="@+id/ivProfilePicture"
         android:layout_width="75dp"
@@ -30,7 +39,7 @@
         android:id="@+id/btnAddFriend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUsername"
+        android:layout_below="@+id/tvEmail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
         android:text="Add Friend"
@@ -40,7 +49,7 @@
         android:id="@+id/btnAcceptFriend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUsername"
+        android:layout_below="@+id/tvEmail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="0dp"
         android:text="Accept Friend"
@@ -50,22 +59,22 @@
         android:id="@+id/tvFriendRequestSent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUsername"
+        android:layout_below="@+id/tvEmail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:text="Friend Request Sent"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvFriends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvUsername"
+        android:layout_below="@+id/tvEmail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:text="Friends"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:visibility="gone" />
 
 </RelativeLayout>

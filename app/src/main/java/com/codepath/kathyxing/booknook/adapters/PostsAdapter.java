@@ -2,6 +2,7 @@ package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,6 +104,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             if(v == rlUserProfile) {
+                Log.i("HELP", "user email is " + post.getUser().getEmail());
                 Intent intent = new Intent(context, UserProfileActivity.class);
                 intent.putExtra("user", post.getUser());
                 context.startActivity(intent);

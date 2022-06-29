@@ -1,21 +1,18 @@
 package com.codepath.kathyxing.booknook.activities;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
-import com.parse.ParseException;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 import java.util.Locale;
 
@@ -33,7 +30,6 @@ public class SignupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-
         // initialize views
         etUsername = findViewById(R.id.etUsername);
         etEmail = findViewById(R.id.etEmail);
@@ -41,27 +37,19 @@ public class SignupActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnGoLogin = findViewById(R.id.btnGoLogin);
         btnSignup = findViewById(R.id.btnSignup);
-
         // click handler for go login button
-        btnGoLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG, "onClick go login button");
-                goLoginActivity();
-            }
+        btnGoLogin.setOnClickListener(v -> {
+            Log.i(TAG, "onClick go login button");
+            goLoginActivity();
         });
-
         // click handler for signup button
-        btnSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG, "onClick signup button");
-                String username = etUsername.getText().toString();
-                String email = etEmail.getText().toString();
-                String password = etPassword.getText().toString();
-                String confirmPassword = etConfirmPassword.getText().toString();
-                signupUser(username, email, password, confirmPassword);
-            }
+        btnSignup.setOnClickListener(v -> {
+            Log.i(TAG, "onClick signup button");
+            String username = etUsername.getText().toString();
+            String email = etEmail.getText().toString();
+            String password = etPassword.getText().toString();
+            String confirmPassword = etConfirmPassword.getText().toString();
+            signupUser(username, email, password, confirmPassword);
         });
     }
 
@@ -69,26 +57,21 @@ public class SignupActivity extends AppCompatActivity {
         if (username.equals("")) {
             Toast.makeText(SignupActivity.this, "You cannot have an empty username!", Toast.LENGTH_SHORT).show();
             return;
-        }
-        else if (email.equals("")) {
+        } else if (email.equals("")) {
             Toast.makeText(SignupActivity.this, "You cannot have an empty email!", Toast.LENGTH_SHORT).show();
             return;
-        }
-        else if (password.equals("")) {
+        } else if (password.equals("")) {
             Toast.makeText(SignupActivity.this, "You cannot have an empty password!", Toast.LENGTH_SHORT).show();
             return;
-        }
-        else if (confirmPassword.equals("")) {
+        } else if (confirmPassword.equals("")) {
             Toast.makeText(SignupActivity.this, "You must confirm your password!", Toast.LENGTH_SHORT).show();
             return;
-        }
-        else if (!password.equals(confirmPassword)) {
+        } else if (!password.equals(confirmPassword)) {
             Toast.makeText(SignupActivity.this, "Your passwords must match!", Toast.LENGTH_SHORT).show();
             etPassword.getText().clear();
             etConfirmPassword.getText().clear();
             return;
         }
-
         // Create the user
         User user = new User();
         // Set core properties
@@ -97,21 +80,19 @@ public class SignupActivity extends AppCompatActivity {
         user.setPassword(password);
         user.setEmail(email.toLowerCase(Locale.ROOT));
         // Invoke signUpInBackground
-        user.signUpInBackground(new SignUpCallback() {
-            public void done(ParseException e) {
-                if (e == null) {
-                    // Hooray! Let them use the app now.
-                    ParseUser.logOut();
-                    showAlert("Account Created Successfully!", "Please verify your email before login", false);
-                } else {
-                    // Sign up didn't succeed, look at the ParseException
-                    Log.e(TAG, "Issue with signup!", e);
-                    showAlert("Account Creation failed", "Account could not be created" + " : " + e.getMessage(), true);
-                    etUsername.getText().clear();
-                    etEmail.getText().clear();
-                    etPassword.getText().clear();
-                    etConfirmPassword.getText().clear();
-                }
+        user.signUpInBackground(e -> {
+            if (e == null) {
+                // Hooray! Let them use the app now.
+                ParseUser.logOut();
+                showAlert("Account Created Successfully!", "Please verify your email before login", false);
+            } else {
+                // Sign up didn't succeed, look at the ParseException
+                Log.e(TAG, "Issue with signup!", e);
+                showAlert("Account Creation failed", "Account could not be created" + " : " + e.getMessage(), true);
+                etUsername.getText().clear();
+                etEmail.getText().clear();
+                etPassword.getText().clear();
+                etConfirmPassword.getText().clear();
             }
         });
     }
@@ -138,9 +119,4 @@ public class SignupActivity extends AppCompatActivity {
         finish();
     }
 
-    private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
-        finish();
-    }
 }

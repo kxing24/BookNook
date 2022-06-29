@@ -58,7 +58,7 @@ public class ComposeActivity extends AppCompatActivity {
         // Extract group from intent extras
         group = (Group) getIntent().getExtras().get("group");
         // unwrap the book passed in via intent, using its simple name as a key
-        book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
+        book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
 
         // initialize the views
         etDescription = findViewById(R.id.etDescription);
@@ -70,34 +70,21 @@ public class ComposeActivity extends AppCompatActivity {
 
         // click handler for CaptureImage button
         // launch the camera so that the user can take a picture
-        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
+        btnCaptureImage.setOnClickListener(v -> launchCamera());
 
         // click handler for GetImageFromGallery button
         // go to the gallery so that the user can choose an image
-        btnGetImageFromGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPickPhoto();
-            }
-        });
+        btnGetImageFromGallery.setOnClickListener(v -> onPickPhoto());
 
         // click handler for submit button
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String description = etDescription.getText().toString();
-                if (description.isEmpty()) {
-                    Toast.makeText(ComposeActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ParseUser currentUser = ParseUser.getCurrentUser();
-                savePost(description, currentUser, photoFile);
+        btnSubmit.setOnClickListener(v -> {
+            String description = etDescription.getText().toString();
+            if (description.isEmpty()) {
+                Toast.makeText(ComposeActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
             }
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            savePost(description, currentUser, photoFile);
         });
 
     }
@@ -195,9 +182,8 @@ public class ComposeActivity extends AppCompatActivity {
                 ivPostImage.setImageBitmap(takenImage);
                 ivPostImage.setVisibility(View.VISIBLE);
             }
-            if (requestCode == PICK_PHOTO_CODE) {
+            if (requestCode == PICK_PHOTO_CODE && data != null) {
                 Uri photoUri = data.getData();
-
                 // Load the image located at photoUri into selectedImage with the correct orientation
                 Bitmap selectedImage = null;
                 try {
@@ -205,11 +191,9 @@ public class ComposeActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 // Load the taken image into a preview
                 ivPostImage.setImageBitmap(selectedImage);
                 ivPostImage.setVisibility(View.VISIBLE);
-
             }
         } else {
             Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();

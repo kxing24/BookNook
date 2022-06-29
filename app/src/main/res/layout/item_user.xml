@@ -24,9 +24,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:layout_toRightOf="@+id/ivProfilePicture"
         android:textSize="24sp"
         tools:text="kathy" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvUsername"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/ivProfilePicture"
+        tools:text="kathyxing02@gmail.com" />
 
 </RelativeLayout>
