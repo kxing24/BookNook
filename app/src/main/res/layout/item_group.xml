@@ -22,9 +22,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         android:layout_toRightOf="@+id/ivBookCover"
         android:textSize="24sp"
         tools:text="Pride and Prejudice Group" />
+
+    <TextView
+        android:id="@+id/tvNumMembers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvGroupTitle"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="3dp"
+        android:layout_toEndOf="@+id/ivBookCover"
+        tools:text="5 members" />
 
 </RelativeLayout>

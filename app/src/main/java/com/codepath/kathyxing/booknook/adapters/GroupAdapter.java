@@ -15,11 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
+import com.codepath.kathyxing.booknook.parse_classes.Member;
+import com.parse.CountCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,21 +53,17 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivCover;
         public TextView tvGroupTitle;
+        public TextView tvNumMembers;
 
         public ViewHolder(final View itemView, final GroupAdapter.OnItemClickListener clickListener) {
             // Stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance.
             super(itemView);
-
-            ivCover = (ImageView)itemView.findViewById(R.id.ivBookCover);
-            tvGroupTitle = (TextView)itemView.findViewById(R.id.tvGroupTitle);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    clickListener.onItemClick(itemView, getAdapterPosition());
-                }
-            });
+            ivCover = itemView.findViewById(R.id.ivBookCover);
+            tvGroupTitle = itemView.findViewById(R.id.tvGroupTitle);
+            tvNumMembers = itemView.findViewById(R.id.tvNumMembers);
+            // set up click handler for the item
+            itemView.setOnClickListener(v -> clickListener.onItemClick(itemView, getAdapterPosition()));
         }
     }
 
@@ -97,6 +97,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         try {
             // Populate data into the views
             holder.tvGroupTitle.setText(group.fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
+            // Query the group's number of members to set tvNumMembers
+            CountCallback getNumMembersInGroupCallback = (count, e) -> holder.tvNumMembers.setText(count + " members");
+            ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
             // Get the group's book using an API call to set the book cover
             client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
                 @Override

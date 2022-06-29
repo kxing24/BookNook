@@ -12,6 +12,7 @@ import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -28,8 +29,8 @@ import java.util.Locale;
 public final class ParseQueryUtilities {
     /**
      * Check if the book group exists
-     * @param book
-     * @param bookGroupStatusCallback
+     * @param book the group's book
+     * @param bookGroupStatusCallback the callback for the async function
      */
     public static void bookGroupStatusAsync(@NonNull Book book, GetCallback bookGroupStatusCallback) {
         ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
@@ -39,10 +40,10 @@ public final class ParseQueryUtilities {
 
     /**
      * Add a user to a group given the group
-     * @param group
-     * @param user
-     * @param bookId
-     * @param addMemberWithGroupCallback
+     * @param group the group that the user is being added to
+     * @param user the user being added to the group
+     * @param bookId the id of the group's book
+     * @param addMemberWithGroupCallback the callback for the async function
      */
     public static void addMemberWithGroupAsync(@NonNull Group group, @NonNull User user, @NonNull String bookId,
                                                @NonNull SaveCallback addMemberWithGroupCallback) {
@@ -56,9 +57,9 @@ public final class ParseQueryUtilities {
 
     /**
      * Add a user to a group given the book
-     * @param book
-     * @param user
-     * @param addMemberWithBookCallback
+     * @param book the group's book
+     * @param user the user being added to the group
+     * @param addMemberWithBookCallback the callback for the async function
      */
     public static void addMemberWithBookAsync(@NonNull Book book, @NonNull User user,
                                               @NonNull GetCallback addMemberWithBookCallback) {
@@ -72,9 +73,9 @@ public final class ParseQueryUtilities {
 
     /**
      * Check if a user is in a group given the book
-     * @param book
-     * @param user
-     * @param userInGroupCallback
+     * @param book the group's book
+     * @param user the user
+     * @param userInGroupCallback the callback for the async function
      */
     public static void userInGroupAsync(@NonNull Book book, @NonNull User user,
                                   @NonNull GetCallback userInGroupCallback) {
@@ -90,7 +91,7 @@ public final class ParseQueryUtilities {
 
     /**
      * Get the posts from the user's groups
-     * @param queryPostsCallback
+     * @param queryPostsCallback the callback for the async function
      */
     public static void queryHomeFeedPostsAsync(@NonNull FindCallback queryPostsCallback) {
         // first query the groups from the user
@@ -110,8 +111,8 @@ public final class ParseQueryUtilities {
 
     /**
      * Get the posts from a group
-     * @param bookId
-     * @param queryPostsCallback
+     * @param bookId the id of the group's book
+     * @param queryPostsCallback the callback for the async function
      */
     public static void queryGroupPostsAsync(@NonNull String bookId, @NonNull FindCallback queryPostsCallback) {
         // specify what type of data we want to query - Post.class
@@ -132,7 +133,7 @@ public final class ParseQueryUtilities {
 
     /**
      * Get the current user's groups
-     * @param queryGroupsCallback
+     * @param queryGroupsCallback the callback for the async function
      */
     public static void queryGroupsAsync(@NonNull FindCallback queryGroupsCallback) {
         // specify what type of data we want to query - Groups.class
@@ -147,7 +148,7 @@ public final class ParseQueryUtilities {
 
     /**
      * Get the current user's friends
-     * @param queryFriendsCallback
+     * @param queryFriendsCallback the callback for the async function
      */
     public static void queryFriendsAsync(@NonNull FindCallback queryFriendsCallback) {
         // query friends where the current user requested and the friend received
@@ -155,13 +156,13 @@ public final class ParseQueryUtilities {
         ParseQuery<User> queryUserRequest = ParseQuery.getQuery(User.class);
         queryFriendRequest.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, ParseUser.getCurrentUser().getObjectId());
         queryFriendRequest.whereEqualTo(Friend.KEY_ACCEPTED, true);
-        queryUserRequest.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_RECEIVING_USER, queryFriendRequest);
+        queryUserRequest.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_RECEIVING_USER_ID, queryFriendRequest);
         // query friends where the current user received and the friend requested
         ParseQuery<Friend> queryFriendReceive = ParseQuery.getQuery(Friend.class);
         ParseQuery<User> queryUserReceive = ParseQuery.getQuery(User.class);
         queryFriendReceive.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
         queryFriendReceive.whereEqualTo(Friend.KEY_ACCEPTED, true);
-        queryUserReceive.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_REQUESTING_USER, queryFriendReceive);
+        queryUserReceive.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_REQUESTING_USER_ID, queryFriendReceive);
         // Combine queries and get result
         List<ParseQuery<User>> queries = new ArrayList<>();
         queries.add(queryUserRequest);
@@ -172,9 +173,9 @@ public final class ParseQueryUtilities {
     }
 
     /**
-     * Get the users that contain a string
-     * @param query
-     * @param queryUsersCallback
+     * Get the users with usernames or emails that contain a string
+     * @param query the string
+     * @param queryUsersCallback the callback for the async function
      */
     public static void queryUsersAsync(@NonNull String query, @NonNull FindCallback queryUsersCallback) {
         // get results where query is in username
@@ -197,8 +198,8 @@ public final class ParseQueryUtilities {
 
     /**
      * query for friend where current user is the requesting user and other user is the receiving user
-     * @param user
-     * @param getRequestingFriendStatusCallback
+     * @param user the receiving user
+     * @param getRequestingFriendStatusCallback the callback for the async function
      */
     public static void getRequestingFriendStatusAsync(@NonNull User user, @NonNull GetCallback getRequestingFriendStatusCallback) {
         ParseQuery<Friend> query = ParseQuery.getQuery(Friend.class);
@@ -210,8 +211,8 @@ public final class ParseQueryUtilities {
 
     /**
      * query for friend where current user is the receiving user and other user is the requesting user
-     * @param user
-     * @param getReceivingFriendStatusCallback
+     * @param user the requesting user
+     * @param getReceivingFriendStatusCallback the callback for the async function
      */
     public static void getReceivingFriendStatusAsync(@NonNull User user, @NonNull GetCallback getReceivingFriendStatusCallback) {
         ParseQuery<Friend> query = ParseQuery.getQuery(Friend.class);
@@ -223,8 +224,8 @@ public final class ParseQueryUtilities {
 
     /**
      * query for friend between current user and other user
-     * @param user
-     * @param getFriendStatusCallback
+     * @param user the other user
+     * @param getFriendStatusCallback the callback for the async function
      */
     public static void getFriendStatusAsync(@NonNull User user, @NonNull GetCallback getFriendStatusCallback) {
         // Get results where current user is requesting other user
@@ -246,8 +247,8 @@ public final class ParseQueryUtilities {
 
     /**
      * The current user sends a friend request to the other user
-     * @param user
-     * @param requestFriendCallback
+     * @param user the other user receiving the friend request
+     * @param requestFriendCallback the callback for the async function
      */
     public static void requestFriendAsync(@NonNull User user, SaveCallback requestFriendCallback) {
         // create the friend
@@ -264,8 +265,8 @@ public final class ParseQueryUtilities {
 
     /**
      * The current user accepts the other user's friend request
-     * @param friend
-     * @param acceptFriendCallback
+     * @param friend the friend relation being the users
+     * @param acceptFriendCallback the callback for the async function
      */
     public static void acceptFriendAsync(@NonNull Friend friend,
                                          @NonNull SaveCallback acceptFriendCallback) {
@@ -275,8 +276,8 @@ public final class ParseQueryUtilities {
 
     /**
      * Get the friend where the current user is receiving and the other user is requesting
-     * @param user
-     * @param getFriendReceivingCallback
+     * @param user the user requesting to be friends
+     * @param getFriendReceivingCallback the callback for the async function
      */
     public static void getFriendReceivingAsync(@NonNull User user,
                                           @NonNull GetCallback getFriendReceivingCallback) {
@@ -284,5 +285,35 @@ public final class ParseQueryUtilities {
         query.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.whereEqualTo(Friend.KEY_REQUESTING_USER_ID, user.getObjectId());
         query.getFirstInBackground(getFriendReceivingCallback);
+    }
+
+    /**
+     * Get the users that are requesting to be friends with the current user
+     * @param getRequestingFriendsCallback the callback for the async function
+     */
+    public static void getRequestingFriendsAsync(@NonNull FindCallback getRequestingFriendsCallback) {
+        // get the friends where the current user is being requested
+        ParseQuery<Friend> queryFriend = ParseQuery.getQuery(Friend.class);
+        queryFriend.whereEqualTo(Friend.KEY_RECEIVING_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        queryFriend.whereEqualTo(Friend.KEY_ACCEPTED, false);
+        ParseQuery<User> queryUser = ParseQuery.getQuery(User.class);
+        // get the users requesting to be friends with the current user
+        queryUser.whereMatchesKeyInQuery(User.KEY_OBJECT_ID, Friend.KEY_REQUESTING_USER_ID, queryFriend);
+        queryUser.findInBackground(getRequestingFriendsCallback);
+    }
+
+    /**
+     * Get the number of members in a group
+     * @param group the group
+     * @param getNumMembersInGroupCallback the callback for the async function
+     */
+    public static void getNumMembersInGroupAsync(@NonNull Group group, @NonNull CountCallback getNumMembersInGroupCallback) {
+        try {
+            ParseQuery<Member> queryMembers = ParseQuery.getQuery(Member.class);
+            queryMembers.whereEqualTo(Member.KEY_BOOK_ID, group.fetchIfNeeded().getString(Group.KEY_BOOK_ID));
+            queryMembers.countInBackground(getNumMembersInGroupCallback);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

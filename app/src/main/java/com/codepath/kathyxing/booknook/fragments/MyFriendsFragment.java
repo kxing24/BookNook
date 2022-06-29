@@ -21,6 +21,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
+import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
 import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
 import com.codepath.kathyxing.booknook.adapters.UserAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
@@ -75,9 +76,11 @@ public class MyFriendsFragment extends Fragment {
         userAdapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                Toast.makeText(getContext(), "User at position " + position + " clicked!", Toast.LENGTH_SHORT).show();
-                // get the group clicked
+                // get the user clicked
                 User user = myFriends.get(position);
+                Intent intent = new Intent(getContext(), UserProfileActivity.class);
+                intent.putExtra("user", user);
+                getContext().startActivity(intent);
             }
         });
         // Attach the adapter to the RecyclerView

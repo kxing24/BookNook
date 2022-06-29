@@ -86,14 +86,8 @@ public class GroupFeedActivity extends AppCompatActivity {
     }
 
     private void getNumMembers() {
-        ParseQuery<Member> queryMembers = ParseQuery.getQuery(Member.class);
-        queryMembers.whereEqualTo(Member.KEY_BOOK_ID, book.getId());
-        queryMembers.countInBackground(new CountCallback() {
-            @Override
-            public void done(int count, ParseException e) {
-                tvNumMembers.setText(Integer.toString(count) + " members");
-            }
-        });
+        CountCallback getNumMembersInGroupCallback = (count, e) -> tvNumMembers.setText(count + " members");
+        ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
     }
 
     private void queryPosts() {

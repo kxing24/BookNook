@@ -78,7 +78,7 @@ public class FindUserFragment extends Fragment {
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         // set up a click handler for bookAdapter
         userAdapter.setOnItemClickListener((itemView, position) -> {
-            // get the book clicked
+            // get the user clicked
             User user = users.get(position);
             // TODO: make userprofileactivity a fragment
             Intent intent = new Intent(getContext(), UserProfileActivity.class);
