@@ -4,8 +4,12 @@
     <item
         android:id="@+id/inviteUser"
         android:icon="@drawable/icon_invite"
-        android:title="Item"
+        android:title="Invite friends"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/leaveGroup"
+        android:title="Leave group"
+        app:showAsAction="never" />
     <item
         android:id="@+id/compose"
         android:icon="@android:drawable/ic_menu_edit"

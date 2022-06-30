@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,9 +21,15 @@ import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
+import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
+import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.CountCallback;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
@@ -42,14 +49,16 @@ public class GroupFeedActivity extends AppCompatActivity {
     private TextView tvNoGroupPosts;
     private TextView tvNumMembers;
     private TextView tvNumPosts;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_feed);
-        // Extract book and group objects from intent extras
+        // Extract data from intent extras
         book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
         group = (Group) getIntent().getExtras().get("group");
+        position = getIntent().getExtras().getInt("position");
         // set up the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,7 +67,13 @@ public class GroupFeedActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putExtra("leftGroup", false);
+            intent.putExtra("position", position);
+            setResult(RESULT_OK, intent);
+            finish();
+        });
         // initialize the views
         rvPosts = findViewById(R.id.rvPosts);
         pbLoading = findViewById(R.id.pbLoading);
@@ -147,7 +162,9 @@ public class GroupFeedActivity extends AppCompatActivity {
             intent.putExtra("group", group);
             startActivity(intent);
             return true;
-
+        }
+        if (item.getItemId() == R.id.leaveGroup) {
+            leaveGroup();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -167,5 +184,29 @@ public class GroupFeedActivity extends AppCompatActivity {
             tvNoGroupPosts.setVisibility(View.GONE);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void leaveGroup() {
+        DeleteCallback leaveGroupCallback = e -> {
+            if (e == null) {
+                Toast.makeText(GroupFeedActivity.this, "Left group!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.putExtra("leftGroup", true);
+                setResult(RESULT_OK, intent);
+                intent.putExtra("position", position);
+                finish();
+            } else {
+                Log.e(TAG, "issue leaving group", e);
+            }
+        };
+        GetCallback<Member> getMemberCallback = (member, e) -> {
+            if (e == null) {
+                ParseQueryUtilities.leaveGroupAsync(member, leaveGroupCallback);
+                //TODO: pass back a boolean and adjust view visibility in previous ones
+            } else {
+                Log.e(TAG, "issue getting member", e);
+            }
+        };
+        ParseQueryUtilities.getMemberAsync(group, (User) ParseUser.getCurrentUser(), getMemberCallback);
     }
 }

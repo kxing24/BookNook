@@ -427,4 +427,26 @@ public final class ParseQueryUtilities {
         query.whereEqualTo(Like.KEY_USER_ID, ParseUser.getCurrentUser().getObjectId());
         query.getFirstInBackground(getLikePostCallback);
     }
+
+    /**
+     * Remove a member relation
+     * @param member the member relation
+     * @param leaveGroupCallback the callback for the async function
+     */
+    public static void leaveGroupAsync(@NonNull Member member, @NonNull DeleteCallback leaveGroupCallback) {
+        member.deleteInBackground(leaveGroupCallback);
+    }
+
+    /**
+     * Gets the member relation between a group and a user
+     * @param group the group
+     * @param user the user
+     * @param getMemberCallback the callback for the async function
+     */
+    public static void getMemberAsync(@NonNull Group group, @NonNull User user, @NonNull GetCallback getMemberCallback) {
+        ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
+        query.whereEqualTo(Member.KEY_BOOK_ID, group.getBookId());
+        query.whereEqualTo(Member.KEY_USER_ID, user.getObjectId());
+        query.getFirstInBackground(getMemberCallback);
+    }
 }

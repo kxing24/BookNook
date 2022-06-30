@@ -41,6 +41,7 @@ public class BookDetailFragment extends Fragment {
 
     // fragment parameters
     public static final String TAG = "BookDetailActivity";
+    private static final int GET_LEFT_GROUP = 10;
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
@@ -52,6 +53,7 @@ public class BookDetailFragment extends Fragment {
     private ProgressBar pbLoading;
     private Book book;
     private Group bookGroup;
+    private int numMembers;
 
     // Required empty public constructor
     public BookDetailFragment() {
@@ -125,12 +127,25 @@ public class BookDetailFragment extends Fragment {
             addMemberWithBook();
             // set button visibility
             btnJoinGroup.setVisibility(View.GONE);
+            tvNumMembers.setText(++numMembers + " members");
         });
         // Click handler for goto group button
         btnGoToGroup.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
             goGroupFeedActivity();
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == GET_LEFT_GROUP && resultCode == getActivity().RESULT_OK) {
+            Boolean leftGroup = data.getExtras().getBoolean("leftGroup");
+            if(leftGroup) {
+                btnGoToGroup.setVisibility(View.GONE);
+                btnJoinGroup.setVisibility(View.VISIBLE);
+                tvNumMembers.setText(--numMembers + " members");
+            }
+        }
     }
 
     private void bookGroupStatus() {
@@ -239,7 +254,10 @@ public class BookDetailFragment extends Fragment {
 
     // set the number of members in the group
     private void setNumMembers(Group group) {
-        CountCallback getNumMembersInGroupCallback = (count, e) -> tvNumMembers.setText(count + " members");
+        CountCallback getNumMembersInGroupCallback = (count, e) -> {
+            tvNumMembers.setText(count + " members");
+            numMembers = count;
+        };
         ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
     }
 
@@ -247,6 +265,6 @@ public class BookDetailFragment extends Fragment {
         Intent i = new Intent(getContext(), GroupFeedActivity.class);
         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
         i.putExtra("group", bookGroup);
-        startActivity(i);
+        startActivityForResult(i, GET_LEFT_GROUP);
     }
 }
