@@ -75,6 +75,8 @@ public final class ParseQueryUtilities {
 
     /**
      * Check if a user is in a group given the book
+     * If the user is in the group, the query will be successful
+     * If the user is not in the group, a ParseException with error code OBJECT_NOT_FOUND will occur
      * @param book the group's book
      * @param user the user
      * @param userInGroupCallback the callback for the async function
@@ -89,6 +91,32 @@ public final class ParseQueryUtilities {
         query.whereEqualTo(Member.KEY_BOOK_ID, book.getId());
         // get the member from the query
         query.getFirstInBackground(userInGroupCallback);
+    }
+
+    /**
+     * Check if a user in a group given the group
+     * If the user is in the group, the query will be successful
+     * If the user is not in the group, a ParseException with error code OBJECT_NOT_FOUND will occur
+     * @param group the group
+     * @param user the user
+     * @param userInGroupCallback the callback for the async function
+     */
+    public static void userInGroupAsync(@NonNull Group group, @NonNull User user, @NonNull GetCallback userInGroupCallback) {
+        ParseQuery<Member> queryMember = ParseQuery.getQuery(Member.class);
+        queryMember.whereEqualTo(Member.KEY_USER_ID, user.getObjectId());
+        queryMember.whereEqualTo(Member.KEY_BOOK_ID, group.getBookId());
+        queryMember.getFirstInBackground(userInGroupCallback);
+    }
+
+    /**
+     * Gets the group from the groupId
+     * @param groupId the groupId
+     * @param getGroupCallback the callback for the async function
+     */
+    public static void getGroupAsync(@NonNull String groupId, @NonNull GetCallback getGroupCallback) {
+        ParseQuery<Group> query = ParseQuery.getQuery(Group.class);
+        query.include(Group.KEY_BOOK_ID);
+        query.getInBackground(groupId, getGroupCallback);
     }
 
     /**

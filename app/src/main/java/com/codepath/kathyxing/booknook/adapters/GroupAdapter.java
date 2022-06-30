@@ -94,6 +94,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, int position) {
         // Get the data model based on position
+        Log.i(TAG, "position is " + position);
         Group group = groups.get(position);
         BookClient client = new BookClient();
         try {

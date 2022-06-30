@@ -28,7 +28,6 @@ import com.parse.CountCallback;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import org.parceler.Parcels;
@@ -62,7 +61,9 @@ public class GroupFeedActivity extends AppCompatActivity {
         // set up the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(group.getGroupName());
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(group.getGroupName());
+        }
         // have the toolbar show a back button
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -172,7 +173,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         // add the post to the top of the recyclerview
-        if (requestCode == ADD_POST && resultCode == RESULT_OK) {
+        if (data != null && requestCode == ADD_POST && resultCode == RESULT_OK) {
             // Get data from the intent (post)
             Post post = (Post) data.getExtras().get("post");
             // Update the RV with the tweet

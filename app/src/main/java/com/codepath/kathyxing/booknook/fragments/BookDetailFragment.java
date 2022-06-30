@@ -42,10 +42,6 @@ public class BookDetailFragment extends Fragment {
     // fragment parameters
     public static final String TAG = "BookDetailActivity";
     private static final int GET_LEFT_GROUP = 10;
-    private ImageView ivBookCover;
-    private TextView tvTitle;
-    private TextView tvAuthor;
-    private TextView tvDescription;
     private TextView tvNumMembers;
     private Button btnJoinGroup;
     private Button btnCreateGroup;
@@ -80,10 +76,10 @@ public class BookDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Initialize views
-        ivBookCover = view.findViewById(R.id.ivBookCover);
-        tvTitle = view.findViewById(R.id.tvGroupTitle);
-        tvAuthor = view.findViewById(R.id.tvAuthor);
-        tvDescription = view.findViewById(R.id.tvDescription);
+        ImageView ivBookCover = view.findViewById(R.id.ivBookCover);
+        TextView tvTitle = view.findViewById(R.id.tvGroupTitle);
+        TextView tvAuthor = view.findViewById(R.id.tvAuthor);
+        TextView tvDescription = view.findViewById(R.id.tvDescription);
         tvNumMembers = view.findViewById(R.id.tvNumMembers);
         btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
@@ -130,20 +126,20 @@ public class BookDetailFragment extends Fragment {
             tvNumMembers.setText(++numMembers + " members");
         });
         // Click handler for goto group button
-        btnGoToGroup.setOnClickListener(v -> {
-            goGroupFeedActivity();
-        });
+        btnGoToGroup.setOnClickListener(v -> goGroupFeedActivity());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == GET_LEFT_GROUP && resultCode == getActivity().RESULT_OK) {
-            Boolean leftGroup = data.getExtras().getBoolean("leftGroup");
-            if(leftGroup) {
-                btnGoToGroup.setVisibility(View.GONE);
-                btnJoinGroup.setVisibility(View.VISIBLE);
-                tvNumMembers.setText(--numMembers + " members");
+            if(data != null) {
+                boolean leftGroup = data.getExtras().getBoolean("leftGroup");
+                if(leftGroup) {
+                    btnGoToGroup.setVisibility(View.GONE);
+                    btnJoinGroup.setVisibility(View.VISIBLE);
+                    tvNumMembers.setText(--numMembers + " members");
+                }
             }
         }
     }
