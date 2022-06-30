@@ -3,8 +3,10 @@ package com.codepath.kathyxing.booknook.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -25,6 +27,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText etConfirmPassword;
     private Button btnSignup;
     private Button btnGoLogin;
+    private RelativeLayout rlSignup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,7 @@ public class SignupActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnGoLogin = findViewById(R.id.btnGoLogin);
         btnSignup = findViewById(R.id.btnSignup);
+        rlSignup = findViewById(R.id.rlSignup);
         // click handler for go login button
         btnGoLogin.setOnClickListener(v -> {
             Log.i(TAG, "onClick go login button");
@@ -51,6 +55,12 @@ public class SignupActivity extends AppCompatActivity {
             String password = etPassword.getText().toString();
             String confirmPassword = etConfirmPassword.getText().toString();
             signupUser(username, email, password, confirmPassword);
+        });
+        // hide keyboard when the relative layout is touched
+        rlSignup.setOnTouchListener((v, event) -> {
+            InputMethodManager imm = (InputMethodManager) SignupActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(SignupActivity.this.getCurrentFocus().getWindowToken(), 0);
+            return true;
         });
     }
 

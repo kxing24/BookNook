@@ -19,6 +19,7 @@ import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -390,15 +391,27 @@ public final class ParseQueryUtilities {
     }
 
     /**
-     * Saves the user's description
+     * Saves the user's profile description
      * @param user the user whose description is being saved
      * @param description the description being saved
      * @param saveUserDescriptionCallback the callback for the async function
      */
-    public static void saveUserDescriptionAsync(@NonNull User user, @NonNull String description,
+    public static void saveProfileDescriptionAsync(@NonNull User user, @NonNull String description,
                                                 @NonNull SaveCallback saveUserDescriptionCallback) {
-        user.put(User.KEY_PROFILE_DESCRIPTION, description);
+        user.setProfileDescription(description);
         user.saveInBackground(saveUserDescriptionCallback);
+    }
+
+    /**
+     * Saves the user's profile picture
+     * @param user the user whose profile picture is being saved
+     * @param image the image being saved
+     * @param saveProfilePictureCallback the callback for the async function
+     */
+    public static void saveProfilePictureAsync(@NonNull User user, @NonNull ParseFile image,
+                                               @NonNull SaveCallback saveProfilePictureCallback) {
+        user.setProfilePicture(image);
+        user.saveInBackground(saveProfilePictureCallback);
     }
 
     /**

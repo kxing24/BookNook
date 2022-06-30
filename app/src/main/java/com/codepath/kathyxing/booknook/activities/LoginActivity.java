@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.codepath.kathyxing.booknook.R;
@@ -24,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private Button btnGoSignup;
     private Button btnForgotPassword;
+    private RelativeLayout rlLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnGoSignup = findViewById(R.id.btnGoSignup);
         btnForgotPassword = findViewById(R.id.btnForgotPassword);
+        rlLogin = findViewById(R.id.rlLogin);
         // click handler for go sign up button
         btnGoSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +64,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 goForgotPasswordActivity();
             }
+        });
+        // hide keyboard when the relative layout is touched
+        rlLogin.setOnTouchListener((v, event) -> {
+            InputMethodManager imm = (InputMethodManager) LoginActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(LoginActivity.this.getCurrentFocus().getWindowToken(), 0);
+            return true;
         });
     }
 

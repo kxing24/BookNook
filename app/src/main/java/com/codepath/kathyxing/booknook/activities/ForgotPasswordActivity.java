@@ -7,8 +7,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
@@ -20,9 +22,11 @@ import com.parse.RequestPasswordResetCallback;
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     // activity parameters
-    EditText etEmail;
-    Button btnResetPassword;
-    Button btnBackToLogin;
+    private EditText etEmail;
+    private Button btnResetPassword;
+    private Button btnBackToLogin;
+    private RelativeLayout rlForgotPassword;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         btnResetPassword = findViewById(R.id.btnResetPassword);
         btnBackToLogin = findViewById(R.id.btnBackToLogin);
+        rlForgotPassword = findViewById(R.id.rlForgotPassword);
         // click handler for reset password button
         btnResetPassword.setOnClickListener(v -> {
             String userEmail = etEmail.getText().toString().trim();
@@ -64,6 +69,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         });
         // click handler for back to login button
         btnBackToLogin.setOnClickListener(v -> goLoginActivity());
+        // hide keyboard when the relative layout is touched
+        rlForgotPassword.setOnTouchListener((v, event) -> {
+            InputMethodManager imm = (InputMethodManager) ForgotPasswordActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(ForgotPasswordActivity.this.getCurrentFocus().getWindowToken(), 0);
+            return true;
+        });
     }
 
     private void showAlert(String title, String message, boolean error) {

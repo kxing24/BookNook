@@ -1,8 +1,15 @@
 package com.codepath.kathyxing.booknook.activities;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -10,15 +17,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
+import com.codepath.kathyxing.booknook.ImageSelectionUtilities;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
@@ -29,13 +41,22 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-public class UserProfileActivity extends AppCompatActivity {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class UserProfileActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     //TODO: user can edit profile picture
     //TODO: click to hide keyboard
 
     // activity parameters
     public static final String TAG = "UserProfileActivity";
+    public final static int PICK_PHOTO_CODE = 1046;
+    public final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public String photoFileName = "photo.jpg";
+    private File photoFile;
     private ImageView ivProfilePicture;
     private TextView tvUsername;
     private TextView tvProfileDescription;
@@ -91,8 +112,7 @@ public class UserProfileActivity extends AppCompatActivity {
             etProfileDescription.setText(user.getProfileDescription());
         }
         // load in profile picture with glide
-        ParseFile profilePicture = user.getProfilePicture();
-        Glide.with(this).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);
+        Glide.with(this).load(user.getProfilePicture().getUrl()).circleCrop().into(ivProfilePicture);
         // set view visibility
         if (!user.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
             setBtnAddFriendVisibility();
@@ -118,43 +138,122 @@ public class UserProfileActivity extends AppCompatActivity {
         // set click handler for save button
         btnSave.setOnClickListener(v -> {
             String newDescription = etProfileDescription.getText().toString();
-            saveUserDescription(newDescription);
+            saveProfileDescription(newDescription);
             if(newDescription.equals("")) {
                 newDescription = "This user has no description";
             }
+            saveProfilePicture();
             doneEditingProfile(newDescription);
             Toast.makeText(UserProfileActivity.this, "Saved profile changes!", Toast.LENGTH_SHORT).show();
         });
         // set click handler for cancel button
         btnCancel.setOnClickListener(v -> {
             String oldDescription = tvProfileDescription.getText().toString();
+            Glide.with(this).load(user.getProfilePicture().getUrl()).circleCrop().into(ivProfilePicture);
             doneEditingProfile(oldDescription);
         });
         // set click handler for edit profile picture button
         ibEditProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: provide options for camera and photo gallery
+                showPopupMenu(v);
             }
         });
         // hide keyboard when the relative layout is touched
-        rlUserProfileActivity.setOnTouchListener((v, event) -> {
-            InputMethodManager imm = (InputMethodManager) UserProfileActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(UserProfileActivity.this.getCurrentFocus().getWindowToken(), 0);
-            return true;
-        });
+        if (UserProfileActivity.this.getCurrentFocus() != null) {
+            rlUserProfileActivity.setOnTouchListener((v, event) -> {
+                InputMethodManager imm = (InputMethodManager) UserProfileActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(UserProfileActivity.this.getCurrentFocus().getWindowToken(), 0);
+                return true;
+            });
+        }
     }
 
-    private void saveUserDescription(String description) {
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        Log.i(TAG, "menu item clicked!");
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.gallery:
+                onPickPhoto();
+                return true;
+            case R.id.camera:
+                launchCamera();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+                // by this point we have the camera photo on disk
+                Bitmap takenImage = ImageSelectionUtilities.rotateBitmapOrientationCamera(photoFile.getPath());
+                // RESIZE BITMAP, see section below
+                // Load the taken image into a preview
+                ivProfilePicture.setImageBitmap(ImageSelectionUtilities.getCroppedBitmap(takenImage));
+            }
+            if (requestCode == PICK_PHOTO_CODE && data != null) {
+                Uri photoUri = data.getData();
+                try {
+                    Bitmap selectedImage = MediaStore.Images.Media.getBitmap(UserProfileActivity.this.getContentResolver(), photoUri);
+                    ivProfilePicture.setImageBitmap(ImageSelectionUtilities.getCroppedBitmap(selectedImage));
+                } catch (IOException e) {
+                    Log.i("TAG", "Some exception " + e);
+                }
+
+                /*
+                Uri photoUri = data.getData();
+                // Load the image located at photoUri into selectedImage with the correct orientation
+                Bitmap selectedImage = null;
+                try {
+                    selectedImage = ImageSelectionUtilities.rotateBitmapOrientationGallery(photoUri, this.getContentResolver());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Load the taken image into a preview
+                ivProfilePicture.setImageBitmap(ImageSelectionUtilities.getCroppedBitmap(selectedImage));
+
+                 */
+            }
+        } else {
+            Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showPopupMenu(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(this);
+        popup.inflate(R.menu.menu_user_profile);
+        popup.show();
+    }
+
+    private void saveProfileDescription(String description) {
         SaveCallback saveUserDescriptionCallback = e -> {
             if (e != null) {
-                Log.e(TAG, "Error while saving", e);
-            }
-            else {
+                Log.e(TAG, "Error while saving description", e);
+            } else {
                 Log.i(TAG, "Profile description save was successful");
             }
         };
-        ParseQueryUtilities.saveUserDescriptionAsync(user, description, saveUserDescriptionCallback);
+        ParseQueryUtilities.saveProfileDescriptionAsync(user, description, saveUserDescriptionCallback);
+    }
+
+    private void saveProfilePicture() {
+        if (photoFile != null) {
+            SaveCallback saveProfilePictureCallback = e -> {
+                if (e != null) {
+                    Log.e(TAG, "Error while image", e);
+                } else {
+                    Log.i(TAG, "Profile picture save was successful");
+                }
+            };
+            ParseQueryUtilities.saveProfilePictureAsync(user, new ParseFile(photoFile), saveProfilePictureCallback);
+            user.setProfilePicture(new ParseFile(photoFile));
+        }
     }
 
     private void doneEditingProfile(String description) {
@@ -268,5 +367,48 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         };
         ParseQueryUtilities.getFriendStatusAsync(user, getFriendStatusCallback);
+    }
+
+    private void launchCamera() {
+        // create Intent to take a picture and return control to the calling application
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Create a File reference for future access
+        photoFile = ImageSelectionUtilities.getPhotoFileUri(photoFileName, this, TAG);
+
+        // wrap File object into a content provider
+        // required for API >= 24
+        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
+        Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider", photoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(this.getPackageManager()) != null) {
+            // Start the image capture intent to take photo
+            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+        }
+    }
+
+    // Trigger gallery selection for a photo
+    private void onPickPhoto() {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+
+        // Create a File reference for future access
+        photoFile = ImageSelectionUtilities.getPhotoFileUri(photoFileName, this, TAG);
+
+        // wrap File object into a content provider
+        // required for API >= 24
+        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
+        Uri fileProvider = FileProvider.getUriForFile(this, "com.codepath.fileprovider", photoFile);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
     }
 }
