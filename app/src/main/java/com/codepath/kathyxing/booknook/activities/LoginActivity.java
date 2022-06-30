@@ -23,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnGoSignup;
+    private Button btnForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoSignup = findViewById(R.id.btnGoSignup);
+        btnForgotPassword = findViewById(R.id.btnForgotPassword);
         // click handler for go sign up button
         btnGoSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +53,13 @@ public class LoginActivity extends AppCompatActivity {
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
             loginUser(username, password);
+        });
+        // click handler for forgot password button
+        btnForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goForgotPasswordActivity();
+            }
         });
     }
 
@@ -97,5 +106,10 @@ public class LoginActivity extends AppCompatActivity {
         Intent i = new Intent(this, SignupActivity.class);
         startActivity(i);
         finish();
+    }
+
+    private void goForgotPasswordActivity() {
+        Intent i = new Intent(this, ForgotPasswordActivity.class);
+        startActivity(i);
     }
 }

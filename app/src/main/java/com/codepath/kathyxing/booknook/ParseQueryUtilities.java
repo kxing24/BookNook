@@ -22,11 +22,14 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.security.auth.callback.PasswordCallback;
 
 public final class ParseQueryUtilities {
     /**
@@ -476,5 +479,14 @@ public final class ParseQueryUtilities {
         query.whereEqualTo(Member.KEY_BOOK_ID, group.getBookId());
         query.whereEqualTo(Member.KEY_USER_ID, user.getObjectId());
         query.getFirstInBackground(getMemberCallback);
+    }
+
+    /**
+     * Sends user an email to reset password
+     * @param email the user's email address
+     * @param requestPasswordResetCallback the callback for the async function
+     */
+    public static void resetPasswordAsync(@NonNull String email, @NonNull RequestPasswordResetCallback requestPasswordResetCallback) {
+        ParseUser.requestPasswordResetInBackground(email, requestPasswordResetCallback);
     }
 }
