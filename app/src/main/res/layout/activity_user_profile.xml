@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlUserProfileActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.UserProfileActivity">
@@ -141,5 +142,19 @@
         android:layout_marginEnd="100dp"
         android:text="Cancel"
         android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/ibEditProfilePicture"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignBottom="@+id/ivProfilePicture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="0dp"
+        android:background="@android:color/transparent"
+        android:scaleType="center"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
 
 </RelativeLayout>

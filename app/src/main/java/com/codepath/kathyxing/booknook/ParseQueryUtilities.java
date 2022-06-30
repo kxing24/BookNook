@@ -9,10 +9,12 @@ import androidx.annotation.NonNull;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
+import com.codepath.kathyxing.booknook.parse_classes.Like;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.CountCallback;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -366,5 +368,63 @@ public final class ParseQueryUtilities {
                                                 @NonNull SaveCallback saveUserDescriptionCallback) {
         user.put(User.KEY_PROFILE_DESCRIPTION, description);
         user.saveInBackground(saveUserDescriptionCallback);
+    }
+
+    /**
+     * Counts the number of likes a post has
+     * @param post the post
+     * @param getPostLikeCallback the callback for the async function
+     */
+    public static void getPostLikeCountAsync(@NonNull Post post, @NonNull CountCallback getPostLikeCallback) {
+        ParseQuery<Like> query = ParseQuery.getQuery(Like.class);
+        query.whereEqualTo(Like.KEY_POST, post);
+        query.countInBackground(getPostLikeCallback);
+    }
+
+    /**
+     * Gets whether or not the user likes the post
+     * @param post the post
+     * @param getUserLikePostStatusCallback the callback for the async function
+     */
+    public static void getUserLikePostStatusAsync(@NonNull Post post,
+                                             @NonNull GetCallback getUserLikePostStatusCallback) {
+        ParseQuery<Like> query = ParseQuery.getQuery(Like.class);
+        query.whereEqualTo(Like.KEY_POST, post);
+        query.whereEqualTo(Like.KEY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.getFirstInBackground(getUserLikePostStatusCallback);
+    }
+
+    /**
+     * Creates a like relation between the post and the current user
+     * @param post the post
+     * @param likePostCallback the callback for the async function
+     */
+    public static void likePostAsync(@NonNull Post post, @NonNull SaveCallback likePostCallback) {
+        Like like = new Like();
+        like.setPost(post);
+        like.setUser((User) ParseUser.getCurrentUser());
+        like.setUserId(ParseUser.getCurrentUser().getObjectId());
+        like.saveInBackground(likePostCallback);
+    }
+
+    /**
+     * Deletes the like relation between the post and the current user
+     * @param like the like relation
+     * @param unlikePostCallback the callback for the async function
+     */
+    public static void unlikePostAsync(@NonNull Like like, @NonNull DeleteCallback unlikePostCallback) {
+        like.deleteInBackground(unlikePostCallback);
+    }
+
+    /**
+     * Get the like relation between the post and the current user
+     * @param post the post
+     * @param getLikePostCallback the callback for the async function
+     */
+    public static void getLikePostAsync(@NonNull Post post, @NonNull GetCallback getLikePostCallback) {
+        ParseQuery<Like> query = ParseQuery.getQuery(Like.class);
+        query.whereEqualTo(Like.KEY_POST, post);
+        query.whereEqualTo(Like.KEY_USER_ID, ParseUser.getCurrentUser().getObjectId());
+        query.getFirstInBackground(getLikePostCallback);
     }
 }

@@ -105,13 +105,10 @@ public class AdvancedSearchFragment extends Fragment {
             }
         });
         // hide keyboard when the relative layout is touched
-        rlAdvancedSearch.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-                return true;
-            }
+        rlAdvancedSearch.setOnTouchListener((v, event) -> {
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(getActivity().INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+            return true;
         });
     }
 }

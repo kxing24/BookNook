@@ -1,14 +1,20 @@
 package com.codepath.kathyxing.booknook.activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -25,6 +31,9 @@ import com.parse.SaveCallback;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    //TODO: user can edit profile picture
+    //TODO: click to hide keyboard
+
     // activity parameters
     public static final String TAG = "UserProfileActivity";
     private ImageView ivProfilePicture;
@@ -38,6 +47,8 @@ public class UserProfileActivity extends AppCompatActivity {
     private EditText etProfileDescription;
     private Button btnSave;
     private Button btnCancel;
+    private ImageButton ibEditProfilePicture;
+    private RelativeLayout rlUserProfileActivity;
     private User user;
 
     @Override
@@ -67,10 +78,12 @@ public class UserProfileActivity extends AppCompatActivity {
         etProfileDescription = findViewById(R.id.etProfileDescription);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
+        ibEditProfilePicture = findViewById(R.id.ibEditProfilePicture);
+        rlUserProfileActivity = findViewById(R.id.rlUserProfileActivity);
         user = (User) getIntent().getExtras().get("user");
         // set the views
         tvUsername.setText(user.getUsername());
-        if (user.getProfileDescription() == null) {
+        if (user.getProfileDescription() == null || user.getProfileDescription().equals("")) {
             tvProfileDescription.setText("This user has no description");
             etProfileDescription.setText("");
         } else {
@@ -100,18 +113,35 @@ public class UserProfileActivity extends AppCompatActivity {
             etProfileDescription.setVisibility(View.VISIBLE);
             btnCancel.setVisibility(View.VISIBLE);
             btnSave.setVisibility(View.VISIBLE);
+            ibEditProfilePicture.setVisibility(View.VISIBLE);
         });
         // set click handler for save button
         btnSave.setOnClickListener(v -> {
             String newDescription = etProfileDescription.getText().toString();
-            doneEditingProfile(newDescription);
             saveUserDescription(newDescription);
+            if(newDescription.equals("")) {
+                newDescription = "This user has no description";
+            }
+            doneEditingProfile(newDescription);
             Toast.makeText(UserProfileActivity.this, "Saved profile changes!", Toast.LENGTH_SHORT).show();
         });
         // set click handler for cancel button
         btnCancel.setOnClickListener(v -> {
             String oldDescription = tvProfileDescription.getText().toString();
             doneEditingProfile(oldDescription);
+        });
+        // set click handler for edit profile picture button
+        ibEditProfilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: provide options for camera and photo gallery
+            }
+        });
+        // hide keyboard when the relative layout is touched
+        rlUserProfileActivity.setOnTouchListener((v, event) -> {
+            InputMethodManager imm = (InputMethodManager) UserProfileActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(UserProfileActivity.this.getCurrentFocus().getWindowToken(), 0);
+            return true;
         });
     }
 
@@ -133,6 +163,7 @@ public class UserProfileActivity extends AppCompatActivity {
         etProfileDescription.setVisibility(View.GONE);
         btnSave.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
+        ibEditProfilePicture.setVisibility(View.GONE);
         btnEditProfile.setVisibility(View.VISIBLE);
     }
 

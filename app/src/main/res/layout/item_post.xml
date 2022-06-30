@@ -79,4 +79,41 @@
         android:layout_marginTop="5dp"
         android:textStyle="bold"
         tools:text="Pride and Prejudice Group" />
+
+    <ImageButton
+        android:id="@+id/ibLikeEmpty"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/ivPostImage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:srcCompat="@drawable/icon_heart_empty"
+        tools:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/ibLikeFilled"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/ivPostImage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:srcCompat="@drawable/icon_heart_filled" />
+
+    <TextView
+        android:id="@+id/tvLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivPostImage"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="12dp"
+        tools:text="36" />
 </RelativeLayout>
