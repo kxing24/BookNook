@@ -27,6 +27,7 @@ import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.CountCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.SaveCallback;
@@ -44,6 +45,7 @@ public class BookDetailFragment extends Fragment {
     private TextView tvTitle;
     private TextView tvAuthor;
     private TextView tvDescription;
+    private TextView tvNumMembers;
     private Button btnJoinGroup;
     private Button btnCreateGroup;
     private Button btnGoToGroup;
@@ -80,6 +82,7 @@ public class BookDetailFragment extends Fragment {
         tvTitle = view.findViewById(R.id.tvGroupTitle);
         tvAuthor = view.findViewById(R.id.tvAuthor);
         tvDescription = view.findViewById(R.id.tvDescription);
+        tvNumMembers = view.findViewById(R.id.tvNumMembers);
         btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
         btnGoToGroup = view.findViewById(R.id.btnGotoGroup);
@@ -93,7 +96,11 @@ public class BookDetailFragment extends Fragment {
         bookGroupStatus();
         // Set view text
         tvTitle.setText(book.getTitle());
-        tvAuthor.setText("by " + book.getAuthor());
+        if(book.getAuthor().equals("")) {
+            tvAuthor.setText("no author available");
+        } else {
+            tvAuthor.setText("by " + book.getAuthor());
+        }
         tvDescription.setText(book.getDescription());
         // Load in the cover image
         if (book.getCoverUrl() != null) {
@@ -134,11 +141,14 @@ public class BookDetailFragment extends Fragment {
                 // book group exists, set the group and check if the user is in the group
                 bookGroup = object;
                 userInGroup();
+                // set the number of members in the group
+                setNumMembers(object);
             } else {
                 // book group doesn't exist
                 if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                     // set the create group button to visible
                     btnCreateGroup.setVisibility(View.VISIBLE);
+                    tvNumMembers.setText("Book group does not exist");
                     pbLoading.setVisibility(View.GONE);
                 }
                 // unknown error, debug
@@ -225,6 +235,12 @@ public class BookDetailFragment extends Fragment {
                 addMemberWithGroup(group);
             }
         });
+    }
+
+    // set the number of members in the group
+    private void setNumMembers(Group group) {
+        CountCallback getNumMembersInGroupCallback = (count, e) -> tvNumMembers.setText(count + " members");
+        ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
     }
 
     private void goGroupFeedActivity() {
