@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.MainActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +39,16 @@ public class AdvancedSearchFragment extends Fragment {
 
     // Required empty public constructor
     public AdvancedSearchFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle("Advanced Search");
+        }
     }
 
     @Override

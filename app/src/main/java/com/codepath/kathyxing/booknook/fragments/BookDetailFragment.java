@@ -4,11 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +13,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -53,7 +52,18 @@ public class BookDetailFragment extends Fragment {
     private Group bookGroup;
 
     // Required empty public constructor
-    public BookDetailFragment() {}
+    public BookDetailFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Set the toolbar text
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.setTitle("Book Details");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,30 +73,22 @@ public class BookDetailFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // Set the toolbar text
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.setTitle("Book Details");
-        }
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Initialize views
-        ivBookCover = (ImageView) view.findViewById(R.id.ivBookCover);
-        tvTitle = (TextView) view.findViewById(R.id.tvGroupTitle);
-        tvAuthor = (TextView) view.findViewById(R.id.tvAuthor);
-        tvDescription = (TextView) view.findViewById(R.id.tvDescription);
-        btnJoinGroup = (Button) view.findViewById(R.id.btnJoinGroup);
-        btnCreateGroup = (Button) view.findViewById(R.id.btnCreateGroup);
-        btnGoToGroup = (Button) view.findViewById(R.id.btnGotoGroup);
-        pbLoading = (ProgressBar) view.findViewById(R.id.pbLoading);
+        ivBookCover = view.findViewById(R.id.ivBookCover);
+        tvTitle = view.findViewById(R.id.tvGroupTitle);
+        tvAuthor = view.findViewById(R.id.tvAuthor);
+        tvDescription = view.findViewById(R.id.tvDescription);
+        btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
+        btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
+        btnGoToGroup = view.findViewById(R.id.btnGotoGroup);
+        pbLoading = view.findViewById(R.id.pbLoading);
         // Extract book object from the bundle
         Bundle bundle = this.getArguments();
-        book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
+        if(bundle != null) {
+            book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
+        }
         // Check if the book group exists and whether the user is already in the group
         bookGroupStatus();
         // Set view text
@@ -94,70 +96,54 @@ public class BookDetailFragment extends Fragment {
         tvAuthor.setText("by " + book.getAuthor());
         tvDescription.setText(book.getDescription());
         // Load in the cover image
-        if(book.getCoverUrl() != null) {
+        if (book.getCoverUrl() != null) {
             Glide.with(this)
                     .load(Uri.parse(book.getCoverUrl()))
                     .apply(new RequestOptions()
                             .placeholder(R.drawable.ic_nocover))
                     .into(ivBookCover);
-        }
-        else {
+        } else {
             Glide.with(this).load(R.drawable.ic_nocover).into(ivBookCover);
         }
         // Click handler for the create group button
-        btnCreateGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // create the group and make the user a member
-                bookGroupCreate(book, (User) User.getCurrentUser());
-                // set button visibility
-                btnCreateGroup.setVisibility(View.GONE);
-            }
+        btnCreateGroup.setOnClickListener(v -> {
+            // create the group and make the user a member
+            bookGroupCreate(book);
+            // set button visibility
+            btnCreateGroup.setVisibility(View.GONE);
         });
         // Click handler for join group button
-        btnJoinGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // make the user a member of the group
-                addMemberWithBook();
-                // set button visibility
-                btnJoinGroup.setVisibility(View.GONE);
-            }
+        btnJoinGroup.setOnClickListener(v -> {
+            // make the user a member of the group
+            addMemberWithBook();
+            // set button visibility
+            btnJoinGroup.setVisibility(View.GONE);
         });
         // Click handler for goto group button
-        btnGoToGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
-                goGroupFeedActivity();
-            }
+        btnGoToGroup.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
+            goGroupFeedActivity();
         });
     }
 
     private void bookGroupStatus() {
         // Create a callback for bookGroupStatusAsync
-        GetCallback bookGroupStatusCallback = new GetCallback<Group>() {
-            @Override
-            public void done(Group object, ParseException e) {
-                // book group exists
-                if (e == null) {
-                    // book group exists, set the group and check if the user is in the group
-                    bookGroup = object;
-                    userInGroup();
+        GetCallback bookGroupStatusCallback = (GetCallback<Group>) (object, e) -> {
+            // book group exists
+            if (e == null) {
+                // book group exists, set the group and check if the user is in the group
+                bookGroup = object;
+                userInGroup();
+            } else {
+                // book group doesn't exist
+                if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                    // set the create group button to visible
+                    btnCreateGroup.setVisibility(View.VISIBLE);
+                    pbLoading.setVisibility(View.GONE);
                 }
+                // unknown error, debug
                 else {
-                    // book group doesn't exist
-                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
-                    {
-                        // set the create group button to visible
-                        btnCreateGroup.setVisibility(View.VISIBLE);
-                        pbLoading.setVisibility(View.GONE);
-                    }
-                    // unknown error, debug
-                    else
-                    {
-                        Log.e(TAG, "Query failed", e);
-                    }
+                    Log.e(TAG, "Query failed", e);
                 }
             }
         };
@@ -166,28 +152,21 @@ public class BookDetailFragment extends Fragment {
 
     private void userInGroup() {
         // Create a callback for userInGroupAsync
-        GetCallback userInGroupCallback = new GetCallback<Member>() {
-            @Override
-            public void done(Member object, ParseException e) {
-                if (e == null) {
-                    // user is in the group
-                    // set the go to group button to be visible
-                    btnGoToGroup.setVisibility(View.VISIBLE);
+        GetCallback userInGroupCallback = (GetCallback<Member>) (object, e) -> {
+            if (e == null) {
+                // user is in the group
+                // set the go to group button to be visible
+                btnGoToGroup.setVisibility(View.VISIBLE);
+                pbLoading.setVisibility(View.GONE);
+            } else {
+                if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                    // user is not in the group
+                    // set the join group button to be visible
+                    btnJoinGroup.setVisibility(View.VISIBLE);
                     pbLoading.setVisibility(View.GONE);
-                }
-                else {
-                    if(e.getCode() == ParseException.OBJECT_NOT_FOUND)
-                    {
-                        // user is not in the group
-                        // set the join group button to be visible
-                        btnJoinGroup.setVisibility(View.VISIBLE);
-                        pbLoading.setVisibility(View.GONE);
-                    }
-                    else
-                    {
-                        // unknown error, debug
-                        Log.e(TAG, "Query failed", e);
-                    }
+                } else {
+                    // unknown error, debug
+                    Log.e(TAG, "Query failed", e);
                 }
             }
         };
@@ -196,17 +175,14 @@ public class BookDetailFragment extends Fragment {
 
     private void addMemberWithBook() {
         // create a callback for getGroupFromBookCallback
-        GetCallback getGroupFromBookCallback = new GetCallback<Group>() {
-            @Override
-            public void done(Group group, ParseException e) {
-                // get the group and create a member with the group and user
-                if (e == null) {
-                    addMemberWithGroup(group);
-                }
-                // an error occurred
-                else {
-                    Log.e(TAG, "Issue getting group", e);
-                }
+        GetCallback getGroupFromBookCallback = (GetCallback<Group>) (group, e) -> {
+            // get the group and create a member with the group and user
+            if (e == null) {
+                addMemberWithGroup(group);
+            }
+            // an error occurred
+            else {
+                Log.e(TAG, "Issue getting group", e);
             }
         };
         ParseQueryUtilities.getGroupFromBookAsync(book, getGroupFromBookCallback);
@@ -214,20 +190,17 @@ public class BookDetailFragment extends Fragment {
 
     private void addMemberWithGroup(@NonNull Group group) {
         // create a callback for addMemberWithGroup
-        SaveCallback addMemberWithGroupCallback = new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                // Error while creating member
-                if (e != null) {
-                    Log.e(TAG, "Error while creating member", e);
-                    Toast.makeText(getContext(), "Failed to join group!", Toast.LENGTH_SHORT).show();
-                }
-                // Successfully created member
-                else {
-                    Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
-                    // User is now a member of the group: adjust visibility of buttons
-                    btnGoToGroup.setVisibility(View.VISIBLE);
-                }
+        SaveCallback addMemberWithGroupCallback = e -> {
+            // Error while creating member
+            if (e != null) {
+                Log.e(TAG, "Error while creating member", e);
+                Toast.makeText(getContext(), "Failed to join group!", Toast.LENGTH_SHORT).show();
+            }
+            // Successfully created member
+            else {
+                Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
+                // User is now a member of the group: adjust visibility of buttons
+                btnGoToGroup.setVisibility(View.VISIBLE);
             }
         };
         ParseQueryUtilities.addMemberWithGroupAsync(group,
@@ -235,25 +208,21 @@ public class BookDetailFragment extends Fragment {
     }
 
     // Creates the group and adds the first user
-    private void bookGroupCreate(@NonNull Book book, @NonNull User user) {
+    private void bookGroupCreate(@NonNull Book book) {
         // creates the group
         Group group = new Group();
         group.setBookId(book.getId());
         group.setGroupName(book.getTitle() + " Group");
-        group.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while creating group", e);
-                    Toast.makeText(getContext(), "Error while creating group!", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Log.i(TAG, "Successfully created group for " + group.getBookId());
-                    // set the group
-                    bookGroup = group;
-                    // make the user a member of the group
-                    addMemberWithGroup(group);
-                }
+        group.saveInBackground(e -> {
+            if (e != null) {
+                Log.e(TAG, "Error while creating group", e);
+                Toast.makeText(getContext(), "Error while creating group!", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.i(TAG, "Successfully created group for " + group.getBookId());
+                // set the group
+                bookGroup = group;
+                // make the user a member of the group
+                addMemberWithGroup(group);
             }
         });
     }

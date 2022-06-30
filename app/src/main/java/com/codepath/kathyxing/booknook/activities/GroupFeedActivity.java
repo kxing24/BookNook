@@ -1,11 +1,5 @@
 package com.codepath.kathyxing.booknook.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,18 +9,20 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
-import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.adapters.UserSelectionAdapter.UserSelectionAdapter;
+import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
-import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.parse.CountCallback;
 import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
 
 import org.parceler.Parcels;
 
@@ -36,6 +32,7 @@ import java.util.List;
 public class GroupFeedActivity extends AppCompatActivity {
 
     public static final String TAG = "GroupFeedActivity";
+    private final int ADD_POST = 20;
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
     private Book book;
@@ -45,17 +42,16 @@ public class GroupFeedActivity extends AppCompatActivity {
     private TextView tvNoGroupPosts;
     private TextView tvNumMembers;
     private TextView tvNumPosts;
-    private final int ADD_POST = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_feed);
         // Extract book and group objects from intent extras
-        book = (Book) Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
+        book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
         group = (Group) getIntent().getExtras().get("group");
         // set up the toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(group.getGroupName());
         // have the toolbar show a back button
@@ -89,8 +85,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         CountCallback getNumMembersInGroupCallback = (count, e) -> {
             if (e == null) {
                 tvNumMembers.setText(count + " members");
-            }
-            else {
+            } else {
                 Log.e(TAG, "error getting num members", e);
             }
         };
@@ -101,8 +96,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         CountCallback getNumPostsInGroupCallback = (count, e) -> {
             if (e == null) {
                 tvNumPosts.setText(count + " posts");
-            }
-            else {
+            } else {
                 Log.e(TAG, "error getting num posts", e);
             }
         };

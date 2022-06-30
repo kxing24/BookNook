@@ -355,4 +355,16 @@ public final class ParseQueryUtilities {
         queryFriends.whereDoesNotMatchKeyInQuery(User.KEY_OBJECT_ID, Member.KEY_USER_ID, queryMembers);
         queryFriends.findInBackground(getFriendsNotInGroupCallback);
     }
+
+    /**
+     * Saves the user's description
+     * @param user the user whose description is being saved
+     * @param description the description being saved
+     * @param saveUserDescriptionCallback the callback for the async function
+     */
+    public static void saveUserDescriptionAsync(@NonNull User user, @NonNull String description,
+                                                @NonNull SaveCallback saveUserDescriptionCallback) {
+        user.put(User.KEY_PROFILE_DESCRIPTION, description);
+        user.saveInBackground(saveUserDescriptionCallback);
+    }
 }

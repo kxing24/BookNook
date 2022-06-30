@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BookNook</string>
     <string name="google_books_api_key">AIzaSyCIH6JcoToLAbhhOizI9JEngHhgx8X6Bso</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_profile">Profile</string>
     <string name="action_logout">Logout</string>
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
     <string name="back4app_app_id">A46pyzEfVBx9EiNqpTcgdSLnuuK3G3cNT1XA6p2U</string>

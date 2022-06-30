@@ -104,10 +104,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             if(v == rlUserProfile) {
-                Log.i("HELP", "user email is " + post.getUser().getEmail());
-                Intent intent = new Intent(context, UserProfileActivity.class);
-                intent.putExtra("user", post.getUser());
-                context.startActivity(intent);
+                if(!post.getUser().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                    Intent intent = new Intent(context, UserProfileActivity.class);
+                    intent.putExtra("user", post.getUser());
+                    context.startActivity(intent);
+                }
             }
         }
     }

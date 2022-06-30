@@ -1,30 +1,27 @@
 package com.codepath.kathyxing.booknook.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.User;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -32,10 +29,15 @@ public class UserProfileActivity extends AppCompatActivity {
     public static final String TAG = "UserProfileActivity";
     private ImageView ivProfilePicture;
     private TextView tvUsername;
+    private TextView tvProfileDescription;
     private Button btnAddFriend;
     private Button btnAcceptFriend;
     private TextView tvFriendRequestSent;
     private TextView tvFriends;
+    private Button btnEditProfile;
+    private EditText etProfileDescription;
+    private Button btnSave;
+    private Button btnCancel;
     private User user;
 
     @Override
@@ -45,27 +47,36 @@ public class UserProfileActivity extends AppCompatActivity {
         // set up the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Profile");
+        }
         // have the toolbar show a back button
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         // initialize views
         ivProfilePicture = findViewById(R.id.ivProfilePicture);
         tvUsername = findViewById(R.id.tvUsername);
+        tvProfileDescription = findViewById(R.id.tvProfileDescription);
         btnAddFriend = findViewById(R.id.btnAddFriend);
         btnAcceptFriend = findViewById(R.id.btnAcceptFriend);
         tvFriendRequestSent = findViewById(R.id.tvFriendRequestSent);
         tvFriends = findViewById(R.id.tvFriends);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
+        etProfileDescription = findViewById(R.id.etProfileDescription);
+        btnSave = findViewById(R.id.btnSave);
+        btnCancel = findViewById(R.id.btnCancel);
         user = (User) getIntent().getExtras().get("user");
         // set the views
         tvUsername.setText(user.getUsername());
+        if (user.getProfileDescription() == null) {
+            tvProfileDescription.setText("This user has no description");
+            etProfileDescription.setText("");
+        } else {
+            tvProfileDescription.setText(user.getProfileDescription());
+            etProfileDescription.setText(user.getProfileDescription());
+        }
         // load in profile picture with glide
         ParseFile profilePicture = user.getProfilePicture();
         Glide.with(this).load(profilePicture.getUrl()).circleCrop().into(ivProfilePicture);
@@ -75,24 +86,64 @@ public class UserProfileActivity extends AppCompatActivity {
             setBtnAcceptFriendVisibility();
             setTvFriendRequestSentVisibility();
             setTvFriendsVisibility();
+        } else {
+            btnEditProfile.setVisibility(View.VISIBLE);
         }
         // set click handler for add friend button
         btnAddFriend.setOnClickListener(v -> requestFriend());
         // set click handler for accept friend button
         btnAcceptFriend.setOnClickListener(v -> acceptFriend());
+        // set click handler for edit profile button
+        btnEditProfile.setOnClickListener(v -> {
+            btnEditProfile.setVisibility(View.GONE);
+            tvProfileDescription.setVisibility(View.GONE);
+            etProfileDescription.setVisibility(View.VISIBLE);
+            btnCancel.setVisibility(View.VISIBLE);
+            btnSave.setVisibility(View.VISIBLE);
+        });
+        // set click handler for save button
+        btnSave.setOnClickListener(v -> {
+            String newDescription = etProfileDescription.getText().toString();
+            doneEditingProfile(newDescription);
+            saveUserDescription(newDescription);
+            Toast.makeText(UserProfileActivity.this, "Saved profile changes!", Toast.LENGTH_SHORT).show();
+        });
+        // set click handler for cancel button
+        btnCancel.setOnClickListener(v -> {
+            String oldDescription = tvProfileDescription.getText().toString();
+            doneEditingProfile(oldDescription);
+        });
+    }
+
+    private void saveUserDescription(String description) {
+        SaveCallback saveUserDescriptionCallback = e -> {
+            if (e != null) {
+                Log.e(TAG, "Error while saving", e);
+            }
+            else {
+                Log.i(TAG, "Profile description save was successful");
+            }
+        };
+        ParseQueryUtilities.saveUserDescriptionAsync(user, description, saveUserDescriptionCallback);
+    }
+
+    private void doneEditingProfile(String description) {
+        tvProfileDescription.setText(description);
+        tvProfileDescription.setVisibility(View.VISIBLE);
+        etProfileDescription.setVisibility(View.GONE);
+        btnSave.setVisibility(View.GONE);
+        btnCancel.setVisibility(View.GONE);
+        btnEditProfile.setVisibility(View.VISIBLE);
     }
 
     private void requestFriend() {
-        SaveCallback requestFriendCallback = new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    btnAddFriend.setVisibility(View.GONE);
-                    tvFriendRequestSent.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(UserProfileActivity.this,
-                            "Error sending friend request!", Toast.LENGTH_SHORT).show();
-                }
+        SaveCallback requestFriendCallback = e -> {
+            if (e == null) {
+                btnAddFriend.setVisibility(View.GONE);
+                tvFriendRequestSent.setVisibility(View.VISIBLE);
+            } else {
+                Toast.makeText(UserProfileActivity.this,
+                        "Error sending friend request!", Toast.LENGTH_SHORT).show();
             }
         };
         ParseQueryUtilities.requestFriendAsync(user, requestFriendCallback);

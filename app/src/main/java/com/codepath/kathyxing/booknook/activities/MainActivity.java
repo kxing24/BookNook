@@ -88,7 +88,10 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_settings:
+            case R.id.action_profile:
+                Intent intent = new Intent(this, UserProfileActivity.class);
+                intent.putExtra("user", ParseUser.getCurrentUser());
+                startActivity(intent);
                 return true;
             case R.id.action_logout:
                 logoutUser();
