@@ -25,24 +25,25 @@ An app that helps you explore different books, find your next read, and interact
 
 **Required Must-have Stories**
 
-* Users can search for books (Open Library API, Google Books API, Internet Archive REST API)
-* Users can rate / review books
-* User can create an account
-* User can login
-* User can join groups
-* User can post in groups
+- [x] Users can search for books (Open Library API, Google Books API, Internet Archive REST API)
+- [x] User can create an account
+- [x] User can login
+- [x] User can join groups
+- [x] User can post in groups
 
 **Optional Nice-to-have Stories**
 
-* User can shelve / sort books
-* User can click on a link to purchase a book
-* User can react to / comment on posts
-* User can friend / follow other users
-* Update reading progress on a book
-* Book giveaways?
-* Incorporate fanfiction?
-* Include trigger / content warnings?
-* Books on shelves sort by (date shelved, rating, etc.)
+- [x] User can like a post
+- [x] User can friend other users
+- [x] User can invite friends to a group
+- [x] User can edit their profile
+- [ ] User can see book recommendations
+- [ ] User can shelve books
+- [ ] Books on shelves sort by (date shelved, rating, etc.)
+- [ ] User can click on a link to purchase a book
+- [ ] User can comment on posts
+- [ ] Update reading progress on a book
+- [ ] Users can rate / review books
 
 ### 2. Screen Archetypes
 
