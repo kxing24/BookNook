@@ -2,13 +2,10 @@ package com.codepath.kathyxing.booknook.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,9 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
@@ -42,9 +37,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class UserProfileActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
@@ -139,7 +132,7 @@ public class UserProfileActivity extends AppCompatActivity implements PopupMenu.
         btnSave.setOnClickListener(v -> {
             String newDescription = etProfileDescription.getText().toString();
             saveProfileDescription(newDescription);
-            if(newDescription.equals("")) {
+            if (newDescription.equals("")) {
                 newDescription = "This user has no description";
             }
             saveProfilePicture();
@@ -204,20 +197,6 @@ public class UserProfileActivity extends AppCompatActivity implements PopupMenu.
                 } catch (IOException e) {
                     Log.i("TAG", "Some exception " + e);
                 }
-
-                /*
-                Uri photoUri = data.getData();
-                // Load the image located at photoUri into selectedImage with the correct orientation
-                Bitmap selectedImage = null;
-                try {
-                    selectedImage = ImageSelectionUtilities.rotateBitmapOrientationGallery(photoUri, this.getContentResolver());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                // Load the taken image into a preview
-                ivProfilePicture.setImageBitmap(ImageSelectionUtilities.getCroppedBitmap(selectedImage));
-
-                 */
             }
         } else {
             Toast.makeText(this, "Issue with getting picture!", Toast.LENGTH_SHORT).show();

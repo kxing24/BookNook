@@ -2,7 +2,6 @@ package com.codepath.kathyxing.booknook;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -17,10 +16,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import androidx.core.content.FileProvider;
-
-import com.codepath.kathyxing.booknook.activities.ComposeActivity;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,10 +25,10 @@ public final class ImageSelectionUtilities {
     /**
      * Returns the Bitmap of the correctly rotated photo given the photo uri
      *
-     * @param photoUri
-     * @param contentResolver
-     * @return
-     * @throws IOException
+     * @param photoUri        the photo uri
+     * @param contentResolver the content resolver
+     * @return the rotated bitmap
+     * @throws IOException an I/O exception
      */
     public static Bitmap rotateBitmapOrientationGallery(Uri photoUri, ContentResolver contentResolver) throws IOException {
         InputStream input = contentResolver.openInputStream(photoUri);
@@ -48,25 +43,29 @@ public final class ImageSelectionUtilities {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             exif = new ExifInterface(inputStream);
         }
-        // get the orientation and set the rotation angle accordingly
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int rotationAngle = 0;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
-        // Rotate Bitmap
-        Matrix matrix = new Matrix();
-        matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
-        // Return result
-        return rotatedBitmap;
+        if (exif != null) {
+            // exif is not null
+            // get the orientation and set the rotation angle accordingly
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            int rotationAngle = 0;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+            // Rotate Bitmap
+            Matrix matrix = new Matrix();
+            matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+            // Return result
+            return Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
+        }
+        // return the original bitmap if exif is null
+        return bm;
     }
 
     /**
      * Returns the Bitmap of the correctly rotated photo given the photo file path
      *
-     * @param photoFilePath
-     * @return
+     * @param photoFilePath the photo file's path
+     * @return the rotated bitmap
      */
     // rotate the image to the correct orientation using the EXIF data stored in the image
     public static Bitmap rotateBitmapOrientationCamera(String photoFilePath) {
@@ -83,28 +82,32 @@ public final class ImageSelectionUtilities {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // get the orientation and set the rotation angle accordingly
-        String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-        int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
-        int rotationAngle = 0;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
-        if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
-        // Rotate Bitmap
-        Matrix matrix = new Matrix();
-        matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
-        // Return result
-        return rotatedBitmap;
+        if (exif != null) {
+            // exif is not null
+            // get the orientation and set the rotation angle accordingly
+            String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+            int rotationAngle = 0;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+            if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+            // Rotate Bitmap
+            Matrix matrix = new Matrix();
+            matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+            // Return result
+            return Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
+        }
+        // exif is null, return the original bitmap
+        return bm;
     }
 
     /**
      * Returns the File for a photo stored on disk given the fileName
      *
-     * @param fileName
-     * @param context
-     * @param TAG
-     * @return
+     * @param fileName the file name
+     * @param context  the context
+     * @param TAG      the tag
+     * @return the file for the photo
      */
     public static File getPhotoFileUri(String fileName, Context context, String TAG) {
         // Get safe storage directory for photos
@@ -113,7 +116,7 @@ public final class ImageSelectionUtilities {
         File mediaStorageDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
 
@@ -123,8 +126,9 @@ public final class ImageSelectionUtilities {
 
     /**
      * Crops the bitmap into a circle
+     *
      * @param bitmap the bitmap to crop
-     * @return
+     * @return the cropped bitmap
      */
     public static Bitmap getCroppedBitmap(Bitmap bitmap) {
         Log.i("HELLO", "cropping bitmap");

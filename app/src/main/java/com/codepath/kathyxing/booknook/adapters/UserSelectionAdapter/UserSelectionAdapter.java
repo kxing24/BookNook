@@ -30,10 +30,6 @@ public class UserSelectionAdapter extends RecyclerView.Adapter<UserSelectionAdap
         this.context = context;
     }
 
-    public SelectionTracker getSelectionTracker() {
-        return selectionTracker;
-    }
-
     public void setSelectionTracker(SelectionTracker selectionTracker) {
         this.selectionTracker = selectionTracker;
     }
@@ -48,9 +44,7 @@ public class UserSelectionAdapter extends RecyclerView.Adapter<UserSelectionAdap
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
-
         holder.bind(user, selectionTracker.isSelected(user));
-
     }
 
     @Override

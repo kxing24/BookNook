@@ -44,7 +44,7 @@ public class MyGroupsFragment extends Fragment {
 
     // the fragment parameters
     public static final String TAG = "MyGroupsFragment";
-    private static final int GET_LEFT_GROUP = 10;
+    private static final int LEFT_GROUP = 10;
     private static final int ADD_GROUP = 30;
     private RecyclerView rvMyGroups;
     private GroupAdapter groupAdapter;
@@ -59,21 +59,20 @@ public class MyGroupsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_groups, container, false);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle(getString(R.string.my_groups));
         }
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_my_groups, container, false);
     }
 
     @Override
@@ -88,9 +87,8 @@ public class MyGroupsFragment extends Fragment {
         rlJoinGroup = view.findViewById(R.id.rlJoinGroup);
         // set up a click handler for rlJoinGroup
         rlJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
-        // set up a click handler for bookAdapter
+        // set up a click handler for groupAdapter
         groupAdapter.setOnItemClickListener((itemView, position) -> {
-            Toast.makeText(getContext(), "Going to group!", Toast.LENGTH_SHORT).show();
             // get the group clicked
             Group group = myGroups.get(position);
             // Get the group's book using an API call
@@ -106,7 +104,7 @@ public class MyGroupsFragment extends Fragment {
                         i.putExtra(Book.class.getSimpleName(), Parcels.wrap(book));
                         i.putExtra("group", group);
                         i.putExtra("position", position);
-                        startActivityForResult(i, GET_LEFT_GROUP);
+                        startActivityForResult(i, LEFT_GROUP);
                     }
 
                     @Override
@@ -128,7 +126,7 @@ public class MyGroupsFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (data != null && resultCode == getActivity().RESULT_OK) {
+        if (resultCode == getActivity().RESULT_OK && data != null) {
             if (requestCode == ADD_GROUP) {
                 // Get data from the intent (group)
                 Group group = (Group) data.getExtras().get("group");
@@ -140,7 +138,7 @@ public class MyGroupsFragment extends Fragment {
                 rvMyGroups.smoothScrollToPosition(0);
                 tvNoGroups.setVisibility(View.GONE);
             }
-            if (requestCode == GET_LEFT_GROUP) {
+            if (requestCode == LEFT_GROUP) {
                 // Get the data from the intent
                 boolean leftGroup = data.getExtras().getBoolean("leftGroup");
                 if (leftGroup) {
@@ -161,7 +159,7 @@ public class MyGroupsFragment extends Fragment {
 
     // get the groups and add them to the myGroups list
     private void queryGroups() {
-        FindCallback queryGroupsCallback = (FindCallback<Member>) (memberList, e) -> {
+        FindCallback<Member> queryGroupsCallback = (memberList, e) -> {
             // check for errors
             if (e != null) {
                 Log.e(TAG, "Issue with getting groups", e);

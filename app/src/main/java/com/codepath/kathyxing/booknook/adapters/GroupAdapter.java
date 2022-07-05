@@ -20,10 +20,8 @@ import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
-import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.parse.CountCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +30,10 @@ import okhttp3.Headers;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
+    // adapter parameters
     public static final String TAG = "GroupAdapter";
-    private List<Group> groups;
-    private Context context;
+    private final List<Group> groups;
+    private final Context context;
     private Book book;
 
     // Define listener member variable
@@ -51,7 +50,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
 
     // View lookup cache
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivCover;
         public TextView tvGroupTitle;
         public TextView tvNumMembers;
@@ -86,8 +85,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         View groupView = inflater.inflate(R.layout.item_group, parent, false);
 
         // Return a new holder instance
-        GroupAdapter.ViewHolder viewHolder = new GroupAdapter.ViewHolder(groupView, listener);
-        return viewHolder;
+        return new GroupAdapter.ViewHolder(groupView, listener);
     }
 
     // Involves populating data into the item through holder

@@ -2,13 +2,6 @@ package com.codepath.kathyxing.booknook.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +11,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
@@ -62,7 +60,8 @@ public class SearchResultsFragment extends Fragment {
     private boolean firstParameter = true;
 
     // Required empty public constructor
-    public SearchResultsFragment() {}
+    public SearchResultsFragment() {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,12 +86,14 @@ public class SearchResultsFragment extends Fragment {
 
         // Extract strings from the bundle
         Bundle bundle = this.getArguments();
-        anyField = bundle.getString("anyField");
-        title = bundle.getString("title");
-        author = bundle.getString("author");
-        publisher = bundle.getString("publisher");
-        subject = bundle.getString("subject");
-        isbn = bundle.getString("isbn");
+        if (bundle != null) {
+            anyField = bundle.getString("anyField");
+            title = bundle.getString("title");
+            author = bundle.getString("author");
+            publisher = bundle.getString("publisher");
+            subject = bundle.getString("subject");
+            isbn = bundle.getString("isbn");
+        }
 
         // set the query based on the extras
         setQuery();
@@ -115,41 +116,34 @@ public class SearchResultsFragment extends Fragment {
         rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // set up a click handler for bookAdapter
-        bookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                // get the book clicked
-                Book book = books.get(position);
-                // swap in the book detail fragment
-                BookDetailFragment nextFragment = new BookDetailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
-                nextFragment.setArguments(bundle);
+        bookAdapter.setOnItemClickListener((itemView, position) -> {
+            // get the book clicked
+            Book book = books.get(position);
+            // swap in the book detail fragment
+            BookDetailFragment nextFragment = new BookDetailFragment();
+            Bundle bundle1 = new Bundle();
+            bundle1.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+            nextFragment.setArguments(bundle1);
+            if (getActivity() != null && getView() != null) {
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
+                        .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
                         .addToBackStack(null)
                         .commit();
             }
         });
 
         // set up a click handler for the prev page button
-        btnPrevPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber--;
-                // Get the new books
-                fetchBooks(pageNumber);
-            }
+        btnPrevPage.setOnClickListener(v -> {
+            pageNumber--;
+            // Get the new books
+            fetchBooks(pageNumber);
         });
 
         // set up a click handler for the next page button
-        btnNextPage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                // Get the new books
-                fetchBooks(pageNumber);
-            }
+        btnNextPage.setOnClickListener(v -> {
+            pageNumber++;
+            // Get the new books
+            fetchBooks(pageNumber);
         });
 
         fetchBooks(pageNumber);
@@ -181,25 +175,22 @@ public class SearchResultsFragment extends Fragment {
                     if (response != null) {
                         // Set the total items
                         totalItems = response.jsonObject.getInt("totalItems");
-                        if(totalItems == 0) {
+                        if (totalItems == 0) {
                             tvNoResults.setVisibility(View.VISIBLE);
-                        }
-                        else {
+                        } else {
                             // Get the items json array
                             items = response.jsonObject.getJSONArray("items");
                             // Parse json array into array of model objects
                             final ArrayList<Book> b = Book.fromJson(items);
                             // Load model objects into the adapter
-                            for (Book book : b) {
-                                books.add(book); // add book through the adapter
-                            }
+                            books.addAll(b);
                             bookAdapter.notifyDataSetChanged();
                             // Set view visibilities
                             btnNextPage.setVisibility(View.VISIBLE);
-                            if(pageNumber > 0) {
+                            if (pageNumber > 0) {
                                 btnPrevPage.setVisibility(View.VISIBLE);
                             }
-                            if(totalItems - startIndex <= 10) {
+                            if (totalItems - startIndex <= 10) {
                                 btnNextPage.setVisibility(View.GONE);
                             }
                             tvPageNumber.setText("Page " + (pageNumber + 1));
@@ -214,66 +205,68 @@ public class SearchResultsFragment extends Fragment {
                     //TODO: handle the case "no value for items"
                 }
             }
+
             @Override
             public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
                 // Handle failed request here
-                if(statusCode == 400) {
+                if (statusCode == 400) {
                     // query missing
-                    Toast.makeText(getContext(), "Did not receive a query, try again!", Toast.LENGTH_SHORT);
-                }
-                else {
-                    Toast.makeText(getContext(), "Issue with query, try again!", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Did not receive a query, try again!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Issue with query, try again!", Toast.LENGTH_SHORT).show();
                 }
                 pbLoading.setVisibility(View.GONE);
                 Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
                 // swap in the advanced search fragment
-                AdvancedSearchFragment nextFragment= new AdvancedSearchFragment();
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
-                        .addToBackStack(null)
-                        .commit();
+                AdvancedSearchFragment nextFragment = new AdvancedSearchFragment();
+                if (getActivity() != null && getView() != null) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
     }
 
     private void setQuery() {
-        if(!anyField.equals("")) {
-            if(!firstParameter) {
+        if (!anyField.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;
             savedQuery += anyField;
         }
-        if(!title.equals("")) {
-            if(!firstParameter) {
+        if (!title.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;
             savedQuery += ("intitle:" + title);
         }
-        if(!author.equals("")) {
-            if(!firstParameter) {
+        if (!author.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;
             savedQuery += ("inauthor:" + author);
         }
-        if(!publisher.equals("")) {
-            if(!firstParameter) {
+        if (!publisher.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;
             savedQuery += ("inpublisher:" + publisher);
         }
-        if(!subject.equals("")) {
-            if(!firstParameter) {
+        if (!subject.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;
-            savedQuery += ("subject:" + subject);
+            savedQuery += ("subject:" + "\"" + subject + "\"");
         }
-        if(!isbn.equals("")) {
-            if(!firstParameter) {
+        if (!isbn.equals("")) {
+            if (!firstParameter) {
                 savedQuery += "+";
             }
             firstParameter = false;

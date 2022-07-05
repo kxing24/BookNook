@@ -8,6 +8,7 @@ import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Like;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
+import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.Parse;
 import com.parse.ParseObject;
@@ -26,6 +27,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(Post.class);
         ParseObject.registerSubclass(Friend.class);
         ParseObject.registerSubclass(Like.class);
+        ParseObject.registerSubclass(Shelf.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(getString(R.string.back4app_app_id))

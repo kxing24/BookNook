@@ -1,23 +1,22 @@
 package com.codepath.kathyxing.booknook.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.LoginActivity;
 import com.codepath.kathyxing.booknook.fragments.BookSearchFragment;
 import com.codepath.kathyxing.booknook.fragments.FriendsFragment;
 import com.codepath.kathyxing.booknook.fragments.HomeFragment;
 import com.codepath.kathyxing.booknook.fragments.MyGroupsFragment;
+import com.codepath.kathyxing.booknook.fragments.ShelvesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
@@ -35,29 +34,29 @@ public class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         // handle navigation selection
-        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment fragment;
-                switch (item.getItemId()) {
-                    case R.id.action_home:
-                        fragment = new HomeFragment();
-                        break;
-                    case R.id.action_book_search:
-                        fragment = new BookSearchFragment();
-                        break;
-                    case R.id.action_friends:
-                        fragment = new FriendsFragment();
-                        break;
-                    case R.id.action_my_groups:
-                        fragment = new MyGroupsFragment();
-                        break;
-                    default: return true;
-                }
-                fragmentManager.beginTransaction().replace(R.id.rlContainer, fragment).commit();
-                return true;
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment fragment;
+            switch (item.getItemId()) {
+                case R.id.action_home:
+                    fragment = new HomeFragment();
+                    break;
+                case R.id.action_book_search:
+                    fragment = new BookSearchFragment();
+                    break;
+                case R.id.action_shelves:
+                    fragment = new ShelvesFragment();
+                    break;
+                case R.id.action_friends:
+                    fragment = new FriendsFragment();
+                    break;
+                case R.id.action_my_groups:
+                    fragment = new MyGroupsFragment();
+                    break;
+                default:
+                    return true;
             }
+            fragmentManager.beginTransaction().replace(R.id.rlContainer, fragment).commit();
+            return true;
         });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_home);
