@@ -36,6 +36,7 @@ An app that helps you explore different books, find your next read, and interact
 - [x] User can like a post
 - [x] User can friend other users
 - [x] User can invite friends to a group
+- [x] User can edit their profile
 - [ ] User can see book recommendations
 - [ ] User can shelve books
 - [ ] Books on shelves sort by (date shelved, rating, etc.)
