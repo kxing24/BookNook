@@ -23,7 +23,6 @@
         android:layout_marginBottom="0dp"
         android:background="@android:color/transparent"
         android:text="@string/next_page"
-        android:textAllCaps="true"
         android:textColor="#0000EE"
         android:visibility="gone" />
 
@@ -37,7 +36,6 @@
         android:layout_marginBottom="0dp"
         android:background="@android:color/transparent"
         android:text="@string/prev_page"
-        android:textAllCaps="true"
         android:textColor="#0000EE"
         android:visibility="gone" />
 
@@ -90,5 +88,60 @@
         android:textAlignment="center"
         android:textSize="30sp"
         android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvRecommendationTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnAdvancedSearch"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="20dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:visibility="gone"
+        tools:text="Because you are in Pride and Prejudice Group, you might enjoy:" />
+
+    <RelativeLayout
+        android:id="@+id/rlBookRecommendation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvRecommendationTitle"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/ivBookCover"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_toEndOf="@+id/ivBookCover"
+            android:textSize="24sp"
+            tools:text="Pride and Prejudice" />
+
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvTitle"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/ivBookCover"
+            android:textSize="12sp"
+            tools:text="Jane Austen" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

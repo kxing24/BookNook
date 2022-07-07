@@ -574,4 +574,20 @@ public final class ParseQueryUtilities {
         group.saveInBackground(createBookGroupCallback);
         return group;
     }
+
+    public static void queryBookRecommendationsAsync(@NonNull User user,
+                                                @NonNull FindCallback<Group> queryBookRecommendationsCallback) {
+        ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
+        // get the groups that have a recommendation
+        groupQuery.whereExists(Group.KEY_RECOMMENDED_BOOK_ID);
+        // get the book only if the user is not already in the group
+        ParseQuery<Member> memberQuery = ParseQuery.getQuery(Member.class);
+        memberQuery.whereEqualTo(Member.KEY_USER_ID, user.getObjectId());
+        groupQuery.whereDoesNotMatchKeyInQuery(Group.KEY_RECOMMENDED_BOOK_ID, Member.KEY_BOOK_ID, memberQuery);
+        // include the group's name and recommended book id
+        groupQuery.include(Group.KEY_GROUP_NAME);
+        groupQuery.include(Group.KEY_RECOMMENDED_BOOK_ID);
+        // get the list of possible groups with recommendations
+        groupQuery.findInBackground(queryBookRecommendationsCallback);
+    }
 }

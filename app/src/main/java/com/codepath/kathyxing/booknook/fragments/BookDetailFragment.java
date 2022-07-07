@@ -288,6 +288,7 @@ public class BookDetailFragment extends Fragment {
         ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
     }
 
+    // TODO: move these methods to a manager class
     // return an array of books with the same subject as the given book
     private void setBookRecommendation(@NonNull Book book, @NonNull Group group) {
         // initialize a book client to get API data
@@ -359,7 +360,7 @@ public class BookDetailFragment extends Fragment {
         return similarBooks.get(0).book;
     }
 
-    private double getBookDistance(Book from, Book to) {
+    private double getBookDistance(@NonNull Book from, @NonNull Book to) {
         double distance = 0;
         ArrayList<String> fromAuthorArray = from.getAuthorArray();
         ArrayList<String> toAuthorArray = to.getAuthorArray();

@@ -121,7 +121,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 @Override
                 public void onSuccess(int statusCode, Headers headers, JSON json) {
                     book = Book.fromJson(json.jsonObject);
-
                     Glide.with(getContext())
                             .load(Uri.parse(book.getCoverUrl()))
                             .apply(new RequestOptions()
@@ -131,7 +130,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 @Override
                 public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                     // Handle failed request here
-                    Log.e("GroupAdapter", "Request failed with code " + statusCode + ". Response message: " + response);
+                    Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + response);
                 }
             });
         } catch (ParseException e) {

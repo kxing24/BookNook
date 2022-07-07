@@ -1,6 +1,7 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,21 +21,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookClient;
+import com.codepath.kathyxing.booknook.parse_classes.Group;
+import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import okhttp3.Headers;
 
@@ -53,12 +66,18 @@ public class BookSearchFragment extends Fragment {
     private Button btnPrevPage;
     private Button btnNextPage;
     private TextView tvPageNumber;
+    private TextView tvRecommendationTitle;
+    private RelativeLayout rlBookRecommendation;
+    private ImageView ivBookCover;
+    private TextView tvTitle;
+    private TextView tvAuthor;
     private BookAdapter bookAdapter;
     private BookClient client;
     private ArrayList<Book> books;
     private String savedQuery;
     private int pageNumber = 0;
     private int totalItems;
+    private Book recommendedBook;
 
     // Required empty public constructor
     public BookSearchFragment() {}
@@ -103,6 +122,11 @@ public class BookSearchFragment extends Fragment {
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
         btnPrevPage = view.findViewById(R.id.btnPrevPage);
         btnNextPage = view.findViewById(R.id.btnNextPage);
+        tvRecommendationTitle = view.findViewById(R.id.tvRecommendationTitle);
+        rlBookRecommendation = view.findViewById(R.id.rlBookRecommendation);
+        ivBookCover = view.findViewById(R.id.ivBookCover);
+        tvTitle = view.findViewById(R.id.tvTitle);
+        tvAuthor = view.findViewById(R.id.tvAuthor);
         books = new ArrayList<>();
         bookAdapter = new BookAdapter(getContext(), books);
         // Attach the adapter to the RecyclerView
@@ -118,6 +142,23 @@ public class BookSearchFragment extends Fragment {
                         .replace(((ViewGroup)getView().getParent()).getId(), nextFragment)
                         .addToBackStack(null)
                         .commit();
+            }
+        });
+        // set up a click handler for the book recommendation
+        rlBookRecommendation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // swap in the book detail fragment
+                BookDetailFragment nextFragment = new BookDetailFragment();
+                Bundle bundle1 = new Bundle();
+                bundle1.putParcelable(Book.class.getSimpleName(), Parcels.wrap(recommendedBook));
+                nextFragment.setArguments(bundle1);
+                if (getActivity() != null && getView() != null) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
         // set up a click handler for bookAdapter
@@ -146,6 +187,7 @@ public class BookSearchFragment extends Fragment {
             // Get the new books
             fetchBooks(savedQuery, pageNumber);
         });
+        getBookRecommendation();
     }
 
     @Override
@@ -158,15 +200,19 @@ public class BookSearchFragment extends Fragment {
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                // hide the advanced search button
+                // hide the advanced search button and book recommendation
                 btnAdvancedSearch.setVisibility(View.GONE);
+                tvRecommendationTitle.setVisibility(View.GONE);
+                rlBookRecommendation.setVisibility(View.GONE);
                 return true;
             }
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 tvNoResults.setVisibility(View.GONE);
-                // show the advanced search button
+                // show the advanced search button and book recommendation
                 btnAdvancedSearch.setVisibility(View.VISIBLE);
+                tvRecommendationTitle.setVisibility(View.VISIBLE);
+                rlBookRecommendation.setVisibility(View.VISIBLE);
                 // clear the items from the adapter
                 bookAdapter.clear();
                 return true;
@@ -253,6 +299,57 @@ public class BookSearchFragment extends Fragment {
             public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
                 // Handle failed request here
                 Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
+            }
+        });
+    }
+
+    private void getBookRecommendation() {
+        // get the list of groups with possible recommendations
+        FindCallback<Group> queryBookRecommendationsCallback = new FindCallback<Group>() {
+            @Override
+            public void done(List<Group> groups, ParseException e) {
+                if (e == null) {
+                    if (!groups.isEmpty()) {
+                        // randomize the list of groups with possible recommendations
+                        Collections.shuffle(groups);
+                        // recommend the book from the first group in the shuffled list
+                        displayBookRecommendation(groups.get(0).getGroupName(), groups.get(0).getRecommendedBookId());
+                    }
+                } else {
+                    Log.e(TAG, "issue getting groups with book recommendations", e);
+                }
+            }
+        };
+        ParseQueryUtilities.queryBookRecommendationsAsync((User) ParseUser.getCurrentUser(), queryBookRecommendationsCallback);
+    }
+
+    private void displayBookRecommendation(String groupName, String bookId) {
+        // get the book from the bookId
+        BookClient client = new BookClient();
+        client.getBook(bookId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Book book = Book.fromJson(json.jsonObject);
+                recommendedBook = book;
+                // display the recommendation
+                tvRecommendationTitle.setText("Because you are in " + groupName + ", you might enjoy:");
+                tvTitle.setText(book.getTitle());
+                tvAuthor.setText(book.getAuthor());
+                if (book.getCoverUrl() != null) {
+                    Glide.with(getContext())
+                            .load(Uri.parse(book.getCoverUrl()))
+                            .apply(new RequestOptions()
+                                    .placeholder(R.drawable.ic_nocover))
+                            .into(ivBookCover);
+                } else {
+                    Glide.with(getContext()).load(R.drawable.ic_nocover).into(ivBookCover);
+                }
+                tvRecommendationTitle.setVisibility(View.VISIBLE);
+                rlBookRecommendation.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + response);
             }
         });
     }
