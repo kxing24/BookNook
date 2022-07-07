@@ -548,6 +548,7 @@ public final class ParseQueryUtilities {
      *
      * @param shelfName the shelf name
      * @param addShelfCallback the callback for the async function
+     * @return the newly-created shelf
      */
     public static Shelf addShelfAsync(@NonNull String shelfName, @NonNull SaveCallback addShelfCallback) {
         Shelf shelf = new Shelf();
@@ -557,5 +558,20 @@ public final class ParseQueryUtilities {
         shelf.setBooks(books);
         shelf.saveInBackground(addShelfCallback);
         return shelf;
+    }
+
+    /**
+     * Creates a group for the book
+     *
+     * @param book the book
+     * @param createBookGroupCallback the callback for the async function
+     * @return the newly-created group
+     */
+    public static Group createBookGroupAsync(@NonNull Book book, @NonNull SaveCallback createBookGroupCallback) {
+        Group group = new Group();
+        group.setBookId(book.getId());
+        group.setGroupName(book.getTitle() + " Group");
+        group.saveInBackground(createBookGroupCallback);
+        return group;
     }
 }

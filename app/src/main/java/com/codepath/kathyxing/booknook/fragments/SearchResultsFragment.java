@@ -46,7 +46,6 @@ public class SearchResultsFragment extends Fragment {
     private Button btnNextPage;
     private TextView tvPageNumber;
     private BookAdapter bookAdapter;
-    private BookClient client;
     private ArrayList<Book> books;
     private int pageNumber = 0;
     private int totalItems;
@@ -166,7 +165,7 @@ public class SearchResultsFragment extends Fragment {
         bookAdapter.clear();
 
         // initialize a book client to get API data
-        client = new BookClient();
+        BookClient client = new BookClient();
         client.getBooks(savedQuery, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON response) {
@@ -202,10 +201,8 @@ public class SearchResultsFragment extends Fragment {
                 } catch (JSONException e) {
                     // Invalid JSON format, show appropriate error.
                     e.printStackTrace();
-                    //TODO: handle the case "no value for items"
                 }
             }
-
             @Override
             public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
                 // Handle failed request here

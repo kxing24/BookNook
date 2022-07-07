@@ -20,10 +20,12 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.models.Book;
+import com.codepath.kathyxing.booknook.net.BookClient;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.User;
@@ -32,16 +34,43 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.SaveCallback;
 
+import org.apache.commons.text.similarity.CosineDistance;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import okhttp3.Headers;
+
+class SameSubjectBookStructure {
+    Book book;
+    double distance;
+}
+
+class SameSubjectBookComparator implements Comparator<SameSubjectBookStructure> {
+
+    // sort in ascending order by distance
+    @Override
+    public int compare(SameSubjectBookStructure o1, SameSubjectBookStructure o2) {
+        return Double.compare(o1.distance, o2.distance);
+    }
+}
 
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class BookDetailFragment extends Fragment {
 
     // fragment parameters
     public static final String TAG = "BookDetailActivity";
     private static final int GET_LEFT_GROUP = 10;
+    public static final int MAX_RESULTS = 40;
+    public static final int TOTAL_RESULTS = 200;
+    public static final int NUM_RECOMMENDED_BOOKS = 5;
     private TextView tvNumMembers;
     private Button btnJoinGroup;
     private Button btnCreateGroup;
@@ -50,6 +79,7 @@ public class BookDetailFragment extends Fragment {
     private Book book;
     private Group bookGroup;
     private int numMembers;
+    private int totalItems;
 
     // Required empty public constructor
     public BookDetailFragment() {
@@ -91,6 +121,7 @@ public class BookDetailFragment extends Fragment {
             book = Parcels.unwrap(bundle.getParcelable(Book.class.getSimpleName()));
         }
         // Check if the book group exists and whether the user is already in the group
+        // Get the recommended books
         bookGroupStatus();
         // Set view text
         tvTitle.setText(book.getTitle());
@@ -146,7 +177,7 @@ public class BookDetailFragment extends Fragment {
 
     private void bookGroupStatus() {
         // Create a callback for bookGroupStatusAsync
-        GetCallback bookGroupStatusCallback = (GetCallback<Group>) (object, e) -> {
+        GetCallback<Group> bookGroupStatusCallback = (object, e) -> {
             // book group exists
             if (e == null) {
                 // book group exists, set the group and check if the user is in the group
@@ -173,7 +204,7 @@ public class BookDetailFragment extends Fragment {
 
     private void userInGroup() {
         // Create a callback for userInGroupAsync
-        GetCallback userInGroupCallback = (GetCallback<Member>) (object, e) -> {
+        GetCallback<Member> userInGroupCallback = (object, e) -> {
             if (e == null) {
                 // user is in the group
                 // set the go to group button to be visible
@@ -196,7 +227,7 @@ public class BookDetailFragment extends Fragment {
 
     private void addMemberWithBook() {
         // create a callback for getGroupFromBookCallback
-        GetCallback getGroupFromBookCallback = (GetCallback<Group>) (group, e) -> {
+        GetCallback<Group> getGroupFromBookCallback = (group, e) -> {
             // get the group and create a member with the group and user
             if (e == null) {
                 addMemberWithGroup(group);
@@ -222,6 +253,7 @@ public class BookDetailFragment extends Fragment {
                 Toast.makeText(getContext(), "Joined group!", Toast.LENGTH_SHORT).show();
                 // User is now a member of the group: adjust visibility of buttons
                 btnGoToGroup.setVisibility(View.VISIBLE);
+                tvNumMembers.setText(++numMembers + " members");
             }
         };
         ParseQueryUtilities.addMemberWithGroupAsync(group,
@@ -231,30 +263,145 @@ public class BookDetailFragment extends Fragment {
     // Creates the group and adds the first user
     private void bookGroupCreate(@NonNull Book book) {
         // creates the group
-        Group group = new Group();
-        group.setBookId(book.getId());
-        group.setGroupName(book.getTitle() + " Group");
-        group.saveInBackground(e -> {
+        SaveCallback createBookGroupCallback = e -> {
             if (e != null) {
                 Log.e(TAG, "Error while creating group", e);
                 Toast.makeText(getContext(), "Error while creating group!", Toast.LENGTH_SHORT).show();
             } else {
-                Log.i(TAG, "Successfully created group for " + group.getBookId());
-                // set the group
-                bookGroup = group;
                 // make the user a member of the group
-                addMemberWithGroup(group);
+                addMemberWithGroup(bookGroup);
+                // if the book has a subject, add book recommendations
+                if (!book.getSubject().equals("")) {
+                    setBookRecommendation(book, bookGroup);
+                }
             }
-        });
+        };
+        bookGroup = ParseQueryUtilities.createBookGroupAsync(book, createBookGroupCallback);
     }
 
     // set the number of members in the group
-    private void setNumMembers(Group group) {
+    private void setNumMembers(@NonNull Group group) {
         CountCallback getNumMembersInGroupCallback = (count, e) -> {
             tvNumMembers.setText(count + " members");
             numMembers = count;
         };
         ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
+    }
+
+    // return an array of books with the same subject as the given book
+    private void setBookRecommendation(@NonNull Book book, @NonNull Group group) {
+        // initialize a book client to get API data
+        BookClient client = new BookClient();
+        String query = "subject:\"" + book.getSubject() + "\"";
+        // create an array to store all the books from the query
+        ArrayList<Book> bookArray = new ArrayList<>();
+        for (int i = 0; i < TOTAL_RESULTS / MAX_RESULTS; i++) {
+            int startIndex = i * MAX_RESULTS;
+            client.getBooks(query, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Headers headers, JSON response) {
+                    try {
+                        JSONArray items;
+                        if (response != null) {
+                            // Set the total items
+                            totalItems = response.jsonObject.getInt("totalItems");
+                            if (totalItems < startIndex) {
+                                return;
+                            } else {
+                                // Get the items json array
+                                items = response.jsonObject.getJSONArray("items");
+                                // Parse json array into array of model objects
+                                final ArrayList<Book> b = Book.fromJson(items);
+                                // Add the books to the overall array
+                                bookArray.addAll(b);
+                            }
+                            if (totalItems < startIndex + MAX_RESULTS || startIndex + MAX_RESULTS >= TOTAL_RESULTS) {
+                                // Finished querying items
+                                Book recommendedBook = getRecommendedBook(book, bookArray);
+                                group.setRecommendedBookId(recommendedBook.getId());
+                                group.saveInBackground();
+                            }
+                            Log.i(TAG, "fetch books success");
+                        }
+                    } catch (JSONException e) {
+                        // Invalid JSON format, show appropriate error.
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
+                    // Handle failed request here
+                    Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
+                }
+            });
+        }
+    }
+
+    // get something similar to the book from sameSubjectBooks
+    private Book getRecommendedBook(Book book, ArrayList<Book> sameSubjectBooks) {
+        // create an arraylist to store the five most similar books to recommend
+        ArrayList<SameSubjectBookStructure> similarBooks = new ArrayList<>();
+        for (int i = 0; i < sameSubjectBooks.size(); i++) {
+            if (!sameSubjectBooks.get(i).getId().equals(book.getId())) {
+                SameSubjectBookStructure recommendedBook = new SameSubjectBookStructure();
+                recommendedBook.book = sameSubjectBooks.get(i);
+                recommendedBook.distance = getBookDistance(sameSubjectBooks.get(i), book);
+                if (similarBooks.size() < NUM_RECOMMENDED_BOOKS) {
+                    similarBooks.add(recommendedBook);
+                }
+                else if (recommendedBook.distance < similarBooks.get(NUM_RECOMMENDED_BOOKS - 1).distance) {
+                    similarBooks.set(NUM_RECOMMENDED_BOOKS - 1, recommendedBook);
+                }
+                Collections.sort(similarBooks, new SameSubjectBookComparator());
+            }
+        }
+        // return the first book in the arraylist (the most similar)
+        return similarBooks.get(0).book;
+    }
+
+    private double getBookDistance(Book from, Book to) {
+        double distance = 0;
+        ArrayList<String> fromAuthorArray = from.getAuthorArray();
+        ArrayList<String> toAuthorArray = to.getAuthorArray();
+        // compare authors
+        if (fromAuthorArray == null || toAuthorArray == null) {
+            distance+=1;
+        } else {
+            fromAuthorArray.retainAll(toAuthorArray);
+            if (fromAuthorArray.isEmpty()) {
+                // no similar authors
+                distance+=1;
+            }
+        }
+        // compare descriptions
+        if (from.getDescription().equals("") || to.getDescription().equals("")) {
+            distance+=10;
+        } else {
+            CosineDistance cosineDistance = new CosineDistance();
+            distance+=cosineDistance.apply(from.getDescription(), to.getDescription())*(double)10;
+        }
+        // compare maturity rating
+        if (from.getMaturityRating().equals("") || to.getMaturityRating().equals("") || !from.getMaturityRating().equals(to.getMaturityRating())) {
+            // different maturity ratings
+            distance+=0.5;
+        }
+        // compare print type
+        if (from.getPrintType().equals("") || to.getPrintType().equals("") || !from.getPrintType().equals(to.getPrintType())) {
+            // different print types
+            distance+=2;
+        }
+        // compare page count
+        if (from.getPageCount() < 0 || to.getPageCount() <= 0) {
+            distance+=1;
+        } else {
+            distance+=Double.min(1, (double) Math.abs(from.getPageCount()-to.getPageCount()) / to.getPageCount());
+        }
+        // compare language
+        if (from.getLanguage().equals("") || to.getLanguage().equals("") || !from.getLanguage().equals(to.getLanguage())) {
+            // different languages
+            distance+=10;
+        }
+        return distance;
     }
 
     private void goGroupFeedActivity() {
