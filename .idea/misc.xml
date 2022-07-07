@@ -32,6 +32,7 @@
         <entry key="app/src/main/res/layout/fragment_my_friends.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/fragment_my_groups.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/fragment_search_results.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_shelf_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/fragment_shelves.xml" value="0.265625" />
         <entry key="app/src/main/res/layout/item_book.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/item_friend.xml" value="0.2786458333333333" />

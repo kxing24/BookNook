@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.AddShelfActivity;
-import com.codepath.kathyxing.booknook.activities.ShelfDetailActivity;
 import com.codepath.kathyxing.booknook.adapters.ShelfAdapter;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.parse.FindCallback;
@@ -36,7 +35,6 @@ public class ShelvesFragment extends Fragment {
 
     // fragment parameters
     public static final String TAG = "ShelvesFragment";
-    private static final int REMOVE_SHELF = 20;
     private static final int ADD_SHELF = 40;
     private RecyclerView rvShelves;
     private ShelfAdapter shelfAdapter;
@@ -82,11 +80,17 @@ public class ShelvesFragment extends Fragment {
         shelfAdapter.setOnItemClickListener((itemView, position) -> {
             // get the shelf clicked
             Shelf shelf = shelves.get(position);
-            // Go to shelf detail
-            Intent i = new Intent(getContext(), ShelfDetailActivity.class);
-            i.putExtra("shelf", shelf);
-            i.putExtra("position", position);
-            startActivityForResult(i, REMOVE_SHELF);
+            // swap in the shelf detail fragment
+            ShelfDetailFragment nextFragment = new ShelfDetailFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("shelf", shelf);
+            nextFragment.setArguments(bundle);
+            if (getActivity() != null && getView() != null) {
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
         // Attach the adapter to the RecyclerView
         rvShelves.setAdapter(shelfAdapter);

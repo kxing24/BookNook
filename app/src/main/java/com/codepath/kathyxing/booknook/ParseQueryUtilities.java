@@ -652,4 +652,18 @@ public final class ParseQueryUtilities {
         bookOnShelf.setUser(user);
         bookOnShelf.saveInBackground(addBookToShelfCallback);
     }
+
+    /**
+     * Get the books on a shelf
+     *
+     * @param shelf the shelf
+     * @param getBooksOnShelfCallback the callback for the async function
+     */
+    public static void getBooksOnShelfAsync(@NonNull Shelf shelf,
+                                            @NonNull FindCallback<BookOnShelf> getBooksOnShelfCallback) {
+        ParseQuery<BookOnShelf> query = ParseQuery.getQuery(BookOnShelf.class);
+        query.whereEqualTo(BookOnShelf.KEY_SHELF_ID, shelf.getObjectId());
+        query.whereEqualTo(BookOnShelf.KEY_USER, ParseUser.getCurrentUser());
+        query.findInBackground(getBooksOnShelfCallback);
+    }
 }

@@ -76,7 +76,6 @@ public class SearchResultsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // Extract strings from the bundle
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -87,11 +86,9 @@ public class SearchResultsFragment extends Fragment {
             subject = bundle.getString("subject");
             isbn = bundle.getString("isbn");
         }
-
         // set the query based on the extras
         setQuery();
         Log.i(TAG, "query is: " + savedQuery);
-
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
@@ -101,22 +98,19 @@ public class SearchResultsFragment extends Fragment {
         btnNextPage = view.findViewById(R.id.btnNextPage);
         books = new ArrayList<>();
         bookAdapter = new BookAdapter(getContext(), books);
-
         // Attach the adapter to the RecyclerView
         rvBooks.setAdapter(bookAdapter);
-
         // Set layout manager to position the items
         rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
-
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener((itemView, position) -> {
             // get the book clicked
             Book book = books.get(position);
             // swap in the book detail fragment
             BookDetailFragment nextFragment = new BookDetailFragment();
-            Bundle bundle1 = new Bundle();
-            bundle1.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
-            nextFragment.setArguments(bundle1);
+            Bundle newBundle = new Bundle();
+            newBundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+            nextFragment.setArguments(newBundle);
             if (getActivity() != null && getView() != null) {
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
@@ -124,21 +118,18 @@ public class SearchResultsFragment extends Fragment {
                         .commit();
             }
         });
-
         // set up a click handler for the prev page button
         btnPrevPage.setOnClickListener(v -> {
             pageNumber--;
             // Get the new books
             fetchBooks(pageNumber);
         });
-
         // set up a click handler for the next page button
         btnNextPage.setOnClickListener(v -> {
             pageNumber++;
             // Get the new books
             fetchBooks(pageNumber);
         });
-
         fetchBooks(pageNumber);
     }
 
@@ -147,8 +138,6 @@ public class SearchResultsFragment extends Fragment {
     private void fetchBooks(int pageNumber) {
         pbLoading.setVisibility(View.VISIBLE);
         int startIndex = pageNumber * MAX_RESULTS;
-        Log.i(TAG, "startIndex is " + startIndex);
-
         // smooth scroll to top
         rvBooks.smoothScrollToPosition(0);
         // adjust view visibility
