@@ -3,6 +3,7 @@ package com.codepath.kathyxing.booknook;
 import androidx.annotation.NonNull;
 
 import com.codepath.kathyxing.booknook.models.Book;
+import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Like;
@@ -22,6 +23,8 @@ import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -575,6 +578,12 @@ public final class ParseQueryUtilities {
         return group;
     }
 
+    /**
+     * Get the book recommendations for a user
+     *
+     * @param user the user
+     * @param queryBookRecommendationsCallback the callback for the async function
+     */
     public static void queryBookRecommendationsAsync(@NonNull User user,
                                                 @NonNull FindCallback<Group> queryBookRecommendationsCallback) {
         ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
@@ -589,5 +598,58 @@ public final class ParseQueryUtilities {
         groupQuery.include(Group.KEY_RECOMMENDED_BOOK_ID);
         // get the list of possible groups with recommendations
         groupQuery.findInBackground(queryBookRecommendationsCallback);
+    }
+
+    /**
+     * Get the user's shelves that the book is not in
+     *
+     * @param book the book
+     * @param user the user
+     * @param getShelvesNotInCallback the callback for the async function
+     */
+    public static void getShelvesNotInAsync(@NonNull Book book, @NonNull User user, @NonNull FindCallback<Shelf> getShelvesNotInCallback) {
+        // get the user's BookOnShelf objects that have the book
+        ParseQuery<BookOnShelf> bookOnShelfQuery = ParseQuery.getQuery(BookOnShelf.class);
+        bookOnShelfQuery.whereEqualTo(BookOnShelf.KEY_USER, user);
+        bookOnShelfQuery.whereEqualTo(BookOnShelf.KEY_BOOK_ID, book.getId());
+        // get the user's shelves that do not have the BookOnShelf objects
+        ParseQuery<Shelf> shelfQuery = ParseQuery.getQuery(Shelf.class);
+        shelfQuery.whereEqualTo(Shelf.KEY_USER, user);
+        shelfQuery.whereDoesNotMatchKeyInQuery(Shelf.KEY_OBJECT_ID, BookOnShelf.KEY_SHELF_ID, bookOnShelfQuery);
+        shelfQuery.findInBackground(getShelvesNotInCallback);
+    }
+
+    /**
+     * Get the number of books on a shelf
+     *
+     * @param shelf the shelf
+     * @param getShelfBookCountCallback the callback for the async function
+     */
+    public static void getShelfBookCountAsync(@NonNull Shelf shelf, @NonNull CountCallback getShelfBookCountCallback) {
+        ParseQuery<BookOnShelf> query = ParseQuery.getQuery(BookOnShelf.class);
+        // get the books that are on the shelf
+        query.whereEqualTo(BookOnShelf.KEY_SHELF_ID, shelf.getObjectId());
+        query.countInBackground(getShelfBookCountCallback);
+    }
+
+    /**
+     * Add the book to the sher
+     *
+     * @param book the book
+     * @param shelf the shelf
+     * @param user the user adding the book to the shelf
+     * @param addBookToShelfCallback the callback for the async function
+     */
+    public static void addBookToShelfAsync(@NonNull Book book, @NonNull Shelf shelf,
+                                           @NonNull User user, @NonNull SaveCallback addBookToShelfCallback) {
+        BookOnShelf bookOnShelf = new BookOnShelf();
+        bookOnShelf.setShelf(shelf);
+        bookOnShelf.setShelfId(shelf.getObjectId());
+        bookOnShelf.setBookId(book.getId());
+        bookOnShelf.setBookAuthor(book.getAuthor());
+        bookOnShelf.setBookTitle(book.getTitle());
+        bookOnShelf.setBookCoverUrl(book.getCoverUrl());
+        bookOnShelf.setUser(user);
+        bookOnShelf.saveInBackground(addBookToShelfCallback);
     }
 }

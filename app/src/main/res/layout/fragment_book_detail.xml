@@ -72,9 +72,8 @@
                 android:id="@+id/btnJoinGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvAuthor"
+                android:layout_below="@+id/btnShelveBook"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
                 android:text="Join Group"
                 android:visibility="gone" />
 
@@ -82,9 +81,8 @@
                 android:id="@+id/btnCreateGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvAuthor"
+                android:layout_below="@+id/btnShelveBook"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
                 android:text="Create Group"
                 android:visibility="gone" />
 
@@ -92,9 +90,8 @@
                 android:id="@+id/btnGotoGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvAuthor"
+                android:layout_below="@+id/btnShelveBook"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
                 android:text="Go To Group"
                 android:visibility="gone" />
 
@@ -102,7 +99,7 @@
                 android:id="@+id/pbLoading"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_below="@+id/tvAuthor"
+                android:layout_below="@+id/btnShelveBook"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="12dp" />
 
@@ -110,10 +107,19 @@
                 android:id="@+id/tvNumMembers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tvAuthor"
+                android:layout_below="@+id/btnShelveBook"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="50dp"
                 tools:text="2 members" />
+
+            <Button
+                android:id="@+id/btnShelveBook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvAuthor"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="Shelve Book" />
 
         </RelativeLayout>
 

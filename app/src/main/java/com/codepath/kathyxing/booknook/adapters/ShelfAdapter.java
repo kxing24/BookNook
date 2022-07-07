@@ -10,8 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
+import com.parse.CountCallback;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +81,7 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
         Log.i(TAG, "position is " + position);
         Shelf shelf = shelves.get(position);
         holder.tvShelfName.setText(shelf.getShelfName());
-        holder.tvBookCount.setText(shelf.getBooks().length() + " books");
+        setBookCount(shelf, holder);
     }
 
     @Override
@@ -89,5 +92,10 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
     // Easy access to the context object in the recyclerview
     private Context getContext() {
         return context;
+    }
+
+    private void setBookCount(@NonNull Shelf shelf, @NonNull ShelfAdapter.ViewHolder holder) {
+        CountCallback getShelfBookCountCallback = (count, e) -> holder.tvBookCount.setText(count + " books");
+        ParseQueryUtilities.getShelfBookCountAsync(shelf, getShelfBookCountCallback);
     }
 }

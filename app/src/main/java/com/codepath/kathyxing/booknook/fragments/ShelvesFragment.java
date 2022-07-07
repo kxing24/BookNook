@@ -1,15 +1,10 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,19 +13,21 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.AddShelfActivity;
-import com.codepath.kathyxing.booknook.activities.JoinGroupActivity;
 import com.codepath.kathyxing.booknook.activities.ShelfDetailActivity;
 import com.codepath.kathyxing.booknook.adapters.ShelfAdapter;
-import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.parse.FindCallback;
-import com.parse.ParseException;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,7 +97,7 @@ public class ShelvesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(resultCode == getActivity().RESULT_OK && data != null) {
+        if (resultCode == RESULT_OK && data != null) {
             if (requestCode == ADD_SHELF) {
                 Log.i(TAG, "shelf added!");
                 // Get data from the intent

@@ -3,6 +3,7 @@ package com.codepath.kathyxing.booknook.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -25,14 +27,18 @@ import com.bumptech.glide.request.RequestOptions;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
+import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
+import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.CountCallback;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.apache.commons.text.similarity.CosineDistance;
@@ -41,6 +47,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 class SameSubjectBookStructure {
     Book book;
@@ -68,6 +75,7 @@ public class BookDetailFragment extends Fragment {
     public static final int TOTAL_RESULTS = 200;
     public static final int NUM_RECOMMENDED_BOOKS = 5;
     private static final int GET_LEFT_GROUP = 10;
+    private Button btnShelveBook;
     private TextView tvNumMembers;
     private Button btnJoinGroup;
     private Button btnCreateGroup;
@@ -106,6 +114,7 @@ public class BookDetailFragment extends Fragment {
         TextView tvTitle = view.findViewById(R.id.tvGroupTitle);
         TextView tvAuthor = view.findViewById(R.id.tvAuthor);
         TextView tvDescription = view.findViewById(R.id.tvDescription);
+        btnShelveBook = view.findViewById(R.id.btnShelveBook);
         tvNumMembers = view.findViewById(R.id.tvNumMembers);
         btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
@@ -137,6 +146,24 @@ public class BookDetailFragment extends Fragment {
         } else {
             Glide.with(this).load(R.drawable.ic_nocover).into(ivBookCover);
         }
+        // Click handler for the shelve book button
+        btnShelveBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the list of shelves that the book is not in
+                FindCallback<Shelf> getShelvesNotInCallback = new FindCallback<Shelf>() {
+                    @Override
+                    public void done(List<Shelf> shelves, ParseException e) {
+                        if (e == null) {
+                            showShelvesAlertDialog(new ArrayList<>(shelves));
+                        } else {
+                            Log.e(TAG, "issue getting shelves", e);
+                        }
+                    }
+                };
+                ParseQueryUtilities.getShelvesNotInAsync(book, (User) ParseUser.getCurrentUser(), getShelvesNotInCallback);
+            }
+        });
         // Click handler for the create group button
         btnCreateGroup.setOnClickListener(v -> {
             // create the group and make the user a member
@@ -382,6 +409,56 @@ public class BookDetailFragment extends Fragment {
             distance += 10;
         }
         return distance;
+    }
+
+    private void showShelvesAlertDialog(ArrayList<Shelf> shelves) {
+        ArrayList<Shelf> selectedShelves = new ArrayList<>();
+        boolean[] selected = new boolean[shelves.size()];
+        String[] shelfNames = new String[shelves.size()];
+        for (int i = 0; i < shelves.size(); i++) {
+            shelfNames[i] = shelves.get(i).getShelfName();
+        }
+        // Initialize alert dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        // set title
+        builder.setTitle("Select Shelves");
+        // set dialog non cancelable
+        builder.setCancelable(false);
+        builder.setMultiChoiceItems(shelfNames, selected, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                // check condition
+                if (b) {
+                    // when checkbox selected, add position to selectedShelvesPositions
+                    selectedShelves.add(shelves.get(i));
+                } else {
+                    // when checkbox unselected, remove position from selectedShelvesPositions
+                    selectedShelves.remove(shelves.get(i));
+                }
+            }
+        });
+        builder.setPositiveButton("Add", (dialogInterface, i) -> {
+            // Add the books to the shelves
+            addBookToShelves(book, selectedShelves);
+        });
+        builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            // dismiss dialog
+            dialogInterface.dismiss();
+        });
+        // show dialog
+        builder.show();
+    }
+
+    private void addBookToShelves(Book book, ArrayList<Shelf> shelves) {
+        for (Shelf shelf : shelves) {
+            SaveCallback addBookToShelfCallback = e -> {
+                if (e != null) {
+                    Log.e(TAG, "issue adding book to shelf", e);
+                }
+            };
+            ParseQueryUtilities.addBookToShelfAsync(book, shelf, (User) ParseUser.getCurrentUser(),
+                    addBookToShelfCallback);
+        }
     }
 
     private void goGroupFeedActivity() {

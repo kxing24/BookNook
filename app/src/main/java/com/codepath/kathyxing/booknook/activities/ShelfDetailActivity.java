@@ -12,5 +12,7 @@ public class ShelfDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shelf_details);
+
+        // TODO: use book adapter to show books on the shelf
     }
 }
