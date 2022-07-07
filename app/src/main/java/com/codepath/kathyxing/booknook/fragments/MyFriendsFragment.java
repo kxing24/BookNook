@@ -15,30 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
-import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
 import com.codepath.kathyxing.booknook.adapters.UserAdapter;
-import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookClient;
-import com.codepath.kathyxing.booknook.parse_classes.Friend;
-import com.codepath.kathyxing.booknook.parse_classes.Group;
-import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
-import org.parceler.Parcels;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Headers;
 
 /**
  * A simple {@link Fragment} subclass.

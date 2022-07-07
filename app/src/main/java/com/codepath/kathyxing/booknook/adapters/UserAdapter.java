@@ -1,36 +1,22 @@
 package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
-import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookClient;
-import com.codepath.kathyxing.booknook.parse_classes.Group;
-import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.codepath.kathyxing.booknook.parse_classes.User;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Headers;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private List<User> users;

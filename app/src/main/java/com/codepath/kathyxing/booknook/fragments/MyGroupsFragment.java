@@ -1,5 +1,7 @@
 package com.codepath.kathyxing.booknook.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +26,7 @@ import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.activities.JoinGroupActivity;
 import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookClient;
+import com.codepath.kathyxing.booknook.net.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.parse.FindCallback;
@@ -51,7 +52,6 @@ public class MyGroupsFragment extends Fragment {
     private ArrayList<Group> myGroups;
     private ProgressBar pbLoading;
     private TextView tvNoGroups;
-    private RelativeLayout rlJoinGroup;
 
 
     // Required empty public constructor
@@ -84,7 +84,7 @@ public class MyGroupsFragment extends Fragment {
         groupAdapter = new GroupAdapter(getContext(), myGroups);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoGroups = view.findViewById(R.id.tvNoGroups);
-        rlJoinGroup = view.findViewById(R.id.rlJoinGroup);
+        RelativeLayout rlJoinGroup = view.findViewById(R.id.rlJoinGroup);
         // set up a click handler for rlJoinGroup
         rlJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
         // set up a click handler for groupAdapter
@@ -93,9 +93,8 @@ public class MyGroupsFragment extends Fragment {
             Group group = myGroups.get(position);
             // Get the group's book using an API call
             // After getting the book, go to the group's feed
-            BookClient client = new BookClient();
             try {
-                client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
+                BookQueryManager.getInstance().getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Book book = Book.fromJson(json.jsonObject);
@@ -106,7 +105,6 @@ public class MyGroupsFragment extends Fragment {
                         i.putExtra("position", position);
                         startActivityForResult(i, LEFT_GROUP);
                     }
-
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                         // Handle failed request here
@@ -126,7 +124,7 @@ public class MyGroupsFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == getActivity().RESULT_OK && data != null) {
+        if (resultCode == RESULT_OK && data != null) {
             if (requestCode == ADD_GROUP) {
                 // Get data from the intent (group)
                 Group group = (Group) data.getExtras().get("group");

@@ -18,7 +18,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookClient;
+import com.codepath.kathyxing.booknook.net.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.parse.CountCallback;
 import com.parse.ParseException;
@@ -94,30 +94,33 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         // Get the data model based on position
         Log.i(TAG, "position is " + position);
         Group group = groups.get(position);
-        BookClient client = new BookClient();
+        // Populate data into the views
         try {
-            // Populate data into the views
             holder.tvGroupTitle.setText(group.fetchIfNeeded().getString(Group.KEY_GROUP_NAME));
-            // Query the group's number of members to set tvNumMembers
-            CountCallback getNumMembersInGroupCallback = (count, e) -> {
-                if(e == null) {
-                    holder.tvNumMembers.setText(count + " members");
-                } else {
-                    Log.e(TAG, "error getting num members", e);
-                }
-            };
-            ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
-            // Query the groups' number of posts to set tvNumPosts
-            CountCallback getNumPostsInGroupCallback = (count, e) -> {
-                if (e == null) {
-                    holder.tvNumPosts.setText(count + " posts");
-                } else {
-                    Log.e(TAG, "error getting num posts", e);
-                }
-            };
-            ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
-            // Get the group's book using an API call to set the book cover
-            client.getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        // Query the group's number of members to set tvNumMembers
+        CountCallback getNumMembersInGroupCallback = (count, e) -> {
+            if(e == null) {
+                holder.tvNumMembers.setText(count + " members");
+            } else {
+                Log.e(TAG, "error getting num members", e);
+            }
+        };
+        ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
+        // Query the groups' number of posts to set tvNumPosts
+        CountCallback getNumPostsInGroupCallback = (count, e) -> {
+            if (e == null) {
+                holder.tvNumPosts.setText(count + " posts");
+            } else {
+                Log.e(TAG, "error getting num posts", e);
+            }
+        };
+        ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
+        // Get the group's book using an API call to set the book cover
+        try {
+            BookQueryManager.getInstance().getBook(group.fetchIfNeeded().getString(Group.KEY_BOOK_ID), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Headers headers, JSON json) {
                     book = Book.fromJson(json.jsonObject);

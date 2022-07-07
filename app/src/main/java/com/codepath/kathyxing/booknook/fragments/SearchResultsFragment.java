@@ -17,19 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookClient;
+import com.codepath.kathyxing.booknook.net.BookQueryManager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-
-import okhttp3.Headers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,7 +43,6 @@ public class SearchResultsFragment extends Fragment {
     private BookAdapter bookAdapter;
     private ArrayList<Book> books;
     private int pageNumber = 0;
-    private int totalItems;
     private String anyField;
     private String title;
     private String author;
@@ -163,65 +157,40 @@ public class SearchResultsFragment extends Fragment {
         btnPrevPage.setVisibility(View.GONE);
         // Remove books from the adapter
         bookAdapter.clear();
-
-        // initialize a book client to get API data
-        BookClient client = new BookClient();
-        client.getBooks(savedQuery, startIndex, MAX_RESULTS, new JsonHttpResponseHandler() {
+        // get API data
+        BookQueryManager.getInstance().getBooks(savedQuery, startIndex, MAX_RESULTS, new BookQueryManager.BooksCallback() {
             @Override
-            public void onSuccess(int statusCode, Headers headers, JSON response) {
-                try {
-                    JSONArray items;
-                    if (response != null) {
-                        // Set the total items
-                        totalItems = response.jsonObject.getInt("totalItems");
-                        if (totalItems == 0) {
-                            tvNoResults.setVisibility(View.VISIBLE);
-                        } else {
-                            // Get the items json array
-                            items = response.jsonObject.getJSONArray("items");
-                            // Parse json array into array of model objects
-                            final ArrayList<Book> b = Book.fromJson(items);
-                            // Load model objects into the adapter
-                            books.addAll(b);
-                            bookAdapter.notifyDataSetChanged();
-                            // Set view visibilities
-                            btnNextPage.setVisibility(View.VISIBLE);
-                            if (pageNumber > 0) {
-                                btnPrevPage.setVisibility(View.VISIBLE);
-                            }
-                            if (totalItems - startIndex <= 10) {
-                                btnNextPage.setVisibility(View.GONE);
-                            }
-                            tvPageNumber.setText("Page " + (pageNumber + 1));
-                            tvPageNumber.setVisibility(View.VISIBLE);
-                        }
-                        pbLoading.setVisibility(View.GONE);
-                        Log.i(TAG, "fetch books success");
-                    }
-                } catch (JSONException e) {
-                    // Invalid JSON format, show appropriate error.
-                    e.printStackTrace();
-                }
+            public void onSuccess(int statusCode, ArrayList<Book> bookList, int totalItems) {
+                // Load model objects into the adapter
+                books.addAll(bookList);
+                bookAdapter.notifyDataSetChanged();
+                // Set view visibilities
+                btnPrevPage.setVisibility(pageNumber > 0 ? View.VISIBLE : View.GONE);
+                btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE: View.VISIBLE);
+                tvPageNumber.setText("Page " + (pageNumber + 1));
+                tvPageNumber.setVisibility(View.VISIBLE);
+                pbLoading.setVisibility(View.GONE);
+                Log.i(TAG, "fetch books success");
             }
+
             @Override
-            public void onFailure(int statusCode, Headers headers, String responseString, Throwable throwable) {
-                // Handle failed request here
-                if (statusCode == 400) {
-                    // query missing
-                    Toast.makeText(getContext(), "Did not receive a query, try again!", Toast.LENGTH_SHORT).show();
+            public void onFailure(int errorCode) {
+                if (errorCode == BookQueryManager.NO_BOOKS_FOUND) {
+                    tvNoResults.setVisibility(View.VISIBLE);
                 } else {
+                    // Handle failed request here
                     Toast.makeText(getContext(), "Issue with query, try again!", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Request failed with code " + errorCode);
+                    // swap in the advanced search fragment
+                    AdvancedSearchFragment nextFragment = new AdvancedSearchFragment();
+                    if (getActivity() != null && getView() != null) {
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
                 }
                 pbLoading.setVisibility(View.GONE);
-                Log.e(TAG, "Request failed with code " + statusCode + ". Response message: " + responseString);
-                // swap in the advanced search fragment
-                AdvancedSearchFragment nextFragment = new AdvancedSearchFragment();
-                if (getActivity() != null && getView() != null) {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
-                            .addToBackStack(null)
-                            .commit();
-                }
             }
         });
     }
