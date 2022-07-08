@@ -95,8 +95,16 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_logout:
                 logoutUser();
                 return true;
+            case android.R.id.home:
+                getSupportFragmentManager().popBackStack();
+                hideHomeButton();
+                // TODO: set the name
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void showBackButton() { getSupportActionBar().setDisplayHomeAsUpEnabled(true); }
+    public void hideHomeButton() { getSupportActionBar().setDisplayHomeAsUpEnabled(false); }
 }

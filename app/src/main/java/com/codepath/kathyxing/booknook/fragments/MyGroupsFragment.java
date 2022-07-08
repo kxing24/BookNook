@@ -59,13 +59,13 @@ public class MyGroupsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onResume() {
+        super.onResume();
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle(getString(R.string.my_groups));
         }
-        super.onCreate(savedInstanceState);
     }
 
     @Override

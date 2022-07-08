@@ -42,13 +42,15 @@ public class AdvancedSearchFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle("Advanced Search");
         }
+        ((MainActivity) getActivity()).showBackButton();
+        clearEditTexts();
     }
 
     @Override
@@ -110,5 +112,14 @@ public class AdvancedSearchFragment extends Fragment {
             imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
             return true;
         });
+    }
+
+    private void clearEditTexts() {
+        etAnyField.getText().clear();
+        etTitle.getText().clear();
+        etAuthor.getText().clear();
+        etPublisher.getText().clear();
+        etSubject.getText().clear();
+        etIsbn.getText().clear();
     }
 }

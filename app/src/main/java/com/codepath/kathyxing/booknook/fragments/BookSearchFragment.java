@@ -92,7 +92,6 @@ public class BookSearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {

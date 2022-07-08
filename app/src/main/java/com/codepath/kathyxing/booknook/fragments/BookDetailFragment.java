@@ -95,13 +95,14 @@ public class BookDetailFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle("Book Details");
         }
+        ((MainActivity)getActivity()).showBackButton();
     }
 
     @Override

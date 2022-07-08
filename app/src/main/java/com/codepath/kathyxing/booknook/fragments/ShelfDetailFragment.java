@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.UserSelectionAdapter.ShelfDetailAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookQueryManager;
@@ -50,13 +51,14 @@ public class ShelfDetailFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle("Shelf Details");
         }
+        ((MainActivity) getActivity()).showBackButton();
     }
 
     @Override

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.kathyxing.booknook.R;
+import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookQueryManager;
@@ -57,13 +58,14 @@ public class SearchResultsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
             activity.setTitle("Search Results");
         }
+        ((MainActivity) getActivity()).showBackButton();
     }
 
     @Override

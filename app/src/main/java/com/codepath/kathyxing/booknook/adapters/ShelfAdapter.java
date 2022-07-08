@@ -1,8 +1,6 @@
 package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
-import com.codepath.kathyxing.booknook.activities.LoginActivity;
-import com.codepath.kathyxing.booknook.activities.SignupActivity;
-import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.parse.CountCallback;
 import com.parse.FindCallback;
-import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,51 +32,14 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
     // Define listener member variable
     private ShelfAdapter.OnItemClickListener listener;
 
-    // Define the listener interface
-    public interface OnItemClickListener {
-        void onItemClick(View itemView, int position);
+    public ShelfAdapter(Context context, ArrayList<Shelf> shelves) {
+        this.shelves = shelves;
+        this.context = context;
     }
 
     // Define the method that allows the parent activity or fragment to define the listener
     public void setOnItemClickListener(ShelfAdapter.OnItemClickListener listener) {
         this.listener = listener;
-    }
-
-    // View lookup cache
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvShelfName;
-        private TextView tvBookCount;
-        private ImageButton ibRemoveShelf;
-        private Shelf shelf;
-
-        public ViewHolder(final View itemView, final ShelfAdapter.OnItemClickListener clickListener) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any ViewHolder instance.
-            super(itemView);
-            tvShelfName = itemView.findViewById(R.id.tvShelfName);
-            tvBookCount = itemView.findViewById(R.id.tvBookCount);
-            ibRemoveShelf = itemView.findViewById(R.id.ibRemoveShelf);
-            // set up click handler for the item
-            itemView.setOnClickListener(v -> clickListener.onItemClick(itemView, getAdapterPosition()));
-            // set up click handler for the remove shelf button
-            ibRemoveShelf.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showRemoveShelfConfirmation(shelf);
-                }
-            });
-        }
-
-        public void bind(Shelf shelf) {
-            this.shelf = shelf;
-            tvShelfName.setText(shelf.getShelfName());
-            setBookCount(shelf, this);
-        }
-    }
-
-    public ShelfAdapter(Context context, ArrayList<Shelf> shelves) {
-        this.shelves = shelves;
-        this.context = context;
     }
 
     // Inflating layout from XML and return the holder
@@ -120,9 +77,7 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
                 .setTitle("Remove Shelf")
                 .setMessage("Are you sure you want to delete this shelf?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    removeShelf(shelf);
-                })
+                .setPositiveButton("Yes", (dialog, which) -> removeShelf(shelf))
                 .setNegativeButton("Never mind", (dialog, which) -> dialog.dismiss());
         builder.show();
     }
@@ -133,7 +88,7 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
         // delete all of the books on the shelf
         FindCallback<BookOnShelf> getBooksOnShelfCallback = (booksOnShelf, e) -> {
             if (e == null) {
-                for(BookOnShelf bookOnShelf : booksOnShelf) {
+                for (BookOnShelf bookOnShelf : booksOnShelf) {
                     bookOnShelf.deleteInBackground();
                 }
             } else {
@@ -144,5 +99,36 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
         // remove shelf from the adapter
         shelves.remove(shelf);
         this.notifyDataSetChanged();
+    }
+
+    // Define the listener interface
+    public interface OnItemClickListener {
+        void onItemClick(View itemView, int position);
+    }
+
+    // View lookup cache
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView tvShelfName;
+        private final TextView tvBookCount;
+        private Shelf shelf;
+
+        public ViewHolder(final View itemView, final ShelfAdapter.OnItemClickListener clickListener) {
+            // Stores the itemView in a public final member variable that can be used
+            // to access the context from any ViewHolder instance.
+            super(itemView);
+            tvShelfName = itemView.findViewById(R.id.tvShelfName);
+            tvBookCount = itemView.findViewById(R.id.tvBookCount);
+            ImageButton ibRemoveShelf = itemView.findViewById(R.id.ibRemoveShelf);
+            // set up click handler for the item
+            itemView.setOnClickListener(v -> clickListener.onItemClick(itemView, getAdapterPosition()));
+            // set up click handler for the remove shelf button
+            ibRemoveShelf.setOnClickListener(v -> showRemoveShelfConfirmation(shelf));
+        }
+
+        public void bind(Shelf shelf) {
+            this.shelf = shelf;
+            tvShelfName.setText(shelf.getShelfName());
+            setBookCount(shelf, this);
+        }
     }
 }
