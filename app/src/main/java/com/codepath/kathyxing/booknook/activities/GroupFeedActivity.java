@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
@@ -48,6 +49,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     private TextView tvNoGroupPosts;
     private TextView tvNumMembers;
     private TextView tvNumPosts;
+    private SwipeRefreshLayout swipeContainer;
     private int position;
 
     @Override
@@ -81,6 +83,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         tvNoGroupPosts = findViewById(R.id.tvNoGroupPosts);
         tvNumMembers = findViewById(R.id.tvNumMembers);
         tvNumPosts = findViewById(R.id.tvNumPosts);
+        swipeContainer = findViewById(R.id.swipeContainer);
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(this, allPosts);
@@ -93,6 +96,18 @@ public class GroupFeedActivity extends AppCompatActivity {
         getNumMembers();
         // get the number of posts in the group
         getNumPosts();
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchFeed();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         // query posts in group
         queryPosts();
     }
@@ -119,7 +134,18 @@ public class GroupFeedActivity extends AppCompatActivity {
         ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
     }
 
+    // Send the request to fetch the updated data
+    private void fetchFeed() {
+        // clear out old items before appending in the new ones
+        adapter.clear();
+        // add new items to adapter
+        queryPosts();
+        // Call setRefreshing(false) to signal refresh has finished
+        swipeContainer.setRefreshing(false);
+    }
+
     private void queryPosts() {
+        pbLoading.setVisibility(View.VISIBLE);
         FindCallback queryPostsCallback = (FindCallback<Post>) (posts, e) -> {
             // check for errors
             if (e != null) {

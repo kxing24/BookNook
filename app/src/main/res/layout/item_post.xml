@@ -90,9 +90,8 @@
         android:layout_marginTop="5dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        android:visibility="gone"
-        app:srcCompat="@drawable/icon_heart_empty"
-        tools:visibility="visible" />
+        android:visibility="invisible"
+        app:srcCompat="@drawable/icon_heart_empty" />
 
     <ImageButton
         android:id="@+id/ibLikeFilled"
@@ -104,7 +103,7 @@
         android:layout_marginTop="5dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:srcCompat="@drawable/icon_heart_filled" />
 
     <TextView

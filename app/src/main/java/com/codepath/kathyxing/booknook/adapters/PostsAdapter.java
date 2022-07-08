@@ -141,7 +141,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         private void likePost() {
-            ibLikeEmpty.setVisibility(View.GONE);
+            ibLikeEmpty.setVisibility(View.INVISIBLE);
             SaveCallback likePostCallback = e -> {
                 if (e == null) {
                     ibLikeFilled.setVisibility(View.VISIBLE);
@@ -154,7 +154,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         private void unlikePost() {
-            ibLikeFilled.setVisibility(View.GONE);
+            ibLikeFilled.setVisibility(View.INVISIBLE);
             DeleteCallback unlikePostCallback = e -> {
                 if(e == null) {
                     ibLikeEmpty.setVisibility(View.VISIBLE);

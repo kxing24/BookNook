@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvPosts;
     private ProgressBar pbLoading;
     private TextView tvNoPosts;
+    private SwipeRefreshLayout swipeContainer;
 
     // Required empty public constructor
     public HomeFragment() {}
@@ -70,6 +72,7 @@ public class HomeFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoPosts = view.findViewById(R.id.tvNoPosts);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
         // initialize the array that will hold posts and create a PostsAdapter
         allPosts = new ArrayList<>();
         adapter = new PostsAdapter(getContext(), allPosts);
@@ -78,12 +81,25 @@ public class HomeFragment extends Fragment {
         rvPosts.setAdapter(adapter);
         // set the layout manager on the recycler view
         rvPosts.setLayoutManager(linearLayoutManager);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchFeed();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         // query posts in user groups
         queryPosts();
     }
 
     // get the posts from the user's groups and display them
     private void queryPosts() {
+        pbLoading.setVisibility(View.VISIBLE);
         FindCallback queryPostsCallback = new FindCallback<Post>() {
             @Override
             public void done(List<Post> objects, ParseException e) {
@@ -101,5 +117,15 @@ public class HomeFragment extends Fragment {
             }
         };
         ParseQueryUtilities.queryHomeFeedPostsAsync(queryPostsCallback);
+    }
+
+    // Send the request to fetch the updated data
+    private void fetchFeed() {
+        // clear out old items before appending in the new ones
+        adapter.clear();
+        // add new items to adapter
+        queryPosts();
+        // Call setRefreshing(false) to signal refresh has finished
+        swipeContainer.setRefreshing(false);
     }
 }
