@@ -7,13 +7,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +47,7 @@ import com.parse.SaveCallback;
 
 import org.apache.commons.text.similarity.CosineDistance;
 import org.parceler.Parcels;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -424,28 +429,25 @@ public class BookDetailFragment extends Fragment {
         builder.setTitle("Select Shelves");
         // set dialog non cancelable
         builder.setCancelable(false);
-        builder.setMultiChoiceItems(shelfNames, selected, new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
-                // check condition
-                if (b) {
-                    // when checkbox selected, add position to selectedShelvesPositions
-                    selectedShelves.add(shelves.get(i));
-                } else {
-                    // when checkbox unselected, remove position from selectedShelvesPositions
-                    selectedShelves.remove(shelves.get(i));
-                }
+        builder.setMultiChoiceItems(shelfNames, selected, (dialogInterface, i, b) -> {
+            // check condition
+            if (b) {
+                // when checkbox selected, add position to selectedShelvesPositions
+                selectedShelves.add(shelves.get(i));
+            } else {
+                // when checkbox unselected, remove position from selectedShelvesPositions
+                selectedShelves.remove(shelves.get(i));
             }
         });
         builder.setPositiveButton("Add", (dialogInterface, i) -> {
             // Add the books to the shelves
             addBookToShelves(book, selectedShelves);
+            Toast.makeText(getContext(), "Added book to shelves!", Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
             // dismiss dialog
             dialogInterface.dismiss();
         });
-        // show dialog
         builder.show();
     }
 
