@@ -72,35 +72,6 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
         ParseQueryUtilities.getShelfBookCountAsync(shelf, getShelfBookCountCallback);
     }
 
-    private void showRemoveShelfConfirmation(Shelf shelf) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle("Remove Shelf")
-                .setMessage("Are you sure you want to delete this shelf?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", (dialog, which) -> removeShelf(shelf))
-                .setNegativeButton("Never mind", (dialog, which) -> dialog.dismiss());
-        builder.show();
-    }
-
-    private void removeShelf(@NonNull Shelf shelf) {
-        // delete the shelf
-        shelf.deleteInBackground();
-        // delete all of the books on the shelf
-        FindCallback<BookOnShelf> getBooksOnShelfCallback = (booksOnShelf, e) -> {
-            if (e == null) {
-                for (BookOnShelf bookOnShelf : booksOnShelf) {
-                    bookOnShelf.deleteInBackground();
-                }
-            } else {
-                Log.e(TAG, "issue deleting book on shelf", e);
-            }
-        };
-        ParseQueryUtilities.getBooksOnShelfAsync(shelf, getBooksOnShelfCallback);
-        // remove shelf from the adapter
-        shelves.remove(shelf);
-        this.notifyDataSetChanged();
-    }
-
     // Define the listener interface
     public interface OnItemClickListener {
         void onItemClick(View itemView, int position);
@@ -110,7 +81,6 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvShelfName;
         private final TextView tvBookCount;
-        private Shelf shelf;
 
         public ViewHolder(final View itemView, final ShelfAdapter.OnItemClickListener clickListener) {
             // Stores the itemView in a public final member variable that can be used
@@ -118,15 +88,11 @@ public class ShelfAdapter extends RecyclerView.Adapter<ShelfAdapter.ViewHolder> 
             super(itemView);
             tvShelfName = itemView.findViewById(R.id.tvShelfName);
             tvBookCount = itemView.findViewById(R.id.tvBookCount);
-            ImageButton ibRemoveShelf = itemView.findViewById(R.id.ibRemoveShelf);
             // set up click handler for the item
             itemView.setOnClickListener(v -> clickListener.onItemClick(itemView, getAdapterPosition()));
-            // set up click handler for the remove shelf button
-            ibRemoveShelf.setOnClickListener(v -> showRemoveShelfConfirmation(shelf));
         }
 
         public void bind(Shelf shelf) {
-            this.shelf = shelf;
             tvShelfName.setText(shelf.getShelfName());
             setBookCount(shelf, this);
         }

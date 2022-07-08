@@ -557,8 +557,6 @@ public final class ParseQueryUtilities {
         Shelf shelf = new Shelf();
         shelf.setShelfName(shelfName);
         shelf.setUser((User) ParseUser.getCurrentUser());
-        JSONArray books = new JSONArray();
-        shelf.setBooks(books);
         shelf.saveInBackground(addShelfCallback);
         return shelf;
     }
