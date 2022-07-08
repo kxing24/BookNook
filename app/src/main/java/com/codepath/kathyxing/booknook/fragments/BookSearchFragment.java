@@ -201,6 +201,9 @@ public class BookSearchFragment extends Fragment {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 tvNoResults.setVisibility(View.GONE);
+                btnNextPage.setVisibility(View.GONE);
+                btnPrevPage.setVisibility(View.GONE);
+                tvPageNumber.setVisibility(View.GONE);
                 // show the advanced search button and book recommendation
                 btnAdvancedSearch.setVisibility(View.VISIBLE);
                 tvRecommendationTitle.setVisibility(View.VISIBLE);
