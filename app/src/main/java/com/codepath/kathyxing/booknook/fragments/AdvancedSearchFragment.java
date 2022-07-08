@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
@@ -99,7 +100,8 @@ public class AdvancedSearchFragment extends Fragment {
                     bundle.putString("subject", subject);
                     bundle.putString("isbn", isbn);
                     nextFragment.setArguments(bundle);
-                    getActivity().getSupportFragmentManager().beginTransaction()
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
                             .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)
                             .addToBackStack(null)
                             .commit();

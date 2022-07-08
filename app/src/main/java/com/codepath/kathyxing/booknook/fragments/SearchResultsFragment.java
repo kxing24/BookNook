@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
@@ -36,7 +37,7 @@ public class SearchResultsFragment extends Fragment {
     public static final String TAG = "SearchResultsFragment";
     public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
-    private ProgressBar pbLoading;
+    private LottieAnimationView avBookSearchLoading;
     private TextView tvNoResults;
     private Button btnPrevPage;
     private Button btnNextPage;
@@ -93,7 +94,7 @@ public class SearchResultsFragment extends Fragment {
         Log.i(TAG, "query is: " + savedQuery);
         // initialize fields
         rvBooks = view.findViewById(R.id.rvBooks);
-        pbLoading = view.findViewById(R.id.pbLoading);
+        avBookSearchLoading = view.findViewById(R.id.avBookSearchLoading);
         tvNoResults = view.findViewById(R.id.tvNoResults);
         tvPageNumber = view.findViewById(R.id.tvPageNumber);
         btnPrevPage = view.findViewById(R.id.btnPrevPage);
@@ -138,7 +139,7 @@ public class SearchResultsFragment extends Fragment {
     // Executes an API call to the Google Books search endpoint, parses the results
     // Converts them into an array of book objects and adds them to the adapter
     private void fetchBooks(int pageNumber) {
-        pbLoading.setVisibility(View.VISIBLE);
+        avBookSearchLoading.setVisibility(View.VISIBLE);
         int startIndex = pageNumber * MAX_RESULTS;
         // smooth scroll to top
         rvBooks.smoothScrollToPosition(0);
@@ -160,7 +161,7 @@ public class SearchResultsFragment extends Fragment {
                 btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE: View.VISIBLE);
                 tvPageNumber.setText("Page " + (pageNumber + 1));
                 tvPageNumber.setVisibility(View.VISIBLE);
-                pbLoading.setVisibility(View.GONE);
+                avBookSearchLoading.setVisibility(View.GONE);
                 Log.i(TAG, "fetch books success");
             }
 
@@ -181,7 +182,7 @@ public class SearchResultsFragment extends Fragment {
                                 .commit();
                     }
                 }
-                pbLoading.setVisibility(View.GONE);
+                avBookSearchLoading.setVisibility(View.GONE);
             }
         });
     }

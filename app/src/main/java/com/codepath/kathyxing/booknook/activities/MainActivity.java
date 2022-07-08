@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.fragments.BookSearchFragment;
@@ -98,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 getSupportFragmentManager().popBackStack();
                 hideHomeButton();
-                // TODO: set the name
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
