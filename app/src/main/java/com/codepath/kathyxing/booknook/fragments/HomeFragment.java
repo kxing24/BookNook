@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.codepath.kathyxing.booknook.EndlessRecyclerViewScrollListener;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
@@ -38,6 +39,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar pbLoading;
     private TextView tvNoPosts;
     private SwipeRefreshLayout swipeContainer;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     // Required empty public constructor
     public HomeFragment() {
@@ -83,19 +85,30 @@ public class HomeFragment extends Fragment {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+        // add endless scroll
+        // Retain an instance so that you can call `resetState()` for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                loadNextDataFromApi(page);
+            }
+        };
+        // Add the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
         // query posts in user groups
-        queryPosts();
+        queryPosts(0);
     }
 
     // get the posts from the user's groups and display them
-    private void queryPosts() {
-        pbLoading.setVisibility(View.VISIBLE);
+    private void queryPosts(int page) {
+        pbLoading.setVisibility(page == 0 ? View.VISIBLE : View.GONE);
         FindCallback<Post> queryPostsCallback = (objects, e) -> {
             if (e != null) {
                 Log.e(TAG, "Query posts error", e);
                 return;
             }
-            if (objects.isEmpty()) {
+            if (objects.isEmpty() && page == 0) {
                 tvNoPosts.setVisibility(View.VISIBLE);
             } else {
                 allPosts.addAll(objects);
@@ -103,16 +116,24 @@ public class HomeFragment extends Fragment {
             }
             pbLoading.setVisibility(View.GONE);
         };
-        ParseQueryUtilities.queryHomeFeedPostsAsync(queryPostsCallback);
+        ParseQueryUtilities.queryHomeFeedPostsAsync(page, queryPostsCallback);
     }
 
     // Send the request to fetch the updated data
     private void fetchFeed() {
         // clear out old items before appending in the new ones
         adapter.clear();
+        // Reset endless scroll listener when performing a new search
+        scrollListener.resetState();
         // add new items to adapter
-        queryPosts();
+        queryPosts(0);
         // Call setRefreshing(false) to signal refresh has finished
         swipeContainer.setRefreshing(false);
+    }
+
+    // Append the next page of data into the adapter
+    // This method probably sends out a network request and appends new data items to your adapter.
+    public void loadNextDataFromApi(int offset) {
+        queryPosts(offset);
     }
 }

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.codepath.kathyxing.booknook.EndlessRecyclerViewScrollListener;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
@@ -50,6 +51,7 @@ public class GroupFeedActivity extends AppCompatActivity {
     private TextView tvNumMembers;
     private TextView tvNumPosts;
     private SwipeRefreshLayout swipeContainer;
+    private EndlessRecyclerViewScrollListener scrollListener;
     private int position;
 
     @Override
@@ -103,60 +105,19 @@ public class GroupFeedActivity extends AppCompatActivity {
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+        // add endless scroll
+        // Retain an instance so that you can call `resetState()` for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                loadNextDataFromApi(page);
+            }
+        };
+        // Add the scroll listener to RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
         // query posts in group
-        queryPosts();
-    }
-
-    private void getNumMembers() {
-        CountCallback getNumMembersInGroupCallback = (count, e) -> {
-            if (e == null) {
-                tvNumMembers.setText(count + " members");
-            } else {
-                Log.e(TAG, "error getting num members", e);
-            }
-        };
-        ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
-    }
-
-    private void getNumPosts() {
-        CountCallback getNumPostsInGroupCallback = (count, e) -> {
-            if (e == null) {
-                tvNumPosts.setText(count + " posts");
-            } else {
-                Log.e(TAG, "error getting num posts", e);
-            }
-        };
-        ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
-    }
-
-    // Send the request to fetch the updated data
-    private void fetchFeed() {
-        // clear out old items before appending in the new ones
-        adapter.clear();
-        // add new items to adapter
-        queryPosts();
-        // Call setRefreshing(false) to signal refresh has finished
-        swipeContainer.setRefreshing(false);
-    }
-
-    private void queryPosts() {
-        pbLoading.setVisibility(View.VISIBLE);
-        FindCallback<Post> queryPostsCallback = (posts, e) -> {
-            // check for errors
-            if (e != null) {
-                Log.e(TAG, "Issue with getting posts", e);
-                return;
-            }
-            // if there are no posts, set tvNoGroupPosts to visible
-            if (posts.isEmpty()) {
-                tvNoGroupPosts.setVisibility(View.VISIBLE);
-            }
-            // save received posts to list and notify adapter of new data
-            allPosts.addAll(posts);
-            adapter.notifyDataSetChanged();
-            pbLoading.setVisibility(View.GONE);
-        };
-        ParseQueryUtilities.queryGroupPostsAsync(book.getId(), queryPostsCallback);
+        queryPosts(0);
     }
 
     @Override
@@ -206,6 +167,63 @@ public class GroupFeedActivity extends AppCompatActivity {
             tvNoGroupPosts.setVisibility(View.GONE);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void getNumMembers() {
+        CountCallback getNumMembersInGroupCallback = (count, e) -> {
+            if (e == null) {
+                tvNumMembers.setText(count + " members");
+            } else {
+                Log.e(TAG, "error getting num members", e);
+            }
+        };
+        ParseQueryUtilities.getNumMembersInGroupAsync(group, getNumMembersInGroupCallback);
+    }
+
+    private void getNumPosts() {
+        CountCallback getNumPostsInGroupCallback = (count, e) -> {
+            if (e == null) {
+                tvNumPosts.setText(count + " posts");
+            } else {
+                Log.e(TAG, "error getting num posts", e);
+            }
+        };
+        ParseQueryUtilities.getNumPostsInGroupAsync(group, getNumPostsInGroupCallback);
+    }
+
+    // Append the next page of data into the adapter
+    // This method probably sends out a network request and appends new data items to your adapter.
+    public void loadNextDataFromApi(int offset) {
+        queryPosts(offset);
+    }
+
+    // Send the request to fetch the updated data
+    private void fetchFeed() {
+        // clear out old items before appending in the new ones
+        adapter.clear();
+        // add new items to adapter
+        queryPosts(0);
+        // Call setRefreshing(false) to signal refresh has finished
+        swipeContainer.setRefreshing(false);
+    }
+
+    private void queryPosts(int page) {
+        pbLoading.setVisibility(page == 0 ? View.VISIBLE : View.GONE);        FindCallback<Post> queryPostsCallback = (posts, e) -> {
+            // check for errors
+            if (e != null) {
+                Log.e(TAG, "Issue with getting posts", e);
+                return;
+            }
+            // if there are no posts, set tvNoGroupPosts to visible
+            if (posts.isEmpty() && page == 0) {
+                tvNoGroupPosts.setVisibility(View.VISIBLE);
+            }
+            // save received posts to list and notify adapter of new data
+            allPosts.addAll(posts);
+            adapter.notifyDataSetChanged();
+            pbLoading.setVisibility(View.GONE);
+        };
+        ParseQueryUtilities.queryGroupPostsAsync(page, book.getId(), queryPostsCallback);
     }
 
     private void leaveGroup() {

@@ -8,8 +8,6 @@ import android.view.View;
 
 import androidx.recyclerview.selection.ItemDetailsLookup;
 
-import com.codepath.kathyxing.booknook.adapters.UserSelectionAdapter.UserSelectionAdapter;
-
 public class UserSelectionLookup extends ItemDetailsLookup {
 
     private final RecyclerView recyclerView;

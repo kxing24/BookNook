@@ -132,7 +132,7 @@ public final class ParseQueryUtilities {
      *
      * @param queryPostsCallback the callback for the async function
      */
-    public static void queryHomeFeedPostsAsync(@NonNull FindCallback<Post> queryPostsCallback) {
+    public static void queryHomeFeedPostsAsync(int page, @NonNull FindCallback<Post> queryPostsCallback) {
         // first query the groups from the user
         ParseQuery<Member> memberQuery = ParseQuery.getQuery(Member.class);
         memberQuery.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
@@ -145,6 +145,8 @@ public final class ParseQueryUtilities {
         postQuery.whereMatchesKeyInQuery(Post.KEY_GROUP, Member.KEY_TO, memberQuery);
         // sort the posts in descending order by creation date
         postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
+        postQuery.setLimit(20);
+        postQuery.setSkip(20 * page);
         postQuery.findInBackground(queryPostsCallback);
     }
 
@@ -154,7 +156,7 @@ public final class ParseQueryUtilities {
      * @param bookId             the id of the group's book
      * @param queryPostsCallback the callback for the async function
      */
-    public static void queryGroupPostsAsync(@NonNull String bookId, @NonNull FindCallback<Post> queryPostsCallback) {
+    public static void queryGroupPostsAsync(int page, @NonNull String bookId, @NonNull FindCallback<Post> queryPostsCallback) {
         // specify what type of data we want to query - Post.class
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         // include data referred by user key
@@ -163,10 +165,11 @@ public final class ParseQueryUtilities {
         query.include(Post.KEY_CREATED_AT);
         // query data where the post's book id is equal to the group book's id
         query.whereEqualTo(Post.KEY_BOOK_ID, bookId);
-        // limit query to latest 20 items
-        query.setLimit(20);
         // order posts by creation date (newest first)
         query.addDescendingOrder("createdAt");
+        // limit query to latest 20 items
+        query.setLimit(20);
+        query.setSkip(20 * page);
         // start an asynchronous call for posts
         query.findInBackground(queryPostsCallback);
     }

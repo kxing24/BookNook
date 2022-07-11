@@ -300,30 +300,30 @@ public class BookSearchFragment extends Fragment {
             }
         }
         Collections.shuffle(genres);
+        // randomly get a recommendation from group or genre
+        Random random = new Random();
+        if (random.nextBoolean()) {
+            // get recommendation from group
+            getBookRecommendationFromGroup(genres);
+        } else {
+            // get recommendation from genre
+            getBookRecommendationFromGenre(genres.get(0));
+        }
+    }
+
+    private void getBookRecommendationFromGroup(ArrayList<String> genres) {
         // get the list of groups with possible recommendations
         FindCallback<Group> queryBookRecommendationsCallback = (groups, e) -> {
-            if (e == null) {
-                if (!groups.isEmpty()) {
-                    // randomly get a recommendation from group or genre
-                    Random random = new Random();
-                    if (random.nextBoolean()) {
-                        // get recommendation from group
-                        Collections.shuffle(groups);
-                        Group group = groups.get(0);
-                        String recommendationTitle = "Because you are in " + group.getGroupName() + ", you might enjoy:";
-                        displayBookRecommendation(recommendationTitle, group.getRecommendedBookId());
-                    } else {
-                        // get recommendation from genre
-                        getBookRecommendationFromGenre(genres.get(0));
-                    }
-                }
+            if (e == null && !groups.isEmpty()) {
+                // randomly get a recommendation from group
+                Collections.shuffle(groups);
+                Group group = groups.get(0);
+                String recommendationTitle = "Because you are in " + group.getGroupName() + ", you might enjoy:";
+                displayBookRecommendation(recommendationTitle, group.getRecommendedBookId());
             } else {
-                if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                    // no recommendations from book, get recommendation from genre
-                    if (!genres.isEmpty()) {
-                        getBookRecommendationFromGenre(genres.get(0));
-                    }
-                } else {
+                // get a recommendation from genre
+                getBookRecommendationFromGenre(genres.get(0));
+                if (e != null) {
                     Log.e(TAG, "issue getting groups with book recommendations", e);
                 }
             }
