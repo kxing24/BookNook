@@ -2,6 +2,12 @@ package com.codepath.kathyxing.booknook.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,23 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.PostsAdapter;
-import com.codepath.kathyxing.booknook.parse_classes.Group;
-import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
 import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +40,8 @@ public class HomeFragment extends Fragment {
     private SwipeRefreshLayout swipeContainer;
 
     // Required empty public constructor
-    public HomeFragment() {}
+    public HomeFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,12 +77,7 @@ public class HomeFragment extends Fragment {
         // set the layout manager on the recycler view
         rvPosts.setLayoutManager(linearLayoutManager);
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchFeed();
-            }
-        });
+        swipeContainer.setOnRefreshListener(this::fetchFeed);
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -100,21 +90,18 @@ public class HomeFragment extends Fragment {
     // get the posts from the user's groups and display them
     private void queryPosts() {
         pbLoading.setVisibility(View.VISIBLE);
-        FindCallback queryPostsCallback = new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> objects, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Query posts error", e);
-                    return;
-                }
-                if (objects.isEmpty()) {
-                    tvNoPosts.setVisibility(View.VISIBLE);
-                } else {
-                    allPosts.addAll(objects);
-                    adapter.notifyDataSetChanged();
-                }
-                pbLoading.setVisibility(View.GONE);
+        FindCallback<Post> queryPostsCallback = (objects, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Query posts error", e);
+                return;
             }
+            if (objects.isEmpty()) {
+                tvNoPosts.setVisibility(View.VISIBLE);
+            } else {
+                allPosts.addAll(objects);
+                adapter.notifyDataSetChanged();
+            }
+            pbLoading.setVisibility(View.GONE);
         };
         ParseQueryUtilities.queryHomeFeedPostsAsync(queryPostsCallback);
     }

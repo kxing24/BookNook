@@ -23,7 +23,6 @@ public class FriendsFragment extends Fragment {
 
     // fragment parameters
     public static final String TAG = "FriendsFragment";
-    private TabLayout tlTabs;
     private ViewPager viewPager;
 
     // Required empty public constructor
@@ -52,7 +51,7 @@ public class FriendsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // initialize views
-        tlTabs = view.findViewById(R.id.tlTabs);
+        TabLayout tlTabs = view.findViewById(R.id.tlTabs);
         viewPager = view.findViewById(R.id.viewPager);
         tlTabs.addTab(tlTabs.newTab().setText("My Friends"));
         tlTabs.addTab(tlTabs.newTab().setText("Find User"));

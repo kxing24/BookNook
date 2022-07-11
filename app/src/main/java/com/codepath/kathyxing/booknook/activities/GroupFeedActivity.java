@@ -97,12 +97,7 @@ public class GroupFeedActivity extends AppCompatActivity {
         // get the number of posts in the group
         getNumPosts();
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchFeed();
-            }
-        });
+        swipeContainer.setOnRefreshListener(this::fetchFeed);
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -146,7 +141,7 @@ public class GroupFeedActivity extends AppCompatActivity {
 
     private void queryPosts() {
         pbLoading.setVisibility(View.VISIBLE);
-        FindCallback queryPostsCallback = (FindCallback<Post>) (posts, e) -> {
+        FindCallback<Post> queryPostsCallback = (posts, e) -> {
             // check for errors
             if (e != null) {
                 Log.e(TAG, "Issue with getting posts", e);
@@ -229,7 +224,6 @@ public class GroupFeedActivity extends AppCompatActivity {
         GetCallback<Member> getMemberCallback = (member, e) -> {
             if (e == null) {
                 ParseQueryUtilities.leaveGroupAsync(member, leaveGroupCallback);
-                //TODO: pass back a boolean and adjust view visibility in previous ones
             } else {
                 Log.e(TAG, "issue getting member", e);
             }

@@ -2,40 +2,28 @@ package com.codepath.kathyxing.booknook.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
 import com.codepath.kathyxing.booknook.adapters.UserAdapter;
-import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -82,7 +70,9 @@ public class FindUserFragment extends Fragment {
             User user = users.get(position);
             Intent intent = new Intent(getContext(), UserProfileActivity.class);
             intent.putExtra("user", user);
-            getContext().startActivity(intent);
+            if (getContext() != null) {
+                getContext().startActivity(intent);
+            }
         });
         // Set the textlistener for the searchview
         svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -94,6 +84,7 @@ public class FindUserFragment extends Fragment {
                 svSearch.clearFocus();
                 return true;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 tvNoResults.setVisibility(View.GONE);
@@ -108,23 +99,20 @@ public class FindUserFragment extends Fragment {
         rvUsers.smoothScrollToPosition(0);
         // Remove users from the adapter
         userAdapter.clear();
-        FindCallback queryUsersCallback = new FindCallback<User>() {
-            @Override
-            public void done(List<User> objects, ParseException e) {
-                // check for errors
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting users", e);
-                    return;
-                }
-                if (objects.isEmpty()) {
-                    tvNoResults.setVisibility(View.VISIBLE);
-                } else {
-                    // save received users to list and notify adapter of new data
-                    users.addAll(objects);
-                    userAdapter.notifyDataSetChanged();
-                }
-                pbLoading.setVisibility(View.GONE);
+        FindCallback<User> queryUsersCallback = (objects, e) -> {
+            // check for errors
+            if (e != null) {
+                Log.e(TAG, "Issue with getting users", e);
+                return;
             }
+            if (objects.isEmpty()) {
+                tvNoResults.setVisibility(View.VISIBLE);
+            } else {
+                // save received users to list and notify adapter of new data
+                users.addAll(objects);
+                userAdapter.notifyDataSetChanged();
+            }
+            pbLoading.setVisibility(View.GONE);
         };
         ParseQueryUtilities.queryUsersAsync(query.trim(), queryUsersCallback);
     }

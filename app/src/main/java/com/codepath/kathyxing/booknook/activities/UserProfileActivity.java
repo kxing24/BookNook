@@ -41,9 +41,6 @@ import java.io.IOException;
 
 public class UserProfileActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
-    //TODO: user can edit profile picture
-    //TODO: click to hide keyboard
-
     // activity parameters
     public static final String TAG = "UserProfileActivity";
     public final static int PICK_PHOTO_CODE = 1046;
