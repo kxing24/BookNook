@@ -36,12 +36,16 @@ import com.codepath.kathyxing.booknook.net.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import okhttp3.Headers;
 
@@ -285,23 +289,66 @@ public class BookSearchFragment extends Fragment {
     }
 
     private void getBookRecommendation() {
+        // get the user's favorite genres
+        ArrayList<String> genres = new ArrayList<>();
+        JSONArray jsonGenres = ((User) ParseUser.getCurrentUser()).getFavoriteGenres();
+        for (int i = 0; i < jsonGenres.length(); i++) {
+            try {
+                genres.add(jsonGenres.getString(i));
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
+        }
+        Collections.shuffle(genres);
         // get the list of groups with possible recommendations
         FindCallback<Group> queryBookRecommendationsCallback = (groups, e) -> {
             if (e == null) {
                 if (!groups.isEmpty()) {
-                    // randomize the list of groups with possible recommendations
-                    Collections.shuffle(groups);
-                    // recommend the book from the first group in the shuffled list
-                    displayBookRecommendation(groups.get(0).getGroupName(), groups.get(0).getRecommendedBookId());
+                    // randomly get a recommendation from group or genre
+                    Random random = new Random();
+                    if (random.nextBoolean()) {
+                        // get recommendation from group
+                        Collections.shuffle(groups);
+                        Group group = groups.get(0);
+                        String recommendationTitle = "Because you are in " + group.getGroupName() + ", you might enjoy:";
+                        displayBookRecommendation(recommendationTitle, group.getRecommendedBookId());
+                    } else {
+                        // get recommendation from genre
+                        getBookRecommendationFromGenre(genres.get(0));
+                    }
                 }
             } else {
-                Log.e(TAG, "issue getting groups with book recommendations", e);
+                if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                    // no recommendations from book, get recommendation from genre
+                    if (!genres.isEmpty()) {
+                        getBookRecommendationFromGenre(genres.get(0));
+                    }
+                } else {
+                    Log.e(TAG, "issue getting groups with book recommendations", e);
+                }
             }
         };
         ParseQueryUtilities.queryBookRecommendationsAsync((User) ParseUser.getCurrentUser(), queryBookRecommendationsCallback);
     }
 
-    private void displayBookRecommendation(String groupName, String bookId) {
+    private void getBookRecommendationFromGenre(String genre) {
+        // get the first forty books of the genre
+        BookQueryManager.getInstance().getBooks("subject:\"" + genre + "\"", 0, 40, new BookQueryManager.BooksCallback() {
+            @Override
+            public void onSuccess(int statusCode, ArrayList<Book> books, int totalItems) {
+                Collections.shuffle(books);
+                Book book = books.get(0);
+                String recommendationTitle = "Because you are interested in " + genre + ", you might enjoy:";
+                displayBookRecommendation(recommendationTitle, book.getId());
+            }
+            @Override
+            public void onFailure(int errorCode) {
+                Log.e(TAG, "Request failed with code " + errorCode);
+            }
+        });
+    }
+
+    private void displayBookRecommendation(String recommendationTitle, String bookId) {
         // get the book from the bookId
         BookQueryManager.getInstance().getBook(bookId, new JsonHttpResponseHandler() {
             @Override
@@ -309,7 +356,7 @@ public class BookSearchFragment extends Fragment {
                 Book book = Book.fromJson(json.jsonObject);
                 recommendedBook = book;
                 // display the recommendation
-                tvRecommendationTitle.setText("Because you are in " + groupName + ", you might enjoy:");
+                tvRecommendationTitle.setText(recommendationTitle);
                 if (book != null) {
                     tvTitle.setText(book.getTitle());
                     tvAuthor.setText(book.getAuthor());
