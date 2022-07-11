@@ -37,8 +37,8 @@ An app that helps you explore different books, find your next read, and interact
 - [x] User can friend other users
 - [x] User can invite friends to a group
 - [x] User can edit their profile
+- [x] User can shelve books
 - [ ] User can see book recommendations
-- [ ] User can shelve books
 - [ ] Books on shelves sort by (date shelved, rating, etc.)
 - [ ] User can click on a link to purchase a book
 - [ ] User can comment on posts
@@ -91,8 +91,6 @@ An app that helps you explore different books, find your next read, and interact
 ## Wireframes
 <img src="https://github.com/kxing24/BookNook/raw/master/wireframes.png" width=600>
 
-## Schema
-[This section will be completed in Unit 9]
 ### Models
 * Book
     * Shelf
