@@ -6,11 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,10 +17,11 @@ import com.bumptech.glide.Glide;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.UserProfileActivity;
-import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Like;
 import com.codepath.kathyxing.booknook.parse_classes.Post;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 import com.parse.CountCallback;
 import com.parse.DeleteCallback;
 import com.parse.GetCallback;
@@ -70,8 +69,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView ivProfilePicture;
         private ImageView ivPostImage;
         private TextView tvPostDescription;
-        private ImageButton ibLikeEmpty;
-        private ImageButton ibLikeFilled;
+        private LikeButton likeButton;
         private TextView tvLikeCount;
         private RelativeLayout rlUserProfile;
         private Post post;
@@ -85,16 +83,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ivPostImage = itemView.findViewById(R.id.ivPostImage);
             tvPostDescription = itemView.findViewById(R.id.tvPostDescription);
             ivProfilePicture = itemView.findViewById(R.id.ivProfilePicture);
-            ibLikeEmpty = itemView.findViewById(R.id.ibLikeEmpty);
-            ibLikeFilled = itemView.findViewById(R.id.ibLikeFilled);
+            likeButton = itemView.findViewById(R.id.likeButton);
             tvLikeCount = itemView.findViewById(R.id.tvLikeCount);
             rlUserProfile = itemView.findViewById(R.id.rlUserProfile);
             // set click handler for rlUserProfile
             rlUserProfile.setOnClickListener(this);
-            // set click handler for ibLikeEmpty
-            ibLikeEmpty.setOnClickListener(this);
-            // set click handler for ibLikeFilled
-            ibLikeFilled.setOnClickListener(this);
+            // set click handler for like button
+            likeButton.setOnLikeListener(new OnLikeListener() {
+                @Override
+                public void liked(LikeButton likeButton) {
+                    likePost();
+                }
+                @Override
+                public void unLiked(LikeButton likeButton) {
+                    unlikePost();
+                }
+            });
         }
 
         public void bind(@NonNull Post post) {
@@ -132,19 +136,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     context.startActivity(intent);
                 }
             }
-            if(v == ibLikeEmpty) {
-                likePost();
-            }
-            if(v == ibLikeFilled) {
-                unlikePost();
-            }
         }
 
         private void likePost() {
-            ibLikeEmpty.setVisibility(View.INVISIBLE);
+            likeButton.setEnabled(false);
             SaveCallback likePostCallback = e -> {
                 if (e == null) {
-                    ibLikeFilled.setVisibility(View.VISIBLE);
+                    likeButton.setEnabled(true);
                     tvLikeCount.setText(Integer.toString(++likeCount));
                 } else {
                     Log.e(TAG, "Issue liking post", e);
@@ -154,10 +152,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         private void unlikePost() {
-            ibLikeFilled.setVisibility(View.INVISIBLE);
+            likeButton.setEnabled(false);
             DeleteCallback unlikePostCallback = e -> {
                 if(e == null) {
-                    ibLikeEmpty.setVisibility(View.VISIBLE);
+                    likeButton.setEnabled(true);
                     tvLikeCount.setText(Integer.toString(--likeCount));
                 } else {
                     Log.e(TAG, "Issue unliking post", e);
@@ -189,11 +187,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             GetCallback<Like> getUserLikePostStatusCallback = (object, e) -> {
                 if (e == null) {
                     // user liked the post
-                    ibLikeFilled.setVisibility(View.VISIBLE);
+                    likeButton.setLiked(true);
                 } else {
                     if(e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                         // user has not liked the post
-                        ibLikeEmpty.setVisibility(View.VISIBLE);
+                        likeButton.setLiked(false);
                     } else {
                         // unknown error, debug
                         Log.e(TAG, "issue getting user like post status", e);

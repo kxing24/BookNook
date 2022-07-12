@@ -3,6 +3,7 @@ package com.codepath.kathyxing.booknook.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         // click handler for login button
         btnLogin.setOnClickListener(v -> {
             Log.i(TAG, "onClick login button");
+            btnLogin.setVisibility(View.INVISIBLE);
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
             loginUser(username, password);
