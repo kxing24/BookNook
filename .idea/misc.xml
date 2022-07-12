@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable-v24/background_splash.xml" value="0.222" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1405" />
+        <entry key="app/src/main/res/drawable/background_gradient.xml" value="0.222" />
+        <entry key="app/src/main/res/drawable/background_splash.xml" value="0.222" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1405" />
         <entry key="app/src/main/res/drawable/user_background.xml" value="0.222" />
         <entry key="app/src/main/res/layout/activity_add_shelf.xml" value="0.2796875" />
@@ -22,6 +25,7 @@
         <entry key="app/src/main/res/layout/activity_select_users.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_shelf_details.xml" value="0.265625" />
         <entry key="app/src/main/res/layout/activity_signup.xml" value="0.22056159420289856" />
+        <entry key="app/src/main/res/layout/activity_splash_screen.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_user_profile.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/fragment_advanced_search.xml" value="0.2796875" />
@@ -39,7 +43,7 @@
         <entry key="app/src/main/res/layout/item_book.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/item_friend.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_group.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.2846379597981771" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.21193695068359375" />
         <entry key="app/src/main/res/layout/item_shelf.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_user.xml" value="0.1" />
         <entry key="app/src/main/res/layout/select_shelves_alert_dialog.xml" value="0.2786458333333333" />
