@@ -10,7 +10,7 @@
         android:id="@+id/tlTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500"
+        android:background="@color/primary"
         app:tabIndicatorColor="@color/white"
         app:tabTextColor="@color/white" />
 

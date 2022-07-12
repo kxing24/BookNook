@@ -4,28 +4,28 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.google.android.material.textfield.TextInputEditText;
 import com.parse.ParseUser;
 
 import java.util.Calendar;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     public static final String TAG = "LoginActivity";
-    private EditText etUsername;
-    private EditText etPassword;
+    private TextInputEditText etUsername;
+    private TextInputEditText etPassword;
     private Button btnLogin;
     private Button btnGoSignup;
     private Button btnForgotPassword;
+    private ProgressBar pbLoading;
     private RelativeLayout rlLogin;
 
     @Override
@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnGoSignup = findViewById(R.id.btnGoSignup);
         btnForgotPassword = findViewById(R.id.btnForgotPassword);
+        pbLoading = findViewById(R.id.pbLoading);
         rlLogin = findViewById(R.id.rlLogin);
         // click handler for go sign up button
         btnGoSignup.setOnClickListener(v -> {
@@ -51,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
         // click handler for login button
         btnLogin.setOnClickListener(v -> {
             Log.i(TAG, "onClick login button");
-            btnLogin.setVisibility(View.INVISIBLE);
             String username = etUsername.getText().toString().trim();
             String password = etPassword.getText().toString();
             loginUser(username, password);
@@ -59,17 +59,13 @@ public class LoginActivity extends AppCompatActivity {
         // click handler for forgot password button
         btnForgotPassword.setOnClickListener(v -> goForgotPasswordActivity());
         // hide keyboard when the relative layout is touched
-        if (LoginActivity.this.getCurrentFocus() != null) {
-            rlLogin.setOnTouchListener((v, event) -> {
-                InputMethodManager imm = (InputMethodManager) LoginActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(LoginActivity.this.getCurrentFocus().getWindowToken(), 0);
-                return true;
-            });
-        }
+        setupUI(rlLogin);
     }
 
     private void loginUser(String username, String password) {
         Log.i(TAG, "Attempting to login user " + username);
+        btnLogin.setVisibility(View.INVISIBLE);
+        pbLoading.setVisibility(View.VISIBLE);
         ParseUser.logInInBackground(username, password, (user, e) -> {
             if (e != null) {
                 Log.e(TAG, "Issues with login", e);
@@ -80,6 +76,8 @@ public class LoginActivity extends AppCompatActivity {
                 user.saveInBackground();
                 Log.i(TAG, "Successfully logged in");
             }
+            btnLogin.setVisibility(View.VISIBLE);
+            pbLoading.setVisibility(View.GONE);
         });
     }
 

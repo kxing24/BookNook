@@ -39,7 +39,7 @@ import com.parse.SaveCallback;
 import java.io.File;
 import java.io.IOException;
 
-public class UserProfileActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class UserProfileActivity extends BaseActivity implements PopupMenu.OnMenuItemClickListener {
 
     // activity parameters
     public static final String TAG = "UserProfileActivity";
@@ -149,14 +149,8 @@ public class UserProfileActivity extends AppCompatActivity implements PopupMenu.
                 showPopupMenu(v);
             }
         });
-        // hide keyboard when the relative layout is touched
-        if (UserProfileActivity.this.getCurrentFocus() != null) {
-            rlUserProfileActivity.setOnTouchListener((v, event) -> {
-                InputMethodManager imm = (InputMethodManager) UserProfileActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(UserProfileActivity.this.getCurrentFocus().getWindowToken(), 0);
-                return true;
-            });
-        }
+        // hide keyboard
+        setupUI(rlUserProfileActivity);
     }
 
     @Override

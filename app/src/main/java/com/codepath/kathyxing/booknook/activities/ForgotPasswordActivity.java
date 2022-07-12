@@ -15,18 +15,18 @@ import android.widget.Toast;
 
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
+import com.google.android.material.textfield.TextInputEditText;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 
-public class ForgotPasswordActivity extends AppCompatActivity {
+public class ForgotPasswordActivity extends BaseActivity {
 
     // activity parameters
-    private EditText etEmail;
+    private TextInputEditText etEmail;
     private Button btnResetPassword;
     private Button btnBackToLogin;
     private RelativeLayout rlForgotPassword;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +70,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         // click handler for back to login button
         btnBackToLogin.setOnClickListener(v -> goLoginActivity());
         // hide keyboard when the relative layout is touched
-        rlForgotPassword.setOnTouchListener((v, event) -> {
-            InputMethodManager imm = (InputMethodManager) ForgotPasswordActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(ForgotPasswordActivity.this.getCurrentFocus().getWindowToken(), 0);
-            return true;
-        });
+        setupUI(rlForgotPassword);
     }
 
     private void showAlert(String title, String message, boolean error) {

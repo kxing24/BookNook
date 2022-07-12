@@ -9,17 +9,17 @@
         <entry key="app/src/main/res/drawable/background_splash.xml" value="0.222" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1405" />
         <entry key="app/src/main/res/drawable/user_background.xml" value="0.222" />
-        <entry key="app/src/main/res/layout/activity_add_shelf.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/activity_add_shelf.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_advanced_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_book_search.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/activity_compose.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/activity_compose.xml" value="0.23157501220703125" />
         <entry key="app/src/main/res/layout/activity_forgot_password.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_group.xml" value="0.30569610595703123" />
-        <entry key="app/src/main/res/layout/activity_group_feed.xml" value="0.27778320312500004" />
+        <entry key="app/src/main/res/layout/activity_group_feed.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_join_group.xml" value="0.2796875" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.42901306152343754" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2417633056640625" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_search_results.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_select_users.xml" value="0.2796875" />
@@ -32,7 +32,7 @@
         <entry key="app/src/main/res/layout/fragment_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/fragment_book_search.xml" value="0.2862196332952949" />
         <entry key="app/src/main/res/layout/fragment_find_user.xml" value="0.2796875" />
-        <entry key="app/src/main/res/layout/fragment_friends.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/fragment_friends.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/fragment_incoming_friend_requests.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/fragment_my_friends.xml" value="0.2796875" />

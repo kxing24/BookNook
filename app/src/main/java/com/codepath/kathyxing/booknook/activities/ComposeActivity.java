@@ -11,10 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import com.codepath.kathyxing.booknook.ImageSelectionUtilities;
@@ -33,13 +35,14 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.io.IOException;
 
-public class ComposeActivity extends AppCompatActivity {
+public class ComposeActivity extends BaseActivity {
     // TODO: add a button to remove the image
 
     public static final String TAG = "ComposeActivity";
     public final static int PICK_PHOTO_CODE = 1046;
     public final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public String photoFileName = "photo.jpg";
+    private RelativeLayout rlCompose;
     private EditText etDescription;
     private Button btnCaptureImage;
     private Button btnGetImageFromGallery;
@@ -54,13 +57,23 @@ public class ComposeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose);
-
         // Extract group from intent extras
         group = (Group) getIntent().getExtras().get("group");
         // unwrap the book passed in via intent, using its simple name as a key
         book = Parcels.unwrap(getIntent().getParcelableExtra(Book.class.getSimpleName()));
-
+        // set up the toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Compose post for " + group.getGroupName());
+        }
+        // have the toolbar show a back button
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> finish());
         // initialize the views
+        rlCompose = findViewById(R.id.rlCompose);
         etDescription = findViewById(R.id.etDescription);
         btnCaptureImage = findViewById(R.id.btnCaptureImage);
         btnGetImageFromGallery = findViewById(R.id.btnGetImageFromGallery);
@@ -88,6 +101,8 @@ public class ComposeActivity extends AppCompatActivity {
             savePost(description, currentUser, photoFile);
         });
 
+        // hide the keyboard
+        setupUI(rlCompose);
     }
 
     private void launchCamera() {

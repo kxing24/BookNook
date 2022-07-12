@@ -18,7 +18,7 @@ import com.parse.ParseUser;
 
 import java.util.Locale;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends BaseActivity {
 
     public static final String TAG = "SignupActivity";
     private EditText etUsername;
@@ -49,7 +49,6 @@ public class SignupActivity extends AppCompatActivity {
         // click handler for signup button
         btnSignup.setOnClickListener(v -> {
             Log.i(TAG, "onClick signup button");
-            // TODO: remove username trailing spaces
             String username = etUsername.getText().toString().trim();
             String email = etEmail.getText().toString();
             String password = etPassword.getText().toString();
@@ -57,11 +56,7 @@ public class SignupActivity extends AppCompatActivity {
             signupUser(username, email, password, confirmPassword);
         });
         // hide keyboard when the relative layout is touched
-        rlSignup.setOnTouchListener((v, event) -> {
-            InputMethodManager imm = (InputMethodManager) SignupActivity.this.getSystemService(UserProfileActivity.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(SignupActivity.this.getCurrentFocus().getWindowToken(), 0);
-            return true;
-        });
+        setupUI(rlSignup);
     }
 
     private void signupUser(String username, String email, String password, String confirmPassword) {
