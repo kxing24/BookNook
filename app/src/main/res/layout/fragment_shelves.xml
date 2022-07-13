@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.ShelvesFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -70,5 +71,21 @@
             android:textSize="24dp"
             android:textStyle="bold" />
     </RelativeLayout>
+
+    <!--com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddShelf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="198dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="282dp"
+        android:scaleType="fitCenter"
+        app:icon="@drawable/icon_add"
+        app:iconGravity="textStart"
+        app:iconSize="40dp"
+        app:iconTint="@color/black"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.BookNook.Button.Circle" /-->
 
 </RelativeLayout>

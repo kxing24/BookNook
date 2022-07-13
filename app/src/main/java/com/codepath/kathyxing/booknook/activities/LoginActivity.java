@@ -18,7 +18,6 @@ import com.parse.ParseUser;
 import java.util.Calendar;
 
 public class LoginActivity extends BaseActivity {
-
     public static final String TAG = "LoginActivity";
     private TextInputEditText etUsername;
     private TextInputEditText etPassword;

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
+import com.codepath.kathyxing.booknook.parse_classes.BookRecommendation;
 import com.codepath.kathyxing.booknook.parse_classes.Friend;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Like;
@@ -27,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -666,5 +668,26 @@ public final class ParseQueryUtilities {
         query.whereEqualTo(BookOnShelf.KEY_SHELF_ID, shelf.getObjectId());
         query.whereEqualTo(BookOnShelf.KEY_USER, ParseUser.getCurrentUser());
         query.findInBackground(getBooksOnShelfCallback);
+    }
+
+    /**
+     * Get a list of books to recommend the user based on their favorite genres
+     *
+     * @param user the user
+     * @param getBookRecommendationsCallback the callback for the async function
+     */
+    public static void getBookRecommendationAsync(@NonNull User user, @NonNull FindCallback<BookRecommendation> getBookRecommendationsCallback) {
+        // convert the user's favorite genres from a JSONArray to an ArrayList
+        ArrayList<String> favoriteGenres = new ArrayList<>();
+        for (int i = 0; i < user.getFavoriteGenres().length(); i++) {
+            try {
+                favoriteGenres.add(user.getFavoriteGenres().getString(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        ParseQuery<BookRecommendation> query = ParseQuery.getQuery(BookRecommendation.class);
+        query.whereContainedIn(BookRecommendation.KEY_GENRE, favoriteGenres);
+        query.findInBackground(getBookRecommendationsCallback);
     }
 }

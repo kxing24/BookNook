@@ -452,6 +452,7 @@ public class BookDetailFragment extends Fragment {
         builder.show();
     }
 
+    // add the book to the selected shelves
     private void addBookToShelves(Book book, ArrayList<Shelf> shelves) {
         for (Shelf shelf : shelves) {
             SaveCallback addBookToShelfCallback = e -> {

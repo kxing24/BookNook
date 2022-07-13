@@ -33,6 +33,7 @@ import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.parse_classes.BookRecommendation;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.FindCallback;
@@ -45,6 +46,7 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import okhttp3.Headers;
@@ -289,29 +291,18 @@ public class BookSearchFragment extends Fragment {
     }
 
     private void getBookRecommendation() {
-        // get the user's favorite genres
-        ArrayList<String> genres = new ArrayList<>();
-        JSONArray jsonGenres = ((User) ParseUser.getCurrentUser()).getFavoriteGenres();
-        for (int i = 0; i < jsonGenres.length(); i++) {
-            try {
-                genres.add(jsonGenres.getString(i));
-            } catch (JSONException ex) {
-                ex.printStackTrace();
-            }
-        }
-        Collections.shuffle(genres);
         // randomly get a recommendation from group or genre
         Random random = new Random();
         if (random.nextBoolean()) {
             // get recommendation from group
-            getBookRecommendationFromGroup(genres);
+            getBookRecommendationFromGroup();
         } else {
             // get recommendation from genre
-            getBookRecommendationFromGenre(genres.get(0));
+            getBookRecommendationFromGenre();
         }
     }
 
-    private void getBookRecommendationFromGroup(ArrayList<String> genres) {
+    private void getBookRecommendationFromGroup() {
         // get the list of groups with possible recommendations
         FindCallback<Group> queryBookRecommendationsCallback = (groups, e) -> {
             if (e == null && !groups.isEmpty()) {
@@ -322,7 +313,7 @@ public class BookSearchFragment extends Fragment {
                 displayBookRecommendation(recommendationTitle, group.getRecommendedBookId());
             } else {
                 // get a recommendation from genre
-                getBookRecommendationFromGenre(genres.get(0));
+                getBookRecommendationFromGenre();
                 if (e != null) {
                     Log.e(TAG, "issue getting groups with book recommendations", e);
                 }
@@ -331,21 +322,22 @@ public class BookSearchFragment extends Fragment {
         ParseQueryUtilities.queryBookRecommendationsAsync((User) ParseUser.getCurrentUser(), queryBookRecommendationsCallback);
     }
 
-    private void getBookRecommendationFromGenre(String genre) {
-        // get the first forty books of the genre
-        BookQueryManager.getInstance().getBooks("subject:\"" + genre + "\"", 0, 40, new BookQueryManager.BooksCallback() {
+    private void getBookRecommendationFromGenre() {
+        FindCallback<BookRecommendation> getBookRecommendationsCallback = new FindCallback<BookRecommendation>() {
             @Override
-            public void onSuccess(int statusCode, ArrayList<Book> books, int totalItems) {
-                Collections.shuffle(books);
-                Book book = books.get(0);
-                String recommendationTitle = "Because you are interested in " + genre + ", you might enjoy:";
-                displayBookRecommendation(recommendationTitle, book.getId());
+            public void done(List<BookRecommendation> recommendations, ParseException e) {
+                if (e == null && !recommendations.isEmpty()) {
+                    Collections.shuffle(recommendations);
+                    String recommendationTitle = "Because you are interested in " + recommendations.get(0).getGenre() + ", you might enjoy:";
+                    displayBookRecommendation(recommendationTitle, recommendations.get(0).getBookId());
+                } else if (recommendations.isEmpty()) {
+                    Log.e(TAG, "no recommendations");
+                } else {
+                    Log.e(TAG, "issue getting recommendations", e);
+                }
             }
-            @Override
-            public void onFailure(int errorCode) {
-                Log.e(TAG, "Request failed with code " + errorCode);
-            }
-        });
+        };
+        ParseQueryUtilities.getBookRecommendationAsync((User) ParseUser.getCurrentUser(), getBookRecommendationsCallback);
     }
 
     private void displayBookRecommendation(String recommendationTitle, String bookId) {
