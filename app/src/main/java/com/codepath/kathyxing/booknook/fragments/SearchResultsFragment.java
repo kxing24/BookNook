@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +21,7 @@ import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.BookQueryManager;
 
 import org.parceler.Parcels;
 
@@ -158,7 +157,7 @@ public class SearchResultsFragment extends Fragment {
                 bookAdapter.notifyDataSetChanged();
                 // Set view visibilities
                 btnPrevPage.setVisibility(pageNumber > 0 ? View.VISIBLE : View.GONE);
-                btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE: View.VISIBLE);
+                btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE : View.VISIBLE);
                 tvPageNumber.setText("Page " + (pageNumber + 1));
                 tvPageNumber.setVisibility(View.VISIBLE);
                 avBookSearchLoading.setVisibility(View.GONE);

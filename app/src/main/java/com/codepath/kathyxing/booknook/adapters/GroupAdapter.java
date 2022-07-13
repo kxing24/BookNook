@@ -18,7 +18,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.parse.CountCallback;
 import com.parse.ParseException;

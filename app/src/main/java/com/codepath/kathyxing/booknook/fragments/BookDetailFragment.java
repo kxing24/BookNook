@@ -3,21 +3,16 @@ package com.codepath.kathyxing.booknook.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +28,7 @@ import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
@@ -47,7 +42,6 @@ import com.parse.SaveCallback;
 
 import org.apache.commons.text.similarity.CosineDistance;
 import org.parceler.Parcels;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +96,7 @@ public class BookDetailFragment extends Fragment {
         if (activity != null) {
             activity.setTitle("Book Details");
         }
-        ((MainActivity)getActivity()).showBackButton();
+        ((MainActivity) getActivity()).showBackButton();
     }
 
     @Override

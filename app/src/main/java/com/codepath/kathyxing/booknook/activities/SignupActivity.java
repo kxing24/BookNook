@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.codepath.kathyxing.booknook.AlertUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.parse.ParseUser;
@@ -87,36 +88,26 @@ public class SignupActivity extends BaseActivity {
         user.setEmail(email.toLowerCase(Locale.ROOT));
         // Invoke signUpInBackground
         user.signUpInBackground(e -> {
+            AlertUtilities.GoActivity goActivity = () -> {
+                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            };
             if (e == null) {
                 // Hooray! Let them use the app now.
                 ParseUser.logOut();
-                showAlert("Account Created Successfully!", "Please verify your email before login", false);
+                AlertUtilities.showAlert(SignupActivity.this, "Account Created Successfully!", "Please verify your email before login", false, goActivity);
             } else {
                 // Sign up didn't succeed, look at the ParseException
                 Log.e(TAG, "Issue with signup!", e);
-                showAlert("Account Creation failed", "Account could not be created" + " : " + e.getMessage(), true);
+                ParseUser.logOut();
+                AlertUtilities.showAlert(SignupActivity.this, "Account Creation failed", "Account could not be created" + " : " + e.getMessage(), true, goActivity);
                 etUsername.getText().clear();
                 etEmail.getText().clear();
                 etPassword.getText().clear();
                 etConfirmPassword.getText().clear();
             }
         });
-    }
-
-    private void showAlert(String title, String message, boolean error) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.cancel();
-                    if (!error) {
-                        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
-        AlertDialog ok = builder.create();
-        ok.show();
     }
 
     private void goLoginActivity() {

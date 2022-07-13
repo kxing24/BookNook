@@ -3,7 +3,6 @@ package com.codepath.kathyxing.booknook.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,11 +26,10 @@ import com.codepath.kathyxing.booknook.activities.AddShelfActivity;
 import com.codepath.kathyxing.booknook.adapters.ShelfAdapter;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.button.MaterialButton;
 import com.parse.FindCallback;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,7 +44,6 @@ public class ShelvesFragment extends Fragment {
     private ArrayList<Shelf> shelves;
     private ProgressBar pbLoading;
     private TextView tvNoShelves;
-    private RelativeLayout rlAddShelf;
 
     public ShelvesFragment() {
         // Required empty public constructor
@@ -79,9 +75,9 @@ public class ShelvesFragment extends Fragment {
         shelfAdapter = new ShelfAdapter(getContext(), shelves);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoShelves = view.findViewById(R.id.tvNoShelves);
-        rlAddShelf = view.findViewById(R.id.rlAddShelf);
+        MaterialButton btnAddShelf = view.findViewById(R.id.btnAddShelf);
         // set up a click handler for rlAddShelf
-        rlAddShelf.setOnClickListener(v -> goAddShelfActivity());
+        btnAddShelf.setOnClickListener(v -> goAddShelfActivity());
         // set up a click handler for bookAdapter
         shelfAdapter.setOnItemClickListener((itemView, position) -> {
             // get the shelf clicked
@@ -108,6 +104,7 @@ public class ShelvesFragment extends Fragment {
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
+
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 // get the shelf swiped and its position

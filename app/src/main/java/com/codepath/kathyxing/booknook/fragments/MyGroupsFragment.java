@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,9 +25,10 @@ import com.codepath.kathyxing.booknook.activities.GroupFeedActivity;
 import com.codepath.kathyxing.booknook.activities.JoinGroupActivity;
 import com.codepath.kathyxing.booknook.adapters.GroupAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
+import com.google.android.material.button.MaterialButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -84,9 +84,9 @@ public class MyGroupsFragment extends Fragment {
         groupAdapter = new GroupAdapter(getContext(), myGroups);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoGroups = view.findViewById(R.id.tvNoGroups);
-        RelativeLayout rlJoinGroup = view.findViewById(R.id.rlJoinGroup);
+        MaterialButton btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
         // set up a click handler for rlJoinGroup
-        rlJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
+        btnJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
         // set up a click handler for groupAdapter
         groupAdapter.setOnItemClickListener((itemView, position) -> {
             // get the group clicked

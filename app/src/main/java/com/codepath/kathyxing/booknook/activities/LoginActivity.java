@@ -8,14 +8,14 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import androidx.appcompat.app.AlertDialog;
-
+import com.codepath.kathyxing.booknook.AlertUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.ParseUser;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 public class LoginActivity extends BaseActivity {
     public static final String TAG = "LoginActivity";
@@ -68,7 +68,16 @@ public class LoginActivity extends BaseActivity {
         ParseUser.logInInBackground(username, password, (user, e) -> {
             if (e != null) {
                 Log.e(TAG, "Issues with login", e);
-                showAlert("Login Fail", e.getMessage() + " Please try again.", true);
+                // show an alert
+                AlertUtilities.GoActivity goActivity = () -> {
+                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                };
+                AlertUtilities.showAlert(LoginActivity.this, "Login Fail", e.getMessage() + " Please try again.", true, goActivity);
+                // clear the edit texts
+                Objects.requireNonNull(etUsername.getText()).clear();
+                Objects.requireNonNull(etPassword.getText()).clear();
             } else {
                 goMainActivity(((User) user).getLastLogin() == null);
                 ((User) user).setLastLogin(Calendar.getInstance().getTime());
@@ -78,22 +87,6 @@ public class LoginActivity extends BaseActivity {
             btnLogin.setVisibility(View.VISIBLE);
             pbLoading.setVisibility(View.GONE);
         });
-    }
-
-    private void showAlert(String title, String message, boolean error) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.cancel();
-                    if (!error) {
-                        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
-        AlertDialog ok = builder.create();
-        ok.show();
     }
 
     private void goMainActivity(boolean firstLogin) {

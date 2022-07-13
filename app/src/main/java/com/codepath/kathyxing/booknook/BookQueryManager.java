@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook.net;
+package com.codepath.kathyxing.booknook;
 
 import android.util.Log;
 

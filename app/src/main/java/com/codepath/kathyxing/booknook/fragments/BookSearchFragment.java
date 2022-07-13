@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,7 +31,7 @@ import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.adapters.BookAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
-import com.codepath.kathyxing.booknook.net.BookQueryManager;
+import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.BookRecommendation;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.User;
@@ -40,8 +39,6 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -270,7 +267,7 @@ public class BookSearchFragment extends Fragment {
                     bookAdapter.notifyDataSetChanged();
                     // Set view visibilities
                     btnPrevPage.setVisibility(pageNumber > 0 ? View.VISIBLE : View.GONE);
-                    btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE: View.VISIBLE);
+                    btnNextPage.setVisibility(totalItems - startIndex <= MAX_RESULTS ? View.GONE : View.VISIBLE);
                     tvPageNumber.setText("Page " + (pageNumber + 1));
                     tvPageNumber.setVisibility(View.VISIBLE);
                 }

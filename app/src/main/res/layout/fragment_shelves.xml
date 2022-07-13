@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.ShelvesFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShelves"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/rlAddShelf"
         android:layout_marginBottom="0dp" />
 
     <ProgressBar
@@ -34,58 +33,23 @@
         android:textSize="30sp"
         android:visibility="gone" />
 
-    <RelativeLayout
-        android:id="@+id/rlAddShelf"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:layout_alignParentStart="true"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddShelf"
+        style="@style/Widget.Material3.Button.Icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp"
-        android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground">
-
-        <ImageView
-            android:id="@+id/ivAddShelf"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_add" />
-
-        <TextView
-            android:id="@+id/tvAddShelf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="20dp"
-            android:layout_toEndOf="@+id/ivAddShelf"
-            android:text="Add Shelf"
-            android:textSize="24dp"
-            android:textStyle="bold" />
-    </RelativeLayout>
-
-    <!--com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAddShelf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="198dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="282dp"
-        android:scaleType="fitCenter"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
         app:icon="@drawable/icon_add"
         app:iconGravity="textStart"
-        app:iconSize="40dp"
-        app:iconTint="@color/black"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.BookNook.Button.Circle" /-->
+        app:iconPadding="0dp"
+        app:iconSize="24dp" />
 
 </RelativeLayout>

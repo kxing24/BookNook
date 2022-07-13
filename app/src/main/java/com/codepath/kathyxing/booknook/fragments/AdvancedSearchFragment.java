@@ -1,23 +1,19 @@
 package com.codepath.kathyxing.booknook.fragments;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.activities.MainActivity;
@@ -85,11 +81,10 @@ public class AdvancedSearchFragment extends Fragment {
                 String subject = etSubject.getText().toString();
                 String isbn = etIsbn.getText().toString();
                 // if every EditText is empty, make a Toast message
-                if(anyField.equals("") && title.equals("") && author.equals("") &&
+                if (anyField.equals("") && title.equals("") && author.equals("") &&
                         publisher.equals("") && subject.equals("") && isbn.equals("")) {
                     Toast.makeText(getContext(), "Make a query!", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     // swap in the search results fragment
                     SearchResultsFragment nextFragment = new SearchResultsFragment();
                     Bundle bundle = new Bundle();
