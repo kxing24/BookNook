@@ -322,6 +322,7 @@ public class BookSearchFragment extends Fragment {
     private void getBookRecommendationFromGenre() {
         FindCallback<BookRecommendation> getBookRecommendationsCallback = (recommendations, e) -> {
             if (e == null && !recommendations.isEmpty()) {
+                Log.i(TAG, "number of recommendations: " + recommendations.size());
                 Collections.shuffle(recommendations);
                 String recommendationTitle = "Because you are interested in " + recommendations.get(0).getGenre() + ", you might enjoy:";
                 displayBookRecommendation(recommendationTitle, recommendations.get(0).getBookId());

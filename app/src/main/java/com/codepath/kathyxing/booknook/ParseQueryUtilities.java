@@ -719,6 +719,7 @@ public final class ParseQueryUtilities {
         }
         ParseQuery<BookRecommendation> query = ParseQuery.getQuery(BookRecommendation.class);
         query.whereContainedIn(BookRecommendation.KEY_GENRE, favoriteGenres);
+        query.setLimit(600);
         query.findInBackground(getBookRecommendationsCallback);
     }
 }

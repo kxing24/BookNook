@@ -346,7 +346,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     // get something similar to the book from sameSubjectBooks
-    private Book getRecommendedBook(Book book, ArrayList<Book> sameSubjectBooks) {
+    public Book getRecommendedBook(Book book, ArrayList<Book> sameSubjectBooks) {
         // create an arraylist to store the five most similar books to recommend
         ArrayList<SameSubjectBookStructure> similarBooks = new ArrayList<>();
         for (int i = 0; i < sameSubjectBooks.size(); i++) {
@@ -366,7 +366,7 @@ public class BookDetailFragment extends Fragment {
         return similarBooks.get(0).book;
     }
 
-    private double getBookDistance(@NonNull Book from, @NonNull Book to) {
+    public double getBookDistance(@NonNull Book from, @NonNull Book to) {
         double distance = 0;
         ArrayList<String> fromAuthorArray = from.getAuthorArray();
         ArrayList<String> toAuthorArray = to.getAuthorArray();
