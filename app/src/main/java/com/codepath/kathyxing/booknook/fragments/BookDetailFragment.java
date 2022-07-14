@@ -384,7 +384,7 @@ public class BookDetailFragment extends Fragment {
             distance += 10;
         } else {
             CosineDistance cosineDistance = new CosineDistance();
-            distance += cosineDistance.apply(from.getDescription(), to.getDescription()) * (double) 10;
+            distance += cosineDistance.apply(from.getDescription(), to.getDescription()) * 10;
         }
         // compare maturity rating
         if (from.getMaturityRating().equals("") || to.getMaturityRating().equals("") || !from.getMaturityRating().equals(to.getMaturityRating())) {
