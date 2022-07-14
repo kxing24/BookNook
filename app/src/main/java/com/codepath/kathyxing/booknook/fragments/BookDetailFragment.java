@@ -177,7 +177,6 @@ public class BookDetailFragment extends Fragment {
             addMemberWithBook(book);
             // set button visibility
             btnJoinGroup.setVisibility(View.GONE);
-            tvNumMembers.setText(++numMembers + " members");
         });
         // Click handler for goto group button
         btnGoToGroup.setOnClickListener(v -> goGroupFeedActivity());

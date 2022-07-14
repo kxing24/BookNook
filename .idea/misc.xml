@@ -11,6 +11,7 @@
         <entry key="app/src/main/res/drawable/logo.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/new_logo.xml" value="0.222" />
         <entry key="app/src/main/res/drawable/user_background.xml" value="0.222" />
+        <entry key="app/src/main/res/drawable/user_text_color.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/vector.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_add_shelf.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_advanced_search.xml" value="0.1" />

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -144,7 +145,7 @@ public class GroupFeedActivity extends AppCompatActivity {
             return true;
         }
         if (item.getItemId() == R.id.leaveGroup) {
-            leaveGroup();
+            showLeaveGroupConfirmation();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -221,6 +222,18 @@ public class GroupFeedActivity extends AppCompatActivity {
             swipeContainer.setRefreshing(false);
         };
         ParseQueryUtilities.queryGroupPostsAsync(page, book.getId(), queryPostsCallback);
+    }
+
+    private void showLeaveGroupConfirmation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Leave Group")
+                .setMessage("Are you sure you want to leave this group?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> leaveGroup())
+                .setNegativeButton("Never mind", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+        builder.show();
     }
 
     private void leaveGroup() {

@@ -115,9 +115,6 @@ public class SelectUsersActivity extends AppCompatActivity {
                 } else {
                     setMenuItemTitle(selectionTracker.getSelection().size());
                 }
-                for (User user : (Iterable<User>) selectionTracker.getSelection()) {
-                    Log.i(TAG, user.getUsername());
-                }
             }
 
             @Override

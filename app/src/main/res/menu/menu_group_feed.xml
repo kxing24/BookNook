@@ -5,15 +5,16 @@
         android:id="@+id/inviteUser"
         android:icon="@drawable/icon_invite"
         android:title="Invite friends"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/leaveGroup"
-        android:title="Leave group"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/compose"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/icon_compose"
         android:title="Compose"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/leaveGroup"
+        android:icon="@drawable/icon_leave_group"
+        android:title="Leave group"
+        app:showAsAction="ifRoom" />
 </menu>

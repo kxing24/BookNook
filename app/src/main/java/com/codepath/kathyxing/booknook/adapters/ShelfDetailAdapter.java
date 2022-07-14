@@ -1,4 +1,4 @@
-package com.codepath.kathyxing.booknook.adapters.UserSelectionAdapter;
+package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
 import android.net.Uri;
