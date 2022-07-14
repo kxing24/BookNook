@@ -4,6 +4,10 @@ import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +19,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +36,7 @@ import com.google.android.material.button.MaterialButton;
 import com.parse.FindCallback;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -111,6 +118,29 @@ public class ShelvesFragment extends Fragment {
                 Shelf shelf = shelves.get(viewHolder.getAdapterPosition());
                 // prompt for confirmation of item removal
                 showRemoveShelfConfirmation(shelf, viewHolder.getAdapterPosition());
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                // set background color
+                final ColorDrawable background = new ColorDrawable(Color.RED);
+                background.setBounds(0, viewHolder.itemView.getTop(),   viewHolder.itemView.getLeft() + Math.round(dX), viewHolder.itemView.getBottom());
+                background.draw(c);
+                // set icon
+                Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.icon_remove);
+                assert icon != null;
+                DrawableCompat.setTint(icon, Color.WHITE);
+                int verticalMargin = (viewHolder.itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                int horizontalMargin;
+                if (dX > icon.getIntrinsicWidth()) {
+                    horizontalMargin = Math.round((dX - icon.getIntrinsicWidth()) / 2);
+                } else {
+                    horizontalMargin = icon.getIntrinsicWidth() * -1;
+                }
+                Log.i(TAG, "height: " + icon.getIntrinsicHeight() + ", width: " + icon.getIntrinsicWidth());
+                icon.setBounds(horizontalMargin, viewHolder.itemView.getTop() + verticalMargin, horizontalMargin + icon.getIntrinsicWidth(), viewHolder.itemView.getBottom() - verticalMargin);
+                icon.draw(c);
             }
         }).attachToRecyclerView(rvShelves);
         queryShelves();
