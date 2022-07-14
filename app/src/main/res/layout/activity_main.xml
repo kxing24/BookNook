@@ -31,9 +31,12 @@
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
-        android:background="@color/white"
+        android:background="@color/primary"
         android:fitsSystemWindows="true"
         android:minHeight="?attr/actionBarSize"
+        android:elevation="10dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:layout_constraintTop_toTopOf="parent" />
 
 </RelativeLayout>

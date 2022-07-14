@@ -81,10 +81,7 @@ public class HomeFragment extends Fragment {
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(this::fetchFeed);
         // Configure the refreshing colors
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        swipeContainer.setColorSchemeResources(R.color.accent);
         // add endless scroll
         // Retain an instance so that you can call `resetState()` for fresh searches
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
@@ -102,7 +99,6 @@ public class HomeFragment extends Fragment {
 
     // get the posts from the user's groups and display them
     private void queryPosts(int page) {
-        pbLoading.setVisibility(page == 0 ? View.VISIBLE : View.GONE);
         FindCallback<Post> queryPostsCallback = (objects, e) -> {
             if (e != null) {
                 Log.e(TAG, "Query posts error", e);
@@ -115,6 +111,8 @@ public class HomeFragment extends Fragment {
                 adapter.notifyDataSetChanged();
             }
             pbLoading.setVisibility(View.GONE);
+            // Call setRefreshing(false) to signal refresh has finished
+            swipeContainer.setRefreshing(false);
         };
         ParseQueryUtilities.queryHomeFeedPostsAsync(page, queryPostsCallback);
     }
@@ -127,8 +125,6 @@ public class HomeFragment extends Fragment {
         scrollListener.resetState();
         // add new items to adapter
         queryPosts(0);
-        // Call setRefreshing(false) to signal refresh has finished
-        swipeContainer.setRefreshing(false);
     }
 
     // Append the next page of data into the adapter

@@ -21,7 +21,7 @@
         <entry key="app/src/main/res/layout/activity_group_feed.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_join_group.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.42901306152343754" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2417633056640625" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_search_results.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_select_users.xml" value="0.2796875" />
@@ -45,7 +45,7 @@
         <entry key="app/src/main/res/layout/item_book.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/item_friend.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_group.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.21193695068359375" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_shelf.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_user.xml" value="0.1" />
         <entry key="app/src/main/res/layout/select_shelves_alert_dialog.xml" value="0.2786458333333333" />
@@ -58,6 +58,7 @@
         <entry key="app/src/main/res/menu/menu_user_profile.xml" value="0.2796875" />
         <entry key="app/src/main/res/menu/menu_user_search.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1405" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
         <entry key="app/src/main/res/xml/fileprovider.xml" value="0.1" />
       </map>
     </option>

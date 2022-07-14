@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         // handle navigation selection
         bottomNavigationView.setOnItemSelectedListener(item -> {
+            hideBackButton();
             Fragment fragment;
             switch (item.getItemId()) {
                 case R.id.action_home:
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case android.R.id.home:
                 getSupportFragmentManager().popBackStack();
-                hideHomeButton();
+                hideBackButton();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -179,5 +180,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showBackButton() { getSupportActionBar().setDisplayHomeAsUpEnabled(true); }
-    public void hideHomeButton() { getSupportActionBar().setDisplayHomeAsUpEnabled(false); }
+    public void hideBackButton() { getSupportActionBar().setDisplayHomeAsUpEnabled(false); }
 }

@@ -8,8 +8,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="accent">#a5dbdd</color>
     <color name="primary">#385684</color>
     <color name="primary_variant">#2D466B</color>
-    <color name="secondary">#5B8DD9</color>
-    <color name="secondary_variant">#a5dbdd</color>
+    <color name="secondary">#00baba</color>
+    <color name="secondary_variant">#009595</color>
+    <color name="tertiary">#e8519b</color>
+    <color name="tertiary_variant">#e875ad</color>
+    <color name="quaternary">#dbf1f1</color>
+    <color name="quaternary_variant">#a5dbdd</color>
 </resources>
