@@ -21,12 +21,9 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         int SPLASH_TIMER = 3400;
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(new Intent(SplashScreenActivity.this , LoginActivity.class));
-                finish();
-            }
-        },SPLASH_TIMER);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            startActivity(new Intent(SplashScreenActivity.this , LoginActivity.class));
+            finish();
+        }, SPLASH_TIMER);
     }
 }

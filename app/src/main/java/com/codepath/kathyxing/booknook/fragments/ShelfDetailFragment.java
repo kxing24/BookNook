@@ -71,10 +71,9 @@ public class ShelfDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // extract the shelf object from the bundle
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            shelf = bundle.getParcelable("shelf");
+        // extract the shelf object
+        if (this.getArguments() != null) {
+            shelf = this.getArguments().getParcelable("shelf");
         }
         // initialize fields
         rvBooksOnShelf = view.findViewById(R.id.rvBooksOnShelf);
@@ -97,9 +96,9 @@ public class ShelfDetailFragment extends Fragment {
                     Book book = Book.fromJson(json.jsonObject);
                     // swap in the book detail fragment
                     BookDetailFragment nextFragment = new BookDetailFragment();
-                    Bundle bundle1 = new Bundle();
-                    bundle1.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
-                    nextFragment.setArguments(bundle1);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(Book.class.getSimpleName(), Parcels.wrap(book));
+                    nextFragment.setArguments(bundle);
                     if (getActivity() != null && getView() != null) {
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(((ViewGroup) getView().getParent()).getId(), nextFragment)

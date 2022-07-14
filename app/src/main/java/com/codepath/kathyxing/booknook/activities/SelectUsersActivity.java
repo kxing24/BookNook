@@ -43,7 +43,6 @@ public class SelectUsersActivity extends AppCompatActivity {
     protected ArrayList<User> users;
     SelectionTracker selectionTracker;
     MenuItem selectedItemCount;
-    private RecyclerView rvSelectUsers;
     private ProgressBar pbLoading;
     private TextView tvNoUsers;
     private ActionMode actionMode;
@@ -67,7 +66,7 @@ public class SelectUsersActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(v -> finish());
         // initialize the views
-        rvSelectUsers = findViewById(R.id.rvSelectUsers);
+        RecyclerView rvSelectUsers = findViewById(R.id.rvSelectUsers);
         pbLoading = findViewById(R.id.pbLoading);
         tvNoUsers = findViewById(R.id.tvNoUsers);
         // initialize the array that will hold users and create a UserSelectionAdapter
@@ -79,7 +78,7 @@ public class SelectUsersActivity extends AppCompatActivity {
         // set the layout manager on the recycler view
         rvSelectUsers.setLayoutManager(linearLayoutManager);
         // initialize the selection tracker
-        selectionTracker = new SelectionTracker.Builder<>("my-selection-id", rvSelectUsers,
+        selectionTracker = new SelectionTracker.Builder<>("selectionId", rvSelectUsers,
                 new UserSelectionKeyProvider(1, users), new UserSelectionLookup(rvSelectUsers),
                 StorageStrategy.createLongStorage())
                 .withOnItemActivatedListener((OnItemActivatedListener<Long>) (item, e) -> {

@@ -59,7 +59,6 @@ public class UserProfileActivity extends BaseActivity implements PopupMenu.OnMen
     private Button btnSave;
     private Button btnCancel;
     private ImageButton ibEditProfilePicture;
-    private RelativeLayout rlUserProfileActivity;
     private User user;
 
     @Override
@@ -90,7 +89,7 @@ public class UserProfileActivity extends BaseActivity implements PopupMenu.OnMen
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
         ibEditProfilePicture = findViewById(R.id.ibEditProfilePicture);
-        rlUserProfileActivity = findViewById(R.id.rlUserProfileActivity);
+        RelativeLayout rlUserProfileActivity = findViewById(R.id.rlUserProfileActivity);
         user = (User) getIntent().getExtras().get("user");
         // set the views
         tvUsername.setText(user.getUsername());

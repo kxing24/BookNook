@@ -22,6 +22,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SaveCallback;
+import com.parse.SignUpCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -455,6 +456,17 @@ public final class ParseQueryUtilities {
     }
 
     /**
+     * Save's the user's favorite genres
+     *
+     * @param user the user whose genres are being saved
+     * @param genres the genres
+     */
+    public static void saveGenresAsync(@NonNull User user, @NonNull ArrayList<String> genres) {
+        user.setFavoriteGenres(new JSONArray(genres));
+        user.saveInBackground();
+    }
+
+    /**
      * Counts the number of likes a post has
      *
      * @param post                the post
@@ -549,6 +561,25 @@ public final class ParseQueryUtilities {
      */
     public static void resetPasswordAsync(@NonNull String email, @NonNull RequestPasswordResetCallback requestPasswordResetCallback) {
         ParseUser.requestPasswordResetInBackground(email, requestPasswordResetCallback);
+    }
+
+    /**
+     * Creates the user given the core properties
+     *
+     * @param username the user's username
+     * @param password the user's password
+     * @param email the user's email
+     * @param createUserCallback the callback for the async function
+     */
+    public static void createUserAsync(@NonNull String username, @NonNull String password, @NonNull String email, @NonNull SignUpCallback createUserCallback) {
+        // Create the user
+        User user = new User();
+        // Set core properties
+        user.setUsername(username);
+        user.setUsernameLowercase(username.toLowerCase(Locale.ROOT));
+        user.setPassword(password);
+        user.setEmail(email.toLowerCase(Locale.ROOT));
+        user.signUpInBackground(createUserCallback);
     }
 
     /**

@@ -13,9 +13,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.codepath.kathyxing.booknook.AlertUtilities;
+import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.codepath.kathyxing.booknook.parse_classes.User;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import java.util.Locale;
 
@@ -79,15 +82,8 @@ public class SignupActivity extends BaseActivity {
             etConfirmPassword.getText().clear();
             return;
         }
-        // Create the user
-        User user = new User();
-        // Set core properties
-        user.setUsername(username);
-        user.setUsernameLowercase(username.toLowerCase(Locale.ROOT));
-        user.setPassword(password);
-        user.setEmail(email.toLowerCase(Locale.ROOT));
-        // Invoke signUpInBackground
-        user.signUpInBackground(e -> {
+        // sign up the user
+        SignUpCallback createUserCallback = e -> {
             AlertUtilities.GoActivity goActivity = () -> {
                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -107,7 +103,8 @@ public class SignupActivity extends BaseActivity {
                 etPassword.getText().clear();
                 etConfirmPassword.getText().clear();
             }
-        });
+        };
+        ParseQueryUtilities.createUserAsync(username, password, email, createUserCallback);
     }
 
     private void goLoginActivity() {

@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.codepath.kathyxing.booknook.AlertUtilities;
 import com.codepath.kathyxing.booknook.ParseQueryUtilities;
 import com.codepath.kathyxing.booknook.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -56,12 +57,17 @@ public class ForgotPasswordActivity extends BaseActivity {
                         "Please enter an email", Toast.LENGTH_SHORT).show();
             } else {
                 RequestPasswordResetCallback requestPasswordResetCallback = e -> {
+                    AlertUtilities.GoActivity goActivity = () -> {
+                        Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    };
                     if (e == null) {
-                        showAlert("Password reset", "Password reset instructions have been sent to email!", false);
+                        AlertUtilities.showAlert(ForgotPasswordActivity.this, "Password reset", "Password reset instructions have been sent to email!", false, goActivity);
                     }
                     else {
                         etEmail.getText().clear();
-                        showAlert("Password reset failed", "Password could not be reset:" + e.getMessage(), true);
+                        AlertUtilities.showAlert(ForgotPasswordActivity.this, "Password reset failed", "Password could not be reset:" + e.getMessage(), true, goActivity);
                     }
                 };
                 ParseQueryUtilities.resetPasswordAsync(userEmail, requestPasswordResetCallback);
@@ -71,22 +77,6 @@ public class ForgotPasswordActivity extends BaseActivity {
         btnBackToLogin.setOnClickListener(v -> goLoginActivity());
         // hide keyboard when the relative layout is touched
         setupUI(rlForgotPassword);
-    }
-
-    private void showAlert(String title, String message, boolean error) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ForgotPasswordActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.cancel();
-                    if (!error) {
-                        Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
-        AlertDialog ok = builder.create();
-        ok.show();
     }
 
     private void goLoginActivity() {

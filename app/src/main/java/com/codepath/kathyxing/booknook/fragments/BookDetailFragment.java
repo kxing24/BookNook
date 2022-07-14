@@ -174,7 +174,7 @@ public class BookDetailFragment extends Fragment {
         // Click handler for join group button
         btnJoinGroup.setOnClickListener(v -> {
             // make the user a member of the group
-            addMemberWithBook();
+            addMemberWithBook(book);
             // set button visibility
             btnJoinGroup.setVisibility(View.GONE);
             tvNumMembers.setText(++numMembers + " members");
@@ -248,7 +248,7 @@ public class BookDetailFragment extends Fragment {
         ParseQueryUtilities.userInGroupAsync(book, (User) User.getCurrentUser(), userInGroupCallback);
     }
 
-    private void addMemberWithBook() {
+    private void addMemberWithBook(Book book) {
         // create a callback for getGroupFromBookCallback
         GetCallback<Group> getGroupFromBookCallback = (group, e) -> {
             // get the group and create a member with the group and user

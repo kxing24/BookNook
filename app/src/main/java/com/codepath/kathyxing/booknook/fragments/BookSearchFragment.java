@@ -320,18 +320,15 @@ public class BookSearchFragment extends Fragment {
     }
 
     private void getBookRecommendationFromGenre() {
-        FindCallback<BookRecommendation> getBookRecommendationsCallback = new FindCallback<BookRecommendation>() {
-            @Override
-            public void done(List<BookRecommendation> recommendations, ParseException e) {
-                if (e == null && !recommendations.isEmpty()) {
-                    Collections.shuffle(recommendations);
-                    String recommendationTitle = "Because you are interested in " + recommendations.get(0).getGenre() + ", you might enjoy:";
-                    displayBookRecommendation(recommendationTitle, recommendations.get(0).getBookId());
-                } else if (recommendations.isEmpty()) {
-                    Log.e(TAG, "no recommendations");
-                } else {
-                    Log.e(TAG, "issue getting recommendations", e);
-                }
+        FindCallback<BookRecommendation> getBookRecommendationsCallback = (recommendations, e) -> {
+            if (e == null && !recommendations.isEmpty()) {
+                Collections.shuffle(recommendations);
+                String recommendationTitle = "Because you are interested in " + recommendations.get(0).getGenre() + ", you might enjoy:";
+                displayBookRecommendation(recommendationTitle, recommendations.get(0).getBookId());
+            } else if (recommendations.isEmpty()) {
+                Log.e(TAG, "no recommendations");
+            } else {
+                Log.e(TAG, "issue getting recommendations", e);
             }
         };
         ParseQueryUtilities.getBookRecommendationAsync((User) ParseUser.getCurrentUser(), getBookRecommendationsCallback);
