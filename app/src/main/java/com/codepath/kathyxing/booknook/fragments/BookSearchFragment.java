@@ -221,7 +221,6 @@ public class BookSearchFragment extends Fragment {
         });
         // Set the textlistener for the searchview
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            // TODO: hide keyboard when user scrolls
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // set the page number back to 0
@@ -302,20 +301,16 @@ public class BookSearchFragment extends Fragment {
             }
         });
         // hide the keyboard on recyclerview touch
-        rvBooks.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //Hide keyboard code
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-                //Find the currently focused view, so we can grab the correct window token from it.
-                View view = getActivity().getCurrentFocus();
-                //If no view currently has focus, create a new one, just so we can grab a window token from it
-                if (view == null) {
-                    view = new View(getContext());
-                }
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                return false;
+        rvBooks.setOnTouchListener((v, event) -> {
+            //Hide keyboard code
+            InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            View view = requireActivity().getCurrentFocus();
+            //If no view currently has focus, create a new one, just so we can grab a window token from it
+            if (view == null) {
+                view = new View(getContext());
             }
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            return false;
         });
     }
 

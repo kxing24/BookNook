@@ -65,7 +65,7 @@ public class ComposeActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Compose post for " + group.getGroupName());
+            getSupportActionBar().setTitle("Compose");
         }
         // have the toolbar show a back button
         setSupportActionBar(toolbar);

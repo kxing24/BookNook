@@ -30,6 +30,7 @@ import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Member;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -84,7 +85,7 @@ public class MyGroupsFragment extends Fragment {
         groupAdapter = new GroupAdapter(getContext(), myGroups);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoGroups = view.findViewById(R.id.tvNoGroups);
-        MaterialButton btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
+        FloatingActionButton btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
         // set up a click handler for rlJoinGroup
         btnJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
         // set up a click handler for groupAdapter

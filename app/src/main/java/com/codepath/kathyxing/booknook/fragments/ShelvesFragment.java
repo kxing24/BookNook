@@ -36,6 +36,7 @@ import com.codepath.kathyxing.booknook.adapters.ShelfAdapter;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class ShelvesFragment extends Fragment {
         shelfAdapter = new ShelfAdapter(getContext(), shelves);
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoShelves = view.findViewById(R.id.tvNoShelves);
-        MaterialButton btnAddShelf = view.findViewById(R.id.btnAddShelf);
+        FloatingActionButton btnAddShelf = view.findViewById(R.id.btnAddShelf);
         // set up a click handler for rlAddShelf
         btnAddShelf.setOnClickListener(v -> goAddShelfActivity());
         // set up a click handler for bookAdapter

@@ -17,18 +17,18 @@
         <entry key="app/src/main/res/layout/activity_advanced_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_book_detail.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_book_search.xml" value="0.22056159420289856" />
-        <entry key="app/src/main/res/layout/activity_compose.xml" value="0.23157501220703125" />
-        <entry key="app/src/main/res/layout/activity_forgot_password.xml" value="0.2796875" />
+        <entry key="app/src/main/res/layout/activity_compose.xml" value="0.32530059814453127" />
+        <entry key="app/src/main/res/layout/activity_forgot_password.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_group.xml" value="0.30569610595703123" />
         <entry key="app/src/main/res/layout/activity_group_feed.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_join_group.xml" value="0.2796875" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.42901306152343754" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_search_results.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_select_users.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_shelf_details.xml" value="0.265625" />
-        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.22056159420289856" />
+        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_splash_screen.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/activity_user_profile.xml" value="0.2796875" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.22056159420289856" />
@@ -43,7 +43,7 @@
         <entry key="app/src/main/res/layout/fragment_my_groups.xml" value="0.3168384496716486" />
         <entry key="app/src/main/res/layout/fragment_search_results.xml" value="0.24073944091796878" />
         <entry key="app/src/main/res/layout/fragment_shelf_detail.xml" value="0.2796875" />
-        <entry key="app/src/main/res/layout/fragment_shelves.xml" value="0.265625" />
+        <entry key="app/src/main/res/layout/fragment_shelves.xml" value="0.3092208862304688" />
         <entry key="app/src/main/res/layout/item_book.xml" value="0.22056159420289856" />
         <entry key="app/src/main/res/layout/item_friend.xml" value="0.2786458333333333" />
         <entry key="app/src/main/res/layout/item_group.xml" value="0.1" />

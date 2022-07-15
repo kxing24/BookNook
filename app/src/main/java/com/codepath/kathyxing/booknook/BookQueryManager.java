@@ -86,7 +86,7 @@ public class BookQueryManager {
 
     // Gets the book from the API given the book id
     public void getBook(final String bookId, JsonHttpResponseHandler handler) {
-        String url = getApiUrl("books/v1/volumes/" + bookId);
+        String url = getApiUrl("books/v1/volumes/" + bookId + "?key=AIzaSyCIH6JcoToLAbhhOizI9JEngHhgx8X6Bso");
         client.get(url, handler);
     }
 }

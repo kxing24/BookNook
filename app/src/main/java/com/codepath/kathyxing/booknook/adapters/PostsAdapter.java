@@ -2,6 +2,7 @@ package com.codepath.kathyxing.booknook.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +36,8 @@ import java.util.List;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     public static final String TAG = "PostsAdapter";
-    private Context context;
-    private List<Post> posts;
+    private final Context context;
+    private final List<Post> posts;
 
     public PostsAdapter(Context context, List<Post> posts) {
         this.context = context;
