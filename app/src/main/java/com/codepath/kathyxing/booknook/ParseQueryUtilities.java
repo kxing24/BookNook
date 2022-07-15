@@ -188,8 +188,6 @@ public final class ParseQueryUtilities {
         // get data where the "from" (user) parameter matches the current user
         query.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
         query.addDescendingOrder(Member.KEY_CREATED_AT);
-        // limit query to latest 20 items
-        query.setLimit(20);
         // start an asynchronous call for groups
         query.findInBackground(queryGroupsCallback);
     }
@@ -203,7 +201,6 @@ public final class ParseQueryUtilities {
         ParseQuery<Shelf> query = ParseQuery.getQuery(Shelf.class);
         query.whereEqualTo(Shelf.KEY_USER, ParseUser.getCurrentUser());
         query.addDescendingOrder(Shelf.KEY_CREATED_AT);
-        query.setLimit(20);
         query.findInBackground(queryShelvesCallback);
     }
 
@@ -710,11 +707,13 @@ public final class ParseQueryUtilities {
     public static void getBookRecommendationAsync(@NonNull User user, @NonNull FindCallback<BookRecommendation> getBookRecommendationsCallback) {
         // convert the user's favorite genres from a JSONArray to an ArrayList
         ArrayList<String> favoriteGenres = new ArrayList<>();
-        for (int i = 0; i < user.getFavoriteGenres().length(); i++) {
-            try {
-                favoriteGenres.add(user.getFavoriteGenres().getString(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
+        if (user.getFavoriteGenres() != null) {
+            for (int i = 0; i < user.getFavoriteGenres().length(); i++) {
+                try {
+                    favoriteGenres.add(user.getFavoriteGenres().getString(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
         ParseQuery<BookRecommendation> query = ParseQuery.getQuery(BookRecommendation.class);

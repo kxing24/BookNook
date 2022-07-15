@@ -31,7 +31,7 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     public static final String TAG = "MainActivity";
     public static final String[] GENRES = {"Juvenile Fiction", "Young Adult Fiction", "Fantasy", "Science Fiction", "Romance", "Mystery", "Thriller", "Art", "History", "Political Science", "Biography"};

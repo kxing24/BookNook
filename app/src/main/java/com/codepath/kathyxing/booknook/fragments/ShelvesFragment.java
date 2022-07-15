@@ -2,6 +2,8 @@ package com.codepath.kathyxing.booknook.fragments;
 
 import static android.app.Activity.RESULT_OK;
 
+import static androidx.recyclerview.widget.RecyclerView.HORIZONTAL;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -104,7 +107,11 @@ public class ShelvesFragment extends Fragment {
         // Attach the adapter to the RecyclerView
         rvShelves.setAdapter(shelfAdapter);
         // Set layout manager to position the items
-        rvShelves.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvShelves.setLayoutManager(layoutManager);
+        // add divider between items
+        DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
+        rvShelves.addItemDecoration(itemDecor);
         // enable swipe to delete
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override

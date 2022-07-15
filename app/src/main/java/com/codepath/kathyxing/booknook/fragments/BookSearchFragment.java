@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -55,7 +57,7 @@ public class BookSearchFragment extends Fragment {
 
     // the fragment parameters
     public static final String TAG = "BookSearchFragment";
-    public static final int MAX_RESULTS = 10;
+    public static final int MAX_RESULTS = 20;
     private RecyclerView rvBooks;
     private LottieAnimationView avBookSearchLoading;
     private TextView tvNoResults;
@@ -73,6 +75,7 @@ public class BookSearchFragment extends Fragment {
     private String savedQuery;
     private int pageNumber = 0;
     private Book recommendedBook;
+    private SearchView searchView;
 
     // Required empty public constructor
     public BookSearchFragment() {
@@ -189,7 +192,7 @@ public class BookSearchFragment extends Fragment {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_book_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         // set actions for when the searchItem expands and collapses
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -218,7 +221,7 @@ public class BookSearchFragment extends Fragment {
         });
         // Set the textlistener for the searchview
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            // TODO: results show up as user types
+            // TODO: hide keyboard when user scrolls
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // set the page number back to 0
@@ -235,6 +238,19 @@ public class BookSearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 tvNoResults.setVisibility(View.GONE);
+                if (newText.length() > 3) {
+                    // set the page number back to 0
+                    pageNumber = 0;
+                    // perform query here
+                    fetchBooks(newText, pageNumber);
+                    // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                    //searchView.clearFocus();
+                    // save the query
+                    savedQuery = newText;
+                } else {
+                    // clear the adapter
+                    bookAdapter.clear();
+                }
                 return false;
             }
         });
@@ -283,6 +299,22 @@ public class BookSearchFragment extends Fragment {
                     Log.e(TAG, "Request failed with code " + errorCode);
                 }
                 avBookSearchLoading.setVisibility(View.GONE);
+            }
+        });
+        // hide the keyboard on recyclerview touch
+        rvBooks.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                //Hide keyboard code
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+                //Find the currently focused view, so we can grab the correct window token from it.
+                View view = getActivity().getCurrentFocus();
+                //If no view currently has focus, create a new one, just so we can grab a window token from it
+                if (view == null) {
+                    view = new View(getContext());
+                }
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                return false;
             }
         });
     }
@@ -359,8 +391,8 @@ public class BookSearchFragment extends Fragment {
                         }
                     }
                 }
-                tvRecommendationTitle.setVisibility(View.VISIBLE);
-                rlBookRecommendation.setVisibility(View.VISIBLE);
+                tvRecommendationTitle.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
+                rlBookRecommendation.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
             }
 
             @Override

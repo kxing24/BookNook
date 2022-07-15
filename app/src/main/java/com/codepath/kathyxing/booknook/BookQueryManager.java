@@ -1,5 +1,6 @@
 package com.codepath.kathyxing.booknook;
 
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.codepath.asynchttpclient.AsyncHttpClient;
@@ -54,7 +55,8 @@ public class BookQueryManager {
 
     // Method for accessing the search API
     public void getBooks(final String query, int startIndex, int maxResults, final BooksCallback booksCallback) {
-        String url = getApiUrl("books/v1/volumes?q=" + query + "&startIndex=" + startIndex + "&maxResults=" + maxResults);
+        String url = getApiUrl("books/v1/volumes?q=" + query + "&startIndex=" + startIndex + "&maxResults=" + maxResults + "&key=AIzaSyCIH6JcoToLAbhhOizI9JEngHhgx8X6Bso");
+        Log.i(TAG, "url: " + url);
         client.get(url, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON response) {

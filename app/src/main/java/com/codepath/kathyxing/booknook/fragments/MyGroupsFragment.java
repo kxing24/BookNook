@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +53,6 @@ public class MyGroupsFragment extends Fragment {
     private ArrayList<Group> myGroups;
     private ProgressBar pbLoading;
     private TextView tvNoGroups;
-
 
     // Required empty public constructor
     public MyGroupsFragment() {
@@ -118,7 +118,11 @@ public class MyGroupsFragment extends Fragment {
         // Attach the adapter to the RecyclerView
         rvMyGroups.setAdapter(groupAdapter);
         // Set layout manager to position the items
-        rvMyGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvMyGroups.setLayoutManager(layoutManager);
+        // add divider between items
+        DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
+        rvMyGroups.addItemDecoration(itemDecor);
         queryGroups();
     }
 

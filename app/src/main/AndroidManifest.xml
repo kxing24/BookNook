@@ -31,49 +31,60 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".BaseActivity"
+            android:name=".activities.BaseActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.SplashScreenActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.AddShelfActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:theme="@style/AddShelfDialogTheme" />
         <activity
             android:name=".activities.ForgotPasswordActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.SelectUsersActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.UserProfileActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.JoinGroupActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:theme="@style/JoinGroupDialogTheme" />
         <activity
             android:name=".activities.ComposeActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.GroupFeedActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.SignupActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"
-            android:exported="false"></activity>
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <provider
