@@ -6,16 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".fragments.ShelvesFragment">
 
+    <RelativeLayout
+        android:id="@+id/rlTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_variant"
+        android:paddingTop="3dp"
+        android:paddingBottom="5dp">
+
+        <Spinner
+            android:id="@+id/spinnerSortShelves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tvSortBy"
+            android:backgroundTint="@color/white" />
+
+        <TextView
+            android:id="@+id/tvSortBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="5dp"
+            android:text="Sort by:"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShelves"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/rlTopBar"
+        android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp" />
 
     <ProgressBar
         android:id="@+id/pbLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/rlTopBar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
 

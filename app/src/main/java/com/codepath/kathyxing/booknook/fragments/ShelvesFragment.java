@@ -15,7 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +58,7 @@ public class ShelvesFragment extends Fragment {
     private ArrayList<Shelf> shelves;
     private ProgressBar pbLoading;
     private TextView tvNoShelves;
+    private Spinner spinnerSortShelves;
 
     public ShelvesFragment() {
         // Required empty public constructor
@@ -87,6 +91,27 @@ public class ShelvesFragment extends Fragment {
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoShelves = view.findViewById(R.id.tvNoShelves);
         FloatingActionButton btnAddShelf = view.findViewById(R.id.btnAddShelf);
+        spinnerSortShelves = view.findViewById(R.id.spinnerSortShelves);
+        // set up the spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.shelf_sorting_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSortShelves.setAdapter(adapter);
+        spinnerSortShelves.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String valueFromSpinner = parent.getItemAtPosition(position).toString();
+                if (valueFromSpinner.equals(getString(R.string.date_added))) {
+                    queryShelves(ParseQueryUtilities.SORT_BY_DATE_ADDED);
+                }
+                if (valueFromSpinner.equals(getString(R.string.shelf_name))) {
+                    queryShelves(ParseQueryUtilities.SORT_BY_SHELF_NAME);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         // set up a click handler for rlAddShelf
         btnAddShelf.setOnClickListener(v -> goAddShelfActivity());
         // set up a click handler for bookAdapter
@@ -119,7 +144,6 @@ public class ShelvesFragment extends Fragment {
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
-
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 // get the shelf swiped and its position
@@ -127,7 +151,6 @@ public class ShelvesFragment extends Fragment {
                 // prompt for confirmation of item removal
                 showRemoveShelfConfirmation(shelf, viewHolder.getAdapterPosition());
             }
-
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -151,7 +174,6 @@ public class ShelvesFragment extends Fragment {
                 icon.draw(c);
             }
         }).attachToRecyclerView(rvShelves);
-        queryShelves();
     }
 
     @Override
@@ -163,10 +185,29 @@ public class ShelvesFragment extends Fragment {
                 Shelf shelf = (Shelf) data.getExtras().get("shelf");
                 // Update the RV with the shelf
                 // Modify data source of shelves
-                shelves.add(0, shelf);
+                int position = -1;
+                String valueFromSpinner = spinnerSortShelves.getSelectedItem().toString();
+                if (valueFromSpinner.equals(getString(R.string.date_added))) {
+                    position = 0;
+                    shelves.add(position, shelf);
+                }
+                if (valueFromSpinner.equals(getString(R.string.shelf_name))) {
+                    // find the shelf's alphabetical location
+                    for (int i = 0; i < shelves.size(); i++) {
+                        if (shelves.get(i).getShelfName().compareToIgnoreCase(shelf.getShelfName()) >= 0) {
+                            position = i;
+                            shelves.add(position, shelf);
+                            break;
+                        }
+                    }
+                }
+                if (position < 0) {
+                    position = shelves.size();
+                    shelves.add(shelf);
+                }
                 // Update the adapter
-                shelfAdapter.notifyItemInserted(0);
-                rvShelves.smoothScrollToPosition(0);
+                shelfAdapter.notifyItemInserted(position);
+                rvShelves.smoothScrollToPosition(position);
                 tvNoShelves.setVisibility(View.GONE);
             }
         }
@@ -206,7 +247,8 @@ public class ShelvesFragment extends Fragment {
     }
 
     // get the shelves and add them to the shelves list
-    private void queryShelves() {
+    private void queryShelves(int sortBy) {
+        shelves.clear();
         FindCallback<Shelf> queryShelvesCallback = (objects, e) -> {
             // check for errors
             if (e != null) {
@@ -218,11 +260,12 @@ public class ShelvesFragment extends Fragment {
             } else {
                 // save received shelves to list and notify adapter of new data
                 shelves.addAll(objects);
+                rvShelves.smoothScrollToPosition(0);
                 shelfAdapter.notifyDataSetChanged();
             }
             pbLoading.setVisibility(View.GONE);
         };
-        ParseQueryUtilities.queryShelvesAsync(queryShelvesCallback);
+        ParseQueryUtilities.queryShelvesAsync(sortBy, queryShelvesCallback);
     }
 
     private void goAddShelfActivity() {

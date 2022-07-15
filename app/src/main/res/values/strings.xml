@@ -18,6 +18,19 @@
     <string name="shelves">Shelves</string>
     <string name="my_groups">My Groups</string>
     <string name="friends">Friends</string>
+    <string name="date_added">Date added</string>
+    <string name="date_joined">Date joined</string>
+    <string name="shelf_name">Shelf name</string>
+    <string name="group_name">Shelf name</string>
+    <string name="book_count">Book count</string>
+    <string-array name="shelf_sorting_array">
+        <item>@string/date_added</item>
+        <item>@string/shelf_name</item>
+    </string-array>
+    <string-array name="group_sorting_array">
+        <item>@string/date_joined</item>
+        <item>@string/group_name</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -2,6 +2,7 @@ package com.codepath.kathyxing.booknook;
 
 import androidx.annotation.NonNull;
 
+import com.codepath.kathyxing.booknook.fragments.ShelvesFragment;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
 import com.codepath.kathyxing.booknook.parse_classes.BookRecommendation;
@@ -34,6 +35,12 @@ import java.util.List;
 import java.util.Locale;
 
 public final class ParseQueryUtilities {
+
+    public static final int SORT_BY_DATE_ADDED = 100;
+    public static final int SORT_BY_DATE_JOINED = 200;
+    public static final int SORT_BY_SHELF_NAME = 300;
+    public static final int SORT_BY_GROUP_NAME = 400;
+
     /**
      * Check if the book group exists
      *
@@ -180,14 +187,22 @@ public final class ParseQueryUtilities {
     /**
      * Get the current user's groups
      *
+     * @param sortBy what to sort the groups by
      * @param queryGroupsCallback the callback for the async function
      */
-    public static void queryGroupsAsync(@NonNull FindCallback<Member> queryGroupsCallback) {
+    public static void queryGroupsAsync(int sortBy, @NonNull FindCallback<Member> queryGroupsCallback) {
         // specify what type of data we want to query - Groups.class
         ParseQuery<Member> query = ParseQuery.getQuery(Member.class);
         // get data where the "from" (user) parameter matches the current user
         query.whereEqualTo(Member.KEY_FROM, ParseUser.getCurrentUser());
-        query.addDescendingOrder(Member.KEY_CREATED_AT);
+        query.include(Member.KEY_TO);
+        switch (sortBy) {
+            case SORT_BY_DATE_JOINED:
+                query.addDescendingOrder(Member.KEY_CREATED_AT);
+                break;
+            default:
+                break;
+        }
         // start an asynchronous call for groups
         query.findInBackground(queryGroupsCallback);
     }
@@ -195,12 +210,22 @@ public final class ParseQueryUtilities {
     /**
      * Get the current user's shelves
      *
+     * @param sortBy what to sort the shelves by
      * @param queryShelvesCallback the callback for the async function
      */
-    public static void queryShelvesAsync(@NonNull FindCallback<Shelf> queryShelvesCallback) {
+    public static void queryShelvesAsync(int sortBy, @NonNull FindCallback<Shelf> queryShelvesCallback) {
         ParseQuery<Shelf> query = ParseQuery.getQuery(Shelf.class);
         query.whereEqualTo(Shelf.KEY_USER, ParseUser.getCurrentUser());
-        query.addDescendingOrder(Shelf.KEY_CREATED_AT);
+        switch (sortBy) {
+            case SORT_BY_DATE_ADDED:
+                query.addDescendingOrder(Shelf.KEY_CREATED_AT);
+                break;
+            case SORT_BY_SHELF_NAME:
+                query.addAscendingOrder(Shelf.KEY_SHELF_NAME);
+                break;
+            default:
+                break;
+        }
         query.findInBackground(queryShelvesCallback);
     }
 

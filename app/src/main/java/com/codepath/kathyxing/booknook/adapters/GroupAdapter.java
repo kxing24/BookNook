@@ -92,7 +92,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, int position) {
         // Get the data model based on position
-        Log.i(TAG, "position is " + position);
         Group group = groups.get(position);
         // Populate data into the views
         try {
@@ -149,5 +148,11 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     // Easy access to the context object in the recyclerview
     private Context getContext() {
         return context;
+    }
+
+    // Clean all elements of the recycler
+    public void clear() {
+        groups.clear();
+        notifyDataSetChanged();
     }
 }

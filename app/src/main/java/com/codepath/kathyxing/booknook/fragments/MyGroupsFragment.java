@@ -9,7 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,8 +40,18 @@ import com.parse.ParseException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import okhttp3.Headers;
+
+class GroupComparator implements Comparator<Group> {
+    // sort in ascending order by group name
+    @Override
+    public int compare(Group group1, Group group2) {
+        return group1.getGroupName().compareToIgnoreCase(group2.getGroupName());
+    }
+}
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,6 +67,7 @@ public class MyGroupsFragment extends Fragment {
     private ArrayList<Group> myGroups;
     private ProgressBar pbLoading;
     private TextView tvNoGroups;
+    private Spinner spinnerSortGroups;
 
     // Required empty public constructor
     public MyGroupsFragment() {
@@ -86,6 +100,27 @@ public class MyGroupsFragment extends Fragment {
         pbLoading = view.findViewById(R.id.pbLoading);
         tvNoGroups = view.findViewById(R.id.tvNoGroups);
         FloatingActionButton btnJoinGroup = view.findViewById(R.id.btnJoinGroup);
+        spinnerSortGroups = view.findViewById(R.id.spinnerSortGroups);
+        // set up the spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.group_sorting_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSortGroups.setAdapter(adapter);
+        spinnerSortGroups.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String valueFromSpinner = parent.getItemAtPosition(position).toString();
+                if (valueFromSpinner.equals(getString(R.string.date_joined))) {
+                    queryGroups(ParseQueryUtilities.SORT_BY_DATE_JOINED);
+                }
+                if (valueFromSpinner.equals(getString(R.string.group_name))) {
+                    queryGroups(ParseQueryUtilities.SORT_BY_GROUP_NAME);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         // set up a click handler for rlJoinGroup
         btnJoinGroup.setOnClickListener(v -> goJoinGroupActivity());
         // set up a click handler for groupAdapter
@@ -124,7 +159,6 @@ public class MyGroupsFragment extends Fragment {
         // add divider between items
         DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
         rvMyGroups.addItemDecoration(itemDecor);
-        queryGroups();
     }
 
     @Override
@@ -135,10 +169,29 @@ public class MyGroupsFragment extends Fragment {
                 Group group = (Group) data.getExtras().get("group");
                 // Update the RV with the group
                 // Modify data source of groups
-                myGroups.add(0, group);
+                int position = -1;
+                String valueFromSpinner = spinnerSortGroups.getSelectedItem().toString();
+                if (valueFromSpinner.equals(getString(R.string.date_joined))) {
+                    position = 0;
+                    myGroups.add(position, group);
+                }
+                if (valueFromSpinner.equals(getString(R.string.shelf_name))) {
+                    // find the group's alphabetical location
+                    for (int i = 0; i < myGroups.size(); i++) {
+                        if (myGroups.get(i).getGroupName().compareToIgnoreCase(group.getGroupName()) >= 0) {
+                            position = i;
+                            myGroups.add(position, group);
+                            break;
+                        }
+                    }
+                }
+                if (position < 0) {
+                    position = myGroups.size();
+                    myGroups.add(group);
+                }
                 // Update the adapter
-                groupAdapter.notifyItemInserted(0);
-                rvMyGroups.smoothScrollToPosition(0);
+                groupAdapter.notifyItemInserted(position);
+                rvMyGroups.smoothScrollToPosition(position);
                 tvNoGroups.setVisibility(View.GONE);
             }
             if (requestCode == LEFT_GROUP) {
@@ -161,7 +214,8 @@ public class MyGroupsFragment extends Fragment {
     }
 
     // get the groups and add them to the myGroups list
-    private void queryGroups() {
+    private void queryGroups(int sortBy) {
+        groupAdapter.clear();
         FindCallback<Member> queryGroupsCallback = (memberList, e) -> {
             // check for errors
             if (e != null) {
@@ -175,11 +229,14 @@ public class MyGroupsFragment extends Fragment {
                 for (Member member : memberList) {
                     myGroups.add(member.getTo());
                 }
+                if (sortBy == ParseQueryUtilities.SORT_BY_GROUP_NAME) {
+                    Collections.sort(myGroups, new GroupComparator());
+                }
                 groupAdapter.notifyDataSetChanged();
             }
             pbLoading.setVisibility(View.GONE);
         };
-        ParseQueryUtilities.queryGroupsAsync(queryGroupsCallback);
+        ParseQueryUtilities.queryGroupsAsync(sortBy, queryGroupsCallback);
     }
 
     private void goJoinGroupActivity() {
