@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -103,7 +104,11 @@ public class SearchResultsFragment extends Fragment {
         // Attach the adapter to the RecyclerView
         rvBooks.setAdapter(bookAdapter);
         // Set layout manager to position the items
-        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvBooks.setLayoutManager(layoutManager);
+        // add divider between items
+        DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
+        rvBooks.addItemDecoration(itemDecor);
         // set up a click handler for bookAdapter
         bookAdapter.setOnItemClickListener((itemView, position) -> {
             // get the book clicked

@@ -6,12 +6,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,14 +27,27 @@ import com.codepath.kathyxing.booknook.adapters.ShelfDetailAdapter;
 import com.codepath.kathyxing.booknook.models.Book;
 import com.codepath.kathyxing.booknook.BookQueryManager;
 import com.codepath.kathyxing.booknook.parse_classes.BookOnShelf;
+import com.codepath.kathyxing.booknook.parse_classes.Group;
 import com.codepath.kathyxing.booknook.parse_classes.Shelf;
 import com.parse.FindCallback;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import okhttp3.Headers;
+
+class AuthorComparator implements Comparator<BookOnShelf> {
+    // sort in ascending order by author surname
+    @Override
+    public int compare(BookOnShelf bookOnShelf1, BookOnShelf bookOnShelf2) {
+        String author1Surname = bookOnShelf1.getBookAuthor().substring(bookOnShelf1.getBookAuthor().lastIndexOf(" ") + 1);
+        String author2Surname = bookOnShelf2.getBookAuthor().substring(bookOnShelf2.getBookAuthor().lastIndexOf(" ") + 1);
+        return author1Surname.compareToIgnoreCase(author2Surname);
+    }
+}
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +62,7 @@ public class ShelfDetailFragment extends Fragment {
     private ShelfDetailAdapter shelfDetailAdapter;
     private ArrayList<BookOnShelf> booksOnShelf;
     private Shelf shelf;
+    private Spinner spinnerSortBooks;
 
     public ShelfDetailFragment() {
         // Required empty public constructor
@@ -56,7 +74,7 @@ public class ShelfDetailFragment extends Fragment {
         // Set the toolbar text
         Activity activity = getActivity();
         if (activity != null) {
-            activity.setTitle("Shelf Details");
+            activity.setTitle(shelf.getShelfName());
         }
         ((MainActivity) getActivity()).showBackButton();
     }
@@ -79,12 +97,32 @@ public class ShelfDetailFragment extends Fragment {
         rvBooksOnShelf = view.findViewById(R.id.rvBooksOnShelf);
         tvNoBooks = view.findViewById(R.id.tvNoBooks);
         pbLoading = view.findViewById(R.id.pbLoading);
+        spinnerSortBooks = view.findViewById(R.id.spinnerSortBooks);
         booksOnShelf = new ArrayList<>();
         shelfDetailAdapter = new ShelfDetailAdapter(getContext(), booksOnShelf);
-        // Attach the adapter to the RecyclerView
-        rvBooksOnShelf.setAdapter(shelfDetailAdapter);
-        // Set layout manager to position the items
-        rvBooksOnShelf.setLayoutManager(new LinearLayoutManager(getContext()));
+        // set up the spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.book_sorting_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSortBooks.setAdapter(adapter);
+        spinnerSortBooks.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String valueFromSpinner = parent.getItemAtPosition(position).toString();
+                if (valueFromSpinner.equals(getString(R.string.date_added))) {
+                    getBooksOnShelf(ParseQueryUtilities.SORT_BY_DATE_ADDED);
+                }
+                if (valueFromSpinner.equals(getString(R.string.title))) {
+                    getBooksOnShelf(ParseQueryUtilities.SORT_BY_TITLE);
+                }
+                if (valueFromSpinner.equals(getString(R.string.author))) {
+                    getBooksOnShelf(ParseQueryUtilities.SORT_BY_AUTHOR);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
         // set up a click handler for shelfDetailAdapter
         shelfDetailAdapter.setOnItemClickListener((itemView, position) -> {
             // get the BookOnShelf clicked
@@ -114,10 +152,17 @@ public class ShelfDetailFragment extends Fragment {
                 }
             });
         });
-        getBooksOnShelf();
+        // Attach the adapter to the RecyclerView
+        rvBooksOnShelf.setAdapter(shelfDetailAdapter);
+        // Set layout manager to position the items
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvBooksOnShelf.setLayoutManager(layoutManager);
+        // add divider between items
+        DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
+        rvBooksOnShelf.addItemDecoration(itemDecor);
     }
 
-    private void getBooksOnShelf() {
+    private void getBooksOnShelf(int sortBy) {
         pbLoading.setVisibility(View.VISIBLE);
         // smooth scroll to top
         rvBooksOnShelf.smoothScrollToPosition(0);
@@ -128,6 +173,9 @@ public class ShelfDetailFragment extends Fragment {
             if (e == null) {
                 // Load model objects into the adapter
                 booksOnShelf.addAll(objects);
+                if (sortBy == ParseQueryUtilities.SORT_BY_AUTHOR) {
+                    Collections.sort(booksOnShelf, new AuthorComparator());
+                }
                 // Set view visibilities
                 if (booksOnShelf.isEmpty()) {
                     tvNoBooks.setVisibility(View.VISIBLE);
@@ -138,6 +186,6 @@ public class ShelfDetailFragment extends Fragment {
             }
             pbLoading.setVisibility(View.GONE);
         };
-        ParseQueryUtilities.getBooksOnShelfAsync(shelf, getBooksOnShelfCallback);
+        ParseQueryUtilities.getBooksOnShelfAsync(sortBy, shelf, getBooksOnShelfCallback);
     }
 }

@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,7 +58,7 @@ public class BookSearchFragment extends Fragment {
 
     // the fragment parameters
     public static final String TAG = "BookSearchFragment";
-    public static final int MAX_RESULTS = 20;
+    public static final int MAX_RESULTS = 10;
     private RecyclerView rvBooks;
     private LottieAnimationView avBookSearchLoading;
     private TextView tvNoResults;
@@ -130,7 +131,11 @@ public class BookSearchFragment extends Fragment {
         // Attach the adapter to the RecyclerView
         rvBooks.setAdapter(bookAdapter);
         // Set layout manager to position the items
-        rvBooks.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        rvBooks.setLayoutManager(layoutManager);
+        // add divider between items
+        DividerItemDecoration itemDecor = new DividerItemDecoration(requireContext(), layoutManager.getOrientation());
+        rvBooks.addItemDecoration(itemDecor);
         // set up a click handler for the advanced search button
         btnAdvancedSearch.setOnClickListener(v -> {
             // swap in the advanced search fragment
@@ -276,7 +281,9 @@ public class BookSearchFragment extends Fragment {
             public void onSuccess(int statusCode, ArrayList<Book> bookList, int totalItems) {
                 if (totalItems == 0) {
                     tvNoResults.setVisibility(View.VISIBLE);
+                    bookAdapter.clear();
                 } else {
+                    tvNoResults.setVisibility(View.GONE);
                     // Load model objects into the adapter
                     books.addAll(bookList);
                     bookAdapter.notifyDataSetChanged();
@@ -294,6 +301,7 @@ public class BookSearchFragment extends Fragment {
             public void onFailure(int errorCode) {
                 if (errorCode == BookQueryManager.NO_BOOKS_FOUND) {
                     tvNoResults.setVisibility(View.VISIBLE);
+                    bookAdapter.clear();
                 } else {
                     Log.e(TAG, "Request failed with code " + errorCode);
                 }
@@ -386,8 +394,10 @@ public class BookSearchFragment extends Fragment {
                         }
                     }
                 }
-                tvRecommendationTitle.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
-                rlBookRecommendation.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
+                if (searchView != null) {
+                    tvRecommendationTitle.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
+                    rlBookRecommendation.setVisibility(searchView.isIconified() ? View.VISIBLE : View.GONE);
+                }
             }
 
             @Override

@@ -240,7 +240,7 @@ public class ShelvesFragment extends Fragment {
                 Log.e(TAG, "issue deleting book on shelf", e);
             }
         };
-        ParseQueryUtilities.getBooksOnShelfAsync(shelf, getBooksOnShelfCallback);
+        ParseQueryUtilities.getBooksOnShelfAsync(0, shelf, getBooksOnShelfCallback);
         // remove shelf from the adapter
         shelves.remove(shelf);
         shelfAdapter.notifyItemRemoved(position);

@@ -40,6 +40,8 @@ public final class ParseQueryUtilities {
     public static final int SORT_BY_DATE_JOINED = 200;
     public static final int SORT_BY_SHELF_NAME = 300;
     public static final int SORT_BY_GROUP_NAME = 400;
+    public static final int SORT_BY_TITLE = 500;
+    public static final int SORT_BY_AUTHOR = 600;
 
     /**
      * Check if the book group exists
@@ -715,11 +717,21 @@ public final class ParseQueryUtilities {
      * @param shelf the shelf
      * @param getBooksOnShelfCallback the callback for the async function
      */
-    public static void getBooksOnShelfAsync(@NonNull Shelf shelf,
+    public static void getBooksOnShelfAsync(int sortBy, @NonNull Shelf shelf,
                                             @NonNull FindCallback<BookOnShelf> getBooksOnShelfCallback) {
         ParseQuery<BookOnShelf> query = ParseQuery.getQuery(BookOnShelf.class);
         query.whereEqualTo(BookOnShelf.KEY_SHELF_ID, shelf.getObjectId());
         query.whereEqualTo(BookOnShelf.KEY_USER, ParseUser.getCurrentUser());
+        switch (sortBy) {
+            case SORT_BY_DATE_ADDED:
+                query.addDescendingOrder(BookOnShelf.KEY_CREATED_AT);
+                break;
+            case SORT_BY_TITLE:
+                query.addAscendingOrder(BookOnShelf.KEY_BOOK_TITLE);
+                break;
+            default:
+                break;
+        }
         query.findInBackground(getBooksOnShelfCallback);
     }
 

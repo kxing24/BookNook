@@ -22,6 +22,8 @@
     <string name="date_joined">Date joined</string>
     <string name="shelf_name">Shelf name</string>
     <string name="group_name">Shelf name</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
     <string name="book_count">Book count</string>
     <string-array name="shelf_sorting_array">
         <item>@string/date_added</item>
@@ -30,6 +32,11 @@
     <string-array name="group_sorting_array">
         <item>@string/date_joined</item>
         <item>@string/group_name</item>
+    </string-array>
+    <string-array name="book_sorting_array">
+        <item>@string/date_added</item>
+        <item>@string/title</item>
+        <item>@string/author</item>
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
