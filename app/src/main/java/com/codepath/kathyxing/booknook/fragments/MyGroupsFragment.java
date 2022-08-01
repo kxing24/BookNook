@@ -175,7 +175,7 @@ public class MyGroupsFragment extends Fragment {
                     position = 0;
                     myGroups.add(position, group);
                 }
-                if (valueFromSpinner.equals(getString(R.string.shelf_name))) {
+                if (valueFromSpinner.equals(getString(R.string.group_name))) {
                     // find the group's alphabetical location
                     for (int i = 0; i < myGroups.size(); i++) {
                         if (myGroups.get(i).getGroupName().compareToIgnoreCase(group.getGroupName()) >= 0) {
